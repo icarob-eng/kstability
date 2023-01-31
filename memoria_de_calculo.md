@@ -7,7 +7,7 @@ utlizadas pelo projeto kstability.
 
 ## Algebra linear
 
-As operações de algebra linear foram definidas na classe [`Vector`](https://github.com/icarob-eng/Estabilidade-IO/blob/main/app/src/main/java/com/montaigne/estabilidade_io/Models.kt), transcrita abaixo:
+As operações de algebra linear foram definidas na classe [`Vector`](https://github.com/icarob-eng/kstability/blob/main/src/commonMain/kotlin/com/kstabilty/Models.kt), transcrita abaixo:
 
 ```kotlin
 data class Vector(val x: Float, val y: Float) {
