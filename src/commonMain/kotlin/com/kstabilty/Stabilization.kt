@@ -13,23 +13,23 @@ class Stabilization {
         fun isStable(structure: Structure) = getResultMomentum(structure) == 0F &&
                 getResultForce(structure) == Vector(0F,0F)
 
+        /**
+         * Read "momentum" as "bending moment".
+         */
         fun getResultMomentum(structure: Structure, axis: Vector = Vector(0F, 0F)): Float {
-            /**
-             * Read "momentum" as "bending moment".
-             */
             var momentum = 0F
             for (load in structure.getEqvLoads())
                 momentum += (load.knot.pos - axis).crossModule(load.vector)
-                // T = d x F; d = d1 - d_origin
+            // T = d x F; d = d1 - d_origin
 
             return momentum
         }
 
+        /**
+         * Note that the result type is a vector, not a laod, since the bending moment from
+         * the resultant force is calculated in `getResultMomentum`.
+         */
         fun getResultForce(structure: Structure): Vector {
-            /**
-             * Note that the result type is a vector, not a laod, since the bending moment from
-             * the resultant force is calculated in `getResultMomentum`.
-             */
             var result = Vector(0F, 0F)
             for (load in structure.getEqvLoads())
                 result += load.vector
@@ -37,13 +37,12 @@ class Stabilization {
             return result
         }
 
+        /**
+         * Return reactions for a support of second gender A and other of the first, B.
+         * The formula is derived in the `algebraic_formulations.ipynb` file.
+         */
         fun getReactionsAB(supportA: Support, supportB: Support,
                            resultForce: Vector, resultMomentum: Float): Pair<Vector, Vector> {
-            /**
-             * Return reactions for a support of second gender A and other of the first, B.
-             * The formula is derived in the `algebraic_formulations.ipynb` file.
-             */
-
             val ra = supportA.knot.pos
             val rb = supportB.knot.pos
             val c = resultForce
@@ -62,12 +61,11 @@ class Stabilization {
             return Pair(Vector(ax, ay), i * k)
         }
 
+        /**
+         * Makes the passed structure stable by adding loads or momenta to the adequate
+         * supports. Raises an assertion error if it doesn't have a way to solve de structure.
+         */
         fun stabilize(structure: Structure) {
-            /**
-             * Makes the passed structure stable by adding loads or momenta to the adequate
-             * supports. Raises an assertion error if it doesn't have a way to solve de structure.
-             */
-
 //            assert(isStable(structure))  // todo: handle else case
 
             val resultMomentum = getResultMomentum(structure)
@@ -107,5 +105,6 @@ class Stabilization {
                 }
             }
         }
+
     }
 }

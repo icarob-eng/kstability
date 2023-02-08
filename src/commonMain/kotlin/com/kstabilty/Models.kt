@@ -11,7 +11,8 @@ object Consts {
 }
 
 enum class SupportGender (val reactions: Int){
-    FIRST(1), SECOND(2), THIRD(3)
+    FIRST(1), SECOND(2), THIRD(3),
+    ROLLER(1), PINNED(2), FIXED(3)
 }
 
 data class Vector(val x: Float, val y: Float) {
@@ -119,4 +120,3 @@ data class Structure(val name: String, val knots: MutableList<Knot> = mutableLis
     fun getDistributedLoads() = knots.flatMap { it.distributedLoads }
     fun getEqvLoads() = getLoads() + getDistributedLoads().map { it.getEqvLoad() }
 }
-
