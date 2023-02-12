@@ -2,6 +2,14 @@ package com.kstabilty
 
 class Stabilization {
     companion object {
+        /**
+         * Check if given structure is isostatic.
+         * Courrent algorithm checks if structure have 3 support genders.
+         *
+         * @param structure Structure to be chaked. Needs to have supports
+         * @return Boolean: true if structure have 3 degrees of support
+         * @see isStable
+         */
         fun isIsostatic(structure: Structure): Boolean {
             // todo: advanced method for checking isostacity
             var genders = 0
@@ -10,11 +18,22 @@ class Stabilization {
             return genders == 3
         }
 
+        /**
+         * Checks if given structure is stabilazed i.e. resultant force and banding moment are both zero
+         *
+         * @see isIsostatic
+         * @see getReactionsAB
+         */
         fun isStable(structure: Structure) = getResultMomentum(structure) == 0F &&
                 getResultForce(structure) == Vector(0F,0F)
 
         /**
+         * Sums bending moment in given structure, from the given rotation axis.
          * Read "momentum" as "bending moment".
+         *
+         * @param structure Structure from witch the resultant bending moment is calculated
+         * @param axis Axis of rotation to calculate the bending momentum
+         * @return Given structure's resultant beindig moment
          */
         fun getResultMomentum(structure: Structure, axis: Vector = Vector(0F, 0F)): Float {
             var momentum = 0F
@@ -26,8 +45,12 @@ class Stabilization {
         }
 
         /**
+         * Sums all loads and equivalent loads in given structure.
          * Note that the result type is a vector, not a laod, since the bending moment from
          * the resultant force is calculated in `getResultMomentum`.
+         *
+         * @param structure Structure from witch the resultant force is calculated
+         * @return Given structure's resultant force, as a vector, without point of application
          */
         fun getResultForce(structure: Structure): Vector {
             var result = Vector(0F, 0F)
@@ -40,6 +63,13 @@ class Stabilization {
         /**
          * Return reactions for a support of second gender A and other of the first, B.
          * The formula is derived in the `algebraic_formulations.ipynb` file.
+         *
+         * @param supportA Second gender support
+         * @param supportB First gender support
+         * @param resultForce Structure's resultant force, calculated by `getResultForce()`
+         * @param resultMomentum Structure's resultant force, calculated by `getResultMomentum()`
+         * @see getResultForce
+         * @see getResultMomentum
          */
         fun getReactionsAB(supportA: Support, supportB: Support,
                            resultForce: Vector, resultMomentum: Float): Pair<Vector, Vector> {
@@ -63,7 +93,15 @@ class Stabilization {
 
         /**
          * Makes the passed structure stable by adding loads or momenta to the adequate
-         * supports. Raises an assertion error if it doesn't have a way to solve de structure.
+         * supports.
+         *
+         * @throws AssertionError throwed if it doesn't have an algorithm to solve de structure.
+         * @param structure Structure to be stabilized. It will be altered
+         * @return Nothing
+         * @see isIsostatic
+         * @see getResultForce
+         * @see getResultMomentum
+         * @see getReactionsAB Algorithm used for stuctures with two supports.
          */
         fun stabilize(structure: Structure) {
 //            assert(isStable(structure))  // todo: handle else case
