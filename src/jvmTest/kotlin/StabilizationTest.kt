@@ -152,4 +152,40 @@ class StabilizationTest {
         Stabilization.stabilize(structureSample)
         assertTrue(Stabilization.isStable(structureSample))
     }
+
+    @Test
+    fun isNotIsostaticTest() {
+        val knotSampleA1 = Knot("A", Vector(0F, 2F))
+        val knotSampleB1 = Knot("B", Vector(4F, 2F))
+
+        Load(knotSampleA1, Vector(0, -3))
+        Support(knotSampleB1, SupportGender.SECOND, Consts.HORIZONTAL)
+
+        val structureB = Structure("Fixed support strcuture",
+            mutableListOf(knotSampleA1, knotSampleB1)
+        )
+
+        assertThrows(IllegalArgumentException::class.java) {Stabilization.stabilize(structureB)}
+    }
+
+    @Test
+    fun isStabilizationStableFixedSupportTest() {
+        val knotSampleA1 = Knot("A", Vector(0F, 2F))
+        val knotSampleB1 = Knot("B", Vector(4F, 2F))
+
+        Load(knotSampleA1, Vector(0, -3))
+        Support(knotSampleB1, SupportGender.THIRD, Consts.HORIZONTAL)
+
+        val structureB = Structure("Fixed support strcuture",
+            mutableListOf(knotSampleA1, knotSampleB1)
+        )
+
+        Stabilization.stabilize(structureB)
+
+        val expectedResultForce = Vector(0, 0)
+        val expectedResultMomenta = 0F
+
+        assertEquals(expectedResultForce, Stabilization.getResultForce(structureB))
+        assertEquals(expectedResultMomenta, Stabilization.getResultMomentum(structureB))
+    }
 }

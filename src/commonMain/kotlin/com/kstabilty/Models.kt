@@ -11,8 +11,9 @@ object Consts {
 }
 
 enum class SupportGender (val reactions: Int){
-    FIRST(1), SECOND(2), THIRD(3),
-    ROLLER(1), PINNED(2), FIXED(3)
+    FIRST(1), // roller
+    SECOND(2),  // pinned
+    THIRD(3), // fixed
 }
 
 data class Vector(val x: Float, val y: Float) {
@@ -74,7 +75,7 @@ data class Support(val knot: Knot, val gender: SupportGender, val dir: Vector) {
     init { knot.support = this }
 }
 
-data class Bar(val knot1: Knot, val knot2: Knot) {
+data class Bar(private val knot1: Knot, private val knot2: Knot) {
     init {
         knot1.bars.add(this)
         knot2.bars.add(this)
@@ -116,6 +117,7 @@ data class DistributedLoad(val knot1: Knot, val knot2: Knot, val norm: Float) {
 data class Structure(val name: String, val knots: MutableList<Knot> = mutableListOf()) {
     fun getSupports() = knots.mapNotNull { it.support }
     fun getBars() = knots.flatMap { it.bars }
+    fun getMomentumLoads() = knots.sumOf { it.momentum.toDouble() }.toFloat()
     fun getLoads() = knots.flatMap { it.loads }
     fun getDistributedLoads() = knots.flatMap { it.distributedLoads }
     fun getEqvLoads() = getLoads() + getDistributedLoads().map { it.getEqvLoad() }

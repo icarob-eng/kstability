@@ -36,7 +36,7 @@ class Stabilization {
          * @return Given structure's resultant beindig moment
          */
         fun getResultMomentum(structure: Structure, axis: Vector = Vector(0F, 0F)): Float {
-            var momentum = 0F
+            var momentum = structure.getMomentumLoads()
             for (load in structure.getEqvLoads())
                 momentum += (load.knot.pos - axis).crossModule(load.vector)
             // T = d x F; d = d1 - d_origin
@@ -101,22 +101,23 @@ class Stabilization {
          * @see isIsostatic
          * @see getResultForce
          * @see getResultMomentum
-         * @see getReactionsAB Algorithm used for stuctures with two supports.
+         * @see getReactionsAB
          */
         fun stabilize(structure: Structure) {
-//            assert(isStable(structure))  // todo: handle else case
-
+            if (! isIsostatic(structure))
+                throw IllegalArgumentException("A estrutura não é isostática")
             val resultMomentum = getResultMomentum(structure)
             val resultForce = getResultForce(structure)
 
             val supports = structure.getSupports()
 
-            if (supports.size == 1) {
-//                assert(supports[0].gender == SupportGender.THIRD)  // todo: handle else case
-                structure.getSupports()[0].knot.momentum -= resultMomentum
+            if (supports.size == 1 && supports[0].gender == SupportGender.THIRD) {
+                structure.getSupports()[0].knot.momentum -= getResultMomentum(structure,
+                    structure.getSupports()[0].knot.pos)
                 Load(structure.getSupports()[0].knot, -resultForce)
             } else {
-//                assert(supports.size == 2)  // todo: handle else case
+                if (supports.size != 2)
+                    throw IllegalArgumentException("A estrutura não é isostática")
 
                 when (SupportGender.SECOND){
                     supports[0].gender -> {  // supports[0] = a
@@ -138,7 +139,7 @@ class Stabilization {
                         Load(structure.getSupports()[0].knot, reactionPair.second)
                     }
                     else -> {
-                        throw AssertionError()  // todo: handle else case
+                        throw IllegalArgumentException("A estrutura não é isostática")
                     }
                 }
             }
