@@ -75,7 +75,7 @@ data class Support(val knot: Knot, val gender: SupportGender, val dir: Vector) {
     init { knot.support = this }
 }
 
-data class Bar(private val knot1: Knot, private val knot2: Knot) {
+data class Bar(val knot1: Knot, val knot2: Knot) {
     init {
         knot1.bars.add(this)
         knot2.bars.add(this)
