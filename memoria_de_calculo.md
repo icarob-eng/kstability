@@ -120,13 +120,18 @@ o nó que serve como eixo de rotação.
 
 ## Cáculo dos esforços nas barras
 
-### Determinação das reações (não implementado)
+### Determinação das cargas resultantes
+As cargas resultantes são determinadas da seguinte forma:
+- Se calcula a força resultante, o que é feito pelo somatório de todas as cargas concentradas e distribuídas adicionadas na estrutura;
+- O momento fletor é calculado pela soma das cargas de momento nos nós somadas ao momento fletor de todas as cargas da estrutura. O momento fletor de uma carga é calculado em relação a um ponto arbitrário, geralmente, a origem do sistema de coordenadas;
 
-Até o momento não foi feita a determinação das reações, tendo se cogitado o seguinte
-procedimento: a partir da quantidade e tipos de apoios, usar algoritmos diferentes para
-adicionar cargas de ração, sejam forças ou momentos fletores nos nós dos apoios.
+### Cálculo das reações de apoio
+Para o cálculo das forças de reação, se emprega dois algoritmos diferentes, para as duas estruturas que o sistema suporta no momento:
+- Determinação de reações de força e momento fletor para uma única viga engastada: basta determinar as resultantes e adicionar cargas opostas;
+- Determinação de forças de reação para uma única viga bi-apoiada em um suporte de primeiro e outro de segundo gênero: o algoritmo para determinar as reações nesta estrutura é o descrito no arquivo `algebraic_formulations.ipybn`;
+
+Após o cálculo, as reações de apoio são adicionadas à estrutura, tornando-a estável. O último passo do sistema é gerar os gráficos de esforços cortantes, valores dos esforços normais e gráficos de momento fletor, para a(s) barra(s) da estrutura. Atualmente só suporta-se uma barra.
 
 ### Etc
 
-Os demais procedimentos de cálculos, como gráfico de esforço cortante ainda não foram implementados
-e sequer planejados.
+Os demais procedimentos de cálculos, como gráfico de esforço cortante ainda não foram implementados.
