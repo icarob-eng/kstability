@@ -113,7 +113,7 @@ object Stabilization {
         if (supports.size == 1 && supports[0].gender == SupportGender.THIRD) {
             structure.getSupports()[0].knot.momentum -= getResultMomentum(structure,
                 structure.getSupports()[0].knot.pos)
-            Load(structure.getSupports()[0].knot, -resultForce)
+            PointLoad(structure.getSupports()[0].knot, -resultForce)
         } else {
             if (supports.size != 2)
                 throw IllegalArgumentException("A estrutura não é isostática")
@@ -125,8 +125,8 @@ object Stabilization {
                         resultForce, resultMomentum
                     )
 
-                    Load(structure.getSupports()[0].knot, reactionPair.first)
-                    Load(structure.getSupports()[1].knot, reactionPair.second)
+                    PointLoad(structure.getSupports()[0].knot, reactionPair.first)
+                    PointLoad(structure.getSupports()[1].knot, reactionPair.second)
                 }
                 supports[1].gender -> {  // supports[1] = a
                     val reactionPair = getReactionsAB(
@@ -134,8 +134,8 @@ object Stabilization {
                         resultForce, resultMomentum
                     )
 
-                    Load(structure.getSupports()[1].knot, reactionPair.first)
-                    Load(structure.getSupports()[0].knot, reactionPair.second)
+                    PointLoad(structure.getSupports()[1].knot, reactionPair.first)
+                    PointLoad(structure.getSupports()[0].knot, reactionPair.second)
                 }
                 else -> {
                     throw IllegalArgumentException("A estrutura não é isostática")

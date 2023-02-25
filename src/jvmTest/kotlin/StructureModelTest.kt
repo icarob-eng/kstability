@@ -29,19 +29,19 @@ class StructureModelTest {
          */
 
         val distributedLoadSample = DistributedLoad(knotSampleB, knotSampleC, 10F)
-        val eqvLoadSample = Load(Knot("", Vector(2F, 2F)), Vector(0F, 20F))
-        assertEquals(true, distributedLoadSample.getEqvLoad() == eqvLoadSample)
+        val eqvPointLoadSample = PointLoad(Knot("", Vector(2F, 2F)), Vector(0F, 20F))
+        assertEquals(true, distributedLoadSample.getEqvLoad() == eqvPointLoadSample)
     }
 
     @Test
     fun structureLoadsHolding() {
         val distributedLoadSampe = DistributedLoad(knotSampleB, knotSampleC, 10F)
-        val loadSampleA = Load(knotSampleB, Vector(0F, 10F))
-        val loadSampleB = Load(knotSampleB, Consts.VERTICAL * 10F)
+        val pointLoadSampleA = PointLoad(knotSampleB, Vector(0F, 10F))
+        val pointLoadSampleB = PointLoad(knotSampleB, Consts.VERTICAL * 10F)
 
         assertEquals(distributedLoadSampe, structureSample.getDistributedLoads()[0])
-        assertEquals(loadSampleA, structureSample.getLoads()[0])
-        assertEquals(loadSampleB, structureSample.getLoads()[1])
+        assertEquals(pointLoadSampleA, structureSample.getLoads()[0])
+        assertEquals(pointLoadSampleB, structureSample.getLoads()[1])
         // kinda surprise that this passes
     }
 
@@ -49,8 +49,8 @@ class StructureModelTest {
     fun structure_getEqvLoads() {
         val expected = setOf(  // using sets gurantees that the order will not matter
             DistributedLoad(knotSampleB, knotSampleC, 10F).getEqvLoad(),
-            Load(knotSampleB, Vector(0F, 10F)),
-            Load(knotSampleB, Consts.VERTICAL * 10F)
+            PointLoad(knotSampleB, Vector(0F, 10F)),
+            PointLoad(knotSampleB, Consts.VERTICAL * 10F)
         )
 
         assertEquals(expected, structureSample.getEqvLoads().toSet())

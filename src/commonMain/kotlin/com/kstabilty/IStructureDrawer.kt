@@ -51,10 +51,10 @@ interface IStructureDrawer {
      * therefore, this method should draw an arrow in the opposite direction of the load's direction, poiting
      * to the knot.
      *
-     * @param load The load that will be drawn
+     * @param pointLoad The load that will be drawn
      * @return void
      */
-    fun drawArrow(load: Load): Nothing
+    fun drawArrow(pointLoad: PointLoad): Nothing
 
     /**
      * Draws several arrows perpendicular to the distributed load's length, putting many points along it and making the

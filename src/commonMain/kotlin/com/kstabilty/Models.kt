@@ -59,7 +59,7 @@ data class Knot(val name: String, val pos: Vector, val structure: Structure? = n
     var support: Support? = null  // only one support by knot
     var momentum = 0F
     val bars: MutableList<Bar> = mutableListOf()
-    val loads: MutableList<Load> = mutableListOf()
+    val pointLoads: MutableList<PointLoad> = mutableListOf()
     val distributedLoads: MutableList<DistributedLoad> = mutableListOf()
 
     init {
@@ -82,11 +82,11 @@ data class Bar(val knot1: Knot, val knot2: Knot) {
     }
 }
 
-data class Load(val knot: Knot, val vector: Vector) {
-    init { knot.loads.add(this) }
+data class PointLoad(val knot: Knot, val vector: Vector) {
+    init { knot.pointLoads.add(this) }
 
     override operator fun equals(other: Any?): Boolean = when (other) {
-        is Load -> this.vector == other.vector && this.knot == other.knot
+        is PointLoad -> this.vector == other.vector && this.knot == other.knot
 
         is DistributedLoad -> this == other.getEqvLoad()
 
@@ -103,7 +103,7 @@ data class DistributedLoad(val knot1: Knot, val knot2: Knot, val norm: Float) {
 
     override operator fun equals(other: Any?) = this.getEqvLoad() == other
 
-    fun getEqvLoad() = Load(
+    fun getEqvLoad() = PointLoad(
         Knot(
             knot1.name + knot2.name,
             (knot1.pos + knot2.pos) / 2,  // midpoint
@@ -118,7 +118,7 @@ data class Structure(val name: String, val knots: MutableList<Knot> = mutableLis
     fun getSupports() = knots.mapNotNull { it.support }
     fun getBars() = knots.flatMap { it.bars }
     fun getMomentumLoads() = knots.sumOf { it.momentum.toDouble() }.toFloat()
-    fun getLoads() = knots.flatMap { it.loads }
+    fun getLoads() = knots.flatMap { it.pointLoads }
     fun getDistributedLoads() = knots.flatMap { it.distributedLoads }
     fun getEqvLoads() = getLoads() + getDistributedLoads().map { it.getEqvLoad() }
 }
