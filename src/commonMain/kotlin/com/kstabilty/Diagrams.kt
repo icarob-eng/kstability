@@ -3,7 +3,7 @@ package com.kstabilty
 import kotlin.math.sqrt
 
 /**
- * Represents a quadratic funtion, even defining the `invoke` operator.
+ * Represents a quadratic funtion defining the `invoke` operator as f(x).
  *
  * Automatically calculates the expresison's delta, roots and vertex.
  */
@@ -25,7 +25,9 @@ data class Quadratic(val a: Double, val b: Double, val c: Double){
  *
  * @see Diagrams.getSections
  */
-data class Section (val bar: Bar, val knot: Knot)
+data class Section (val bar: Bar, val knotInput: Knot) {
+    val knot = bar.makeTangentKnot(knotInput)
+}
 
 object Diagrams {
     // todo: utilizar interface de plotagem
@@ -34,16 +36,19 @@ object Diagrams {
      * Derives a list of sections from a strucure. Each section is defined by a knot, where it begins.
      * The knots are devided by a line perpedicular to the given bar.
      *
+     * **By now this function considers all loads in the structure, not just loads in the bar**
+     *
      * @see Section
      * @param structure The structure that will be devided.
      * @param bar The direction that the sections will be devided.
      *
      * @return List of sections.
      */
-    fun getSections(structure: Structure, bar: Bar): List<Section> = TODO()
+    fun getSections(structure: Structure, bar: Bar): List<Section> {
+        return structure.knots.map { Section(bar, it) }
+    }
 
-
-    // todo: definir padrão de design para esta função não se limitar a um único calculo
+    // todo: make recursive
     /**
      * Derives the quadratic expression for the bending moment, for a section.
      *
@@ -56,7 +61,21 @@ object Diagrams {
      * @see getSections
      * @see Quadratic
      */
-    fun generateQuadratic(allSections: List<Section>, sectionId: Int): Quadratic = TODO()
+    fun generateMomentQuadratic(allSections: List<Section>, sectionId: Int): Quadratic = TODO()
+
+    /**
+     * Derives the quadratic expression for the shear force, for a section.
+     *
+     * @param allSections A list with all the strucutre's sections, where the sections to the left will be actually
+     * used.
+     * @param sectionId Specify the section from which will be calculated the quadratic.
+     *
+     * @return The generated quadratic.
+     *
+     * @see getSections
+     * @see Quadratic
+     */
+    fun generateShearQuadratic(allSections: List<Section>, sectionId: Int): Quadratic = TODO()
 
     /**
      * Generates a chart's list of plot point's x values.
@@ -85,8 +104,33 @@ object Diagrams {
      *
      * @see getXAxis
      * @see Section
-     * @see generateQuadratic
+     * @see generateMomentQuadratic
+     * @see generateShearQuadratic
      * @see Quadratic
      */
     fun getYAxis(sections: List<Section>, xAxis: List<Double>, quadratics: List<Quadratic>): List<Double> = TODO()
+
+    fun getShearForceDiagram(structure: Structure, bar: Bar, step: Float): Pair<List<Double>, List<Double>> {
+        val sections = getSections(structure, bar)
+
+        val x = getXAxis(sections, step)
+
+        val quadratics = sections.indices.map { generateShearQuadratic(sections, it) }
+
+        val y = getYAxis(sections, x, quadratics)
+
+        return Pair(x, y)
+    }
+
+    fun getBendingMomentDiagram(structure: Structure, bar: Bar, step: Float): Pair<List<Double>, List<Double>> {
+        val sections = getSections(structure, bar)
+
+        val x = getXAxis(sections, step)
+
+        val quadratics = sections.indices.map { generateMomentQuadratic(sections, it) }
+
+        val y = getYAxis(sections, x, quadratics)
+
+        return Pair(x, y)
+    }
 }

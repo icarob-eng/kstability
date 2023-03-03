@@ -80,6 +80,8 @@ data class Bar(val knot1: Knot, val knot2: Knot) {
         knot1.bars.add(this)
         knot2.bars.add(this)
     }
+
+    fun makeTangentKnot(knot: Knot): Knot = TODO()
 }
 
 data class PointLoad(val knot: Knot, val vector: Vector) {
