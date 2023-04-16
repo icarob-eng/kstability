@@ -26,17 +26,17 @@ data class Polynomial(val a: Double, val b: Double, val c: Double){
 }
 
 object PointLoadPolynomials {
-    fun normal(f: Vector): Polynomial = Polynomial(a=0F, b=0F, c=f.x)
+    fun normalStress(f: Vector): Polynomial = Polynomial(a=0F, b=0F, c=f.x)
 
-    fun shearForce(f: Vector): Polynomial = Polynomial(a=0F, b=0F, c=f.y)
+    fun shearStress(f: Vector): Polynomial = Polynomial(a=0F, b=0F, c=f.y)
 
     fun bendingMoment(a: Vector, f: Vector): Polynomial = Polynomial(a=0F, b=f.y, c=-f.y*a.x)
 }
 
 object DistributedLoadPolynomials {
-    fun normal(a: Vector, f: Vector): Polynomial = Polynomial(a=0F, b=f.x, c=-f.x*a.x)
+    fun normalStress(a: Vector, f: Vector): Polynomial = Polynomial(a=0F, b=f.x, c=-f.x*a.x)
 
-    fun shearForce(a: Vector, f: Vector): Polynomial = Polynomial(a=0F, b=f.y, c=-f.y*a.x)
+    fun shearStress(a: Vector, f: Vector): Polynomial = Polynomial(a=0F, b=f.y, c=-f.y*a.x)
 
     fun bendingMoment(a: Vector, f: Vector): Polynomial = Polynomial(a=f.y/2, b=-f.y*a.x, c=(f.y*a.x*a.x)/2)
 
@@ -44,7 +44,7 @@ object DistributedLoadPolynomials {
 }
 
 object MomentumLoadPolynomials{
-    fun normal() = 0
-    fun shearForce() = 0
+    fun normalStress() = 0
+    fun shearStress() = 0
     fun bendingMoment(m: Double) = Polynomial(a=0.0,b=0.0,c=m)
 }

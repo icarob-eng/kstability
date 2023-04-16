@@ -1,72 +1,11 @@
 package com.kstabilty
 
-import kotlin.jvm.JvmField
-import kotlin.math.sqrt
-
-object Consts {
-    @JvmField
-    val HORIZONTAL = Vector(1, 0)
-    @JvmField
-    val VERTICAL = Vector(0, 1)
-}
 
 enum class SupportGender (val reactions: Int){
     FIRST(1), // roller
     SECOND(2),  // pinned
     THIRD(3), // fixed
 }
-
-data class Vector(val x: Float, val y: Float) {
-    constructor(x: Int, y: Int) : this(x.toFloat(), y.toFloat())
-    constructor(x: Double, y: Double) : this(x.toFloat(), y.toFloat())
-
-    operator fun plus(other: Vector) = Vector(this.x + other.x, this.y + other.y)
-    operator fun minus(other: Vector) = Vector(this.x - other.x, this.y - other.y)
-
-    operator fun times(other: Float) = Vector(x * other, y * other)
-    operator fun times(other: Int) = this.times(other.toFloat())
-    operator fun times(other: Double) = this.times(other.toFloat())
-
-    operator fun div(other: Float) = Vector(x / other, y / other)
-    operator fun div(other: Int) = this.div(other.toFloat())
-    operator fun div(other: Double) = this.div(other.toFloat())
-
-    operator fun unaryMinus() = this * -1
-    operator fun unaryPlus() = this
-
-    override operator fun equals(other: Any?) = when (other) {
-        // todo: check if that's the correct way of comparing types
-        is Number -> this.modulus() == other
-
-        is Vector -> this.x == other.x && this.y == other.y
-
-        else -> false
-    }
-
-    fun modulus() = sqrt(this*this)  // = sqrt(x**2 + y**2)
-
-    fun normalize() = this/modulus()
-
-    operator fun times(other: Vector) = this.x * other.x + this.y * other.y  // dot product
-
-    fun crossModule(other: Vector) = this.x * other.y - this.y * other.x
-
-    fun getOrhtogonal() = Vector(-y, x).normalize()
-
-    fun incline(i: Float): Vector {
-        return if (i == 0F) this
-        else if (i.isFinite()) {
-            // sin and cos arctg formulae from wolfram alpha
-            val cosarctg = 1 / sqrt(i*i + 1)
-            val sinarctg = i / sqrt(i*i + 1)
-            Vector(
-                this.x * cosarctg - this.y * sinarctg,
-                this.x * sinarctg + this.y * cosarctg
-            )
-        } else - this.getOrhtogonal()  // todo: check this
-    }
-}
-
 
 data class Knot(val name: String, val pos: Vector, val structure: Structure? = null) {
     var support: Support? = null  // only one support by knot
@@ -89,7 +28,9 @@ data class Support(val knot: Knot, val gender: SupportGender, val dir: Vector) {
 }
 
 data class Bar(val knot1: Knot, val knot2: Knot) {
-    val inclination = if (knot1.pos.x != knot2.pos.x)(knot2.pos.y - knot1.pos.y)/(knot2.pos.x - knot1.pos.x) else Float.POSITIVE_INFINITY
+    val inclination = if (knot1.pos.x != knot2.pos.x) (knot2.pos.y - knot1.pos.y)/(knot2.pos.x - knot1.pos.x)
+    else if (knot2.pos.y >= knot1.pos.y) Float.POSITIVE_INFINITY else Float.NEGATIVE_INFINITY
+
     init {
         knot1.bars.add(this)
         knot2.bars.add(this)

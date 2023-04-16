@@ -44,7 +44,7 @@ object Diagrams {
      * @see getSections
      * @see Polynomial
      */
-    fun generateMomentPolynomial(allSections: List<Section>, sectionId: Int): Polynomial = TODO()
+    fun generateMomentFunction(allSections: List<Section>, sectionId: Int): Polynomial = TODO()
 
     /**
      * Derives the polynomial expression for the shear force, for a section.
@@ -58,7 +58,7 @@ object Diagrams {
      * @see getSections
      * @see Polynomial
      */
-    fun generateShearPolynomial(allSections: List<Section>, sectionId: Int): Polynomial = TODO()
+    fun generateShearFunction(allSections: List<Section>, sectionId: Int): Polynomial = TODO()
 
     /**
      * Generates a chart's list of plot point's x values.
@@ -97,7 +97,7 @@ object Diagrams {
      *
      * @see getXAxis
      * @see Section
-     * @see generateMomentPolynomial
+     * @see generateMomentFunction
      * @see generateShearPolynomial
      * @see Polynomial
      */
@@ -108,7 +108,7 @@ object Diagrams {
 
         val x = getXAxis(sections, step)
 
-        val polynomial = sections.indices.map { generateShearPolynomial(sections, it) }
+        val polynomial = sections.indices.map { generateShearFunction(sections, it) }
 
         val y = getYAxis(sections, x, polynomial)
 
@@ -120,10 +120,12 @@ object Diagrams {
 
         val x = getXAxis(sections, step)
 
-        val polynomial = sections.indices.map { generateMomentPolynomial(sections, it) }
+        val polynomial = sections.indices.map { generateMomentFunction(sections, it) }
 
         val y = getYAxis(sections, x, polynomial)
 
         return Pair(x, y)
     }
+
+    fun scaleAxis(axis: List<Float>, factor: Float) = axis.map { it * factor }
 }
