@@ -96,7 +96,7 @@ $\vec{P_e} = \frac{\vec{P_1} + \vec{P_2}}{2}$
 
 e
 
-$\vec{F_e} = (getNormal(\vec{P_2} - \vec{P_1}) \cdot |\vec{P_2} - \vec{P_1}|) \times N$
+$\vec{F_e} = (getOrthogonal(\vec{P_2} - \vec{P_1}) \cdot |\vec{P_2} - \vec{P_1}|) \times N$
 
 A implementação das equações foi esta:
 
@@ -105,7 +105,7 @@ fun getEqvLoad() = Load(
         Knot(knot1.name + knot2.name,
             (knot1.pos + knot2.pos) / 2F,  // midpoint
             null),
-        (knot2.pos - knot1.pos).getNormal() * (knot2.pos - knot1.pos).modulus() * norm
+        (knot2.pos - knot1.pos).getOrthogonal() * (knot2.pos - knot1.pos).modulus() * norm
         )
 ```
 
@@ -132,7 +132,8 @@ Para o cálculo das forças de reação, se emprega dois algoritmos diferentes, 
 
 Após o cálculo, as reações de apoio são adicionadas à estrutura, tornando-a estável. O último passo do sistema é gerar os gráficos de esforços cortantes, valores dos esforços normais e gráficos de momento fletor, para a(s) barra(s) da estrutura. Atualmente só suporta-se uma barra.
 
-## Diagramas de esforço cortante, esforço normal e momento fletor
+## Diagramas de esforço cortante, esforço 
+e momento fletor
 
 O algorítmo usado para encontrar a lista de pontos do diagrama de uma barra consiste nos passos mostrados a seguir:
 1. É criada uma cópia da estrutura, com a barra em análise sendo rotacionada para sua inclinação ($\frac{\Delta y}{\Delta x}$) ser $0$, assim, todos os demais vetores são também rotacionados;
@@ -173,11 +174,12 @@ Pelas restrições do sistema (em que a carga mais complexa é uma carga distirb
 #### a) Carga pontual
 Dada uma carga pontual $\vec{F}$ aplicada em $\vec{A}$ e sabendo que estamos num sistema linear onde $A_x$ é paralela a $x$, temos que:
 
-$$ \left \{\begin{cases}
+$$ \left \{ \begin{cases}
 N_n(x) = F_x \implies c=F_x \\
 Q_n(x) = F_y \implies c=F_y \\
 M_n(x) = (x - A_x) F_y \implies F_y x - F_y A_x \implies b=F_y, c=-F_y A_x
 \end{cases}$$
+
 Com as demais constantes com o valor de $0$.
 
 #### b) Carga distribuída
