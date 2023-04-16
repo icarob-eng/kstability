@@ -6,9 +6,9 @@ package com.kstabilty
  *
  * @see Diagrams.getSections
  */
-data class Section (val bar: Bar, val knotInput: Knot) {
-    val knot = bar.makeTangentKnot(knotInput)
-}
+data class Section (val bar: Bar, val knot: Knot)
+typealias Axis = List<Float>
+typealias Axes = Pair<Axis, Axis>
 
 object Diagrams {
     // todo: utilizar interface de plotagem
@@ -28,8 +28,6 @@ object Diagrams {
     fun getSections(structure: Structure, bar: Bar): List<Section> {
         return structure.knots.map { Section(bar, it) }
     }
-
-    // todo: rotate structure
 
     // todo: make recursive
     /**
@@ -74,7 +72,7 @@ object Diagrams {
      * @see getSections
      * @see Section
      */
-    fun getXAxis(sections: List<Section>, resolution: Float): List<Float> {
+    fun getXAxis(sections: List<Section>, resolution: Float): Axis{
         val referenceBar = sections.first().bar
         val axis = mutableListOf<Float>()
         var x = referenceBar.knot1.pos.x
@@ -107,31 +105,30 @@ object Diagrams {
      * @see generateShearPolynomial
      * @see Polynomial
      */
-    fun getYAxis(sections: List<Section>, xAxis: List<Float>, polynomials: List<Polynomial>): List<Float> = TODO()
+    fun getYAxis(sections: List<Section>, xAxis: Axis, polynomials: List<Polynomial>): Axis = TODO()
 
-    fun getShearForceDiagram(structure: Structure, bar: Bar, step: Float): Pair<List<Float>, List<Float>> {
+    fun getDiagram(inputStructure: Structure, bar: Bar,
+                   method: (List<Section>, Int) -> Polynomial,
+                   step: Float): Pair<List<Float>, List<Float>> {
+
+        val structure = inputStructure.rotateAll(bar.inclination)
         val sections = getSections(structure, bar)
 
         val x = getXAxis(sections, step)
 
-        val polynomial = sections.indices.map { generateShearFunction(sections, it) }
+        val polynomials = sections.indices.map { method(sections, it) }
 
-        val y = getYAxis(sections, x, polynomial)
+        val y = getYAxis(sections, x, polynomials)
 
-        return Pair(x, y)
+        return rotatePlot(Pair(x, y), -bar.inclination)
     }
 
-    fun getBendingMomentDiagram(structure: Structure, bar: Bar, step: Float): Pair<List<Float>, List<Float>> {
-        val sections = getSections(structure, bar)
 
-        val x = getXAxis(sections, step)
+    fun rotatePlot(axes: Axes, i: Float): Axes{
+        val vectorList: List<Vector> = axes.first.mapIndexed { index, it -> Vector(it, axes.second[index])}
+        vectorList.forEach { it.rotate(i) }
 
-        val polynomial = sections.indices.map { generateMomentFunction(sections, it) }
-
-        val y = getYAxis(sections, x, polynomial)
-
-        return Pair(x, y)
+        return Pair(vectorList.map { it.x }, vectorList.map { it.y })
     }
-
-    fun scaleAxis(axis: List<Float>, factor: Float) = axis.map { it * factor }
+    fun scaleAxis(axis: Axis, factor: Float) = axis.map { it * factor }
 }

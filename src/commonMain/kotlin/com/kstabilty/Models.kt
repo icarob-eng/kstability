@@ -81,6 +81,8 @@ data class Structure(val name: String, val knots: MutableList<Knot> = mutableLis
     fun getEqvLoads() = getPointLoads() + getDistributedLoads().map { it.getEqvLoad() }
 
     fun rotateAll(i: Float): Structure {
+        // todo: testar se rotacionar os nós e cargas pontuais já resolveria
+
         val newStructure = Structure(this.name + "'", mutableListOf())
         this.knots.forEach {
             val knot = Knot(it.name, it.pos.rotate(i), newStructure)
