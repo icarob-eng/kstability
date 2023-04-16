@@ -40,8 +40,8 @@ class StructureModelTest {
         val pointLoadSampleB = PointLoad(knotSampleB, Consts.VERTICAL * 10F)
 
         assertEquals(distributedLoadSampe, structureSample.getDistributedLoads()[0])
-        assertEquals(pointLoadSampleA, structureSample.getLoads()[0])
-        assertEquals(pointLoadSampleB, structureSample.getLoads()[1])
+        assertEquals(pointLoadSampleA, structureSample.getPointLoads()[0])
+        assertEquals(pointLoadSampleB, structureSample.getPointLoads()[1])
         // kinda surprise that this passes
     }
 

@@ -82,6 +82,12 @@ object Diagrams {
             axis.add(x)
             x += resolution
         }
+
+        for (section in sections) {
+            val i = section.knot.pos.x
+            if (i !in axis) axis.add(i)
+            axis.add(i)  // guarantees that there's 2 points at intersection
+        }
         return axis
     }
 
