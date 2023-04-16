@@ -1,0 +1,50 @@
+package com.kstabilty
+
+import kotlin.math.sqrt
+
+/**
+ * Represents a polynomial function defining the `invoke` operator as f(x). Calculates vertex and roots for a != 0.
+ *
+ * Automatically calculates the expression's delta, roots and vertex.
+ */
+data class Polynomial(val a: Double, val b: Double, val c: Double){
+    constructor(a: Float, b: Float, c: Float) : this (a.toDouble(), b.toDouble(), c.toDouble())
+    private val delta = b * b - 4 * a * c
+    val roots = if (a != 0.toDouble()) Pair(
+        (- b + sqrt(delta))/ (2 * a),
+        (- b - sqrt(delta))/ (2 * a)
+    ) else null
+    val vertex = if (a != 0.toDouble()) Vector(-b / (2 * a), delta / (4 * a)) else null
+
+    operator fun invoke(x: Int) = a * x * x + b * x + c
+    operator fun invoke(x: Float) = a * x * x + b * x + c
+    operator fun invoke(x: Double) = a * x * x + b * x + c
+
+    operator fun plus(other: Polynomial) = Polynomial(this.a + other.a, this.b + other.b, this.c + other.c)
+
+    operator fun minus(other: Polynomial) = Polynomial(this.a - other.a, this.b - other.b, this.c - other.c)
+}
+
+object PointLoadPolynomials {
+    fun normal(f: Vector): Polynomial = Polynomial(a=0F, b=0F, c=f.x)
+
+    fun shearForce(f: Vector): Polynomial = Polynomial(a=0F, b=0F, c=f.y)
+
+    fun bendingMoment(a: Vector, f: Vector): Polynomial = Polynomial(a=0F, b=f.y, c=-f.y*a.x)
+}
+
+object DistributedLoadPolynomials {
+    fun normal(a: Vector, f: Vector): Polynomial = Polynomial(a=0F, b=f.x, c=-f.x*a.x)
+
+    fun shearForce(a: Vector, f: Vector): Polynomial = Polynomial(a=0F, b=f.y, c=-f.y*a.x)
+
+    fun bendingMoment(a: Vector, f: Vector): Polynomial = Polynomial(a=f.y/2, b=-f.y*a.x, c=(f.y*a.x*a.x)/2)
+
+    inline fun bendingMomentEnd(a: Vector, f: Vector, end: Vector) = bendingMoment(a, f) + bendingMoment(end, -f)
+}
+
+object MomentumLoadPolynomials{
+    fun normal() = 0
+    fun shearForce() = 0
+    fun bendingMoment(m: Double) = Polynomial(a=0.0,b=0.0,c=m)
+}

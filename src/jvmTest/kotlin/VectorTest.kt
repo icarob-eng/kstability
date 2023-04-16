@@ -54,7 +54,7 @@ class VectorTest {
     }
 
     @Test
-    fun getNormal() {
-        assertEquals(Consts.VERTICAL, sampleC.getNormal())
+    fun getOrthogonal() {
+        assertEquals(Consts.VERTICAL, sampleC.getOrhtogonal())
     }
 }

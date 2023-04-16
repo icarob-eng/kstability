@@ -51,7 +51,20 @@ data class Vector(val x: Float, val y: Float) {
 
     fun crossModule(other: Vector) = this.x * other.y - this.y * other.x
 
-    fun getNormal() = Vector(-y, x).normalize()
+    fun getOrhtogonal() = Vector(-y, x).normalize()
+
+    fun incline(i: Float): Vector {
+        return if (i == 0F) this
+        else if (i.isFinite()) {
+            // sin and cos arctg formulae from wolfram alpha
+            val cosarctg = 1 / sqrt(i*i + 1)
+            val sinarctg = i / sqrt(i*i + 1)
+            Vector(
+                this.x * cosarctg - this.y * sinarctg,
+                this.x * sinarctg + this.y * cosarctg
+            )
+        } else - this.getOrhtogonal()  // todo: check this
+    }
 }
 
 
@@ -76,6 +89,7 @@ data class Support(val knot: Knot, val gender: SupportGender, val dir: Vector) {
 }
 
 data class Bar(val knot1: Knot, val knot2: Knot) {
+    val inclination = if (knot1.pos.x != knot2.pos.x)(knot2.pos.y - knot1.pos.y)/(knot2.pos.x - knot1.pos.x) else Float.POSITIVE_INFINITY
     init {
         knot1.bars.add(this)
         knot2.bars.add(this)
@@ -111,7 +125,7 @@ data class DistributedLoad(val knot1: Knot, val knot2: Knot, val norm: Float) {
             (knot1.pos + knot2.pos) / 2,  // midpoint
             null
         ),
-        (knot2.pos - knot1.pos).getNormal() * (knot2.pos - knot1.pos).modulus() * norm
+        (knot2.pos - knot1.pos).getOrhtogonal() * (knot2.pos - knot1.pos).modulus() * norm
         // bisector vector times modulus of the entire distributed force
     )
 }

@@ -1,24 +1,5 @@
 package com.kstabilty
 
-import kotlin.math.sqrt
-
-/**
- * Represents a quadratic funtion defining the `invoke` operator as f(x).
- *
- * Automatically calculates the expresison's delta, roots and vertex.
- */
-data class Quadratic(val a: Double, val b: Double, val c: Double){
-    val delta = b * b - 4 * a * c
-    val roots = Pair(
-        (- b + sqrt(delta))/ (2 * a),
-        (- b - sqrt(delta))/ (2 * a)
-    )
-    val vertex = Vector(-b / (2 * a), delta / (4 * a))
-
-    operator fun invoke(x: Int) = a * x * x + b * x + c
-    operator fun invoke(x: Float) = a * x * x + b * x + c
-    operator fun invoke(x: Double) = a * x * x + b * x + c
-}
 
 /**
  * Defines a section along one bar, where the knot marks the **start** of the section, and the bar, the direction.
@@ -48,34 +29,36 @@ object Diagrams {
         return structure.knots.map { Section(bar, it) }
     }
 
+    // todo: rotate structure
+
     // todo: make recursive
     /**
-     * Derives the quadratic expression for the bending moment, for a section.
+     * Derives the polynomial expression for the bending moment, for a section.
      *
      * @param allSections A list with all the strucutre's sections, where the sections to the left will be actually
      * used.
-     * @param sectionId Specify the section from which will be calculated the quadratic.
+     * @param sectionId Specify the section from which will be calculated the polynomial.
      *
-     * @return The generated quadratic.
+     * @return The generated polynomial.
      *
      * @see getSections
-     * @see Quadratic
+     * @see Polynomial
      */
-    fun generateMomentQuadratic(allSections: List<Section>, sectionId: Int): Quadratic = TODO()
+    fun generateMomentPolynomial(allSections: List<Section>, sectionId: Int): Polynomial = TODO()
 
     /**
-     * Derives the quadratic expression for the shear force, for a section.
+     * Derives the polynomial expression for the shear force, for a section.
      *
      * @param allSections A list with all the strucutre's sections, where the sections to the left will be actually
      * used.
-     * @param sectionId Specify the section from which will be calculated the quadratic.
+     * @param sectionId Specify the section from which will be calculated the polynomial.
      *
-     * @return The generated quadratic.
+     * @return The generated polynomial.
      *
      * @see getSections
-     * @see Quadratic
+     * @see Polynomial
      */
-    fun generateShearQuadratic(allSections: List<Section>, sectionId: Int): Quadratic = TODO()
+    fun generateShearPolynomial(allSections: List<Section>, sectionId: Int): Polynomial = TODO()
 
     /**
      * Generates a chart's list of plot point's x values.
@@ -91,45 +74,55 @@ object Diagrams {
      * @see getSections
      * @see Section
      */
-    fun getXAxis(sections: List<Section>, step: Float): List<Double> = TODO()
+    fun getXAxis(sections: List<Section>, resolution: Float): List<Float> {
+        val referenceBar = sections.first().bar
+        val axis = mutableListOf<Float>()
+        var x = referenceBar.knot1.pos.x
+        while (x < referenceBar.knot2.pos.x) {
+            axis.add(x)
+            x += resolution
+        }
+        return axis
+    }
+
 
     /**
-     * Calculates y values from x values and the quadratic funtions and put the results in a list of Doubles.
+     * Calculates y values from x values and the quadratic functions and put the results in a list of Doubles.
      *
      * @param sections List of structure's sections.
      * @param xAxis List of x values from which the y values will be calculated.
-     * @param quadratics The quadratic functions that will determine the y values.
+     * @param polynomials The quadratic functions that will determine the y values.
      *
      * @return A list of y values, as Doubles.
      *
      * @see getXAxis
      * @see Section
-     * @see generateMomentQuadratic
-     * @see generateShearQuadratic
-     * @see Quadratic
+     * @see generateMomentPolynomial
+     * @see generateShearPolynomial
+     * @see Polynomial
      */
-    fun getYAxis(sections: List<Section>, xAxis: List<Double>, quadratics: List<Quadratic>): List<Double> = TODO()
+    fun getYAxis(sections: List<Section>, xAxis: List<Float>, polynomials: List<Polynomial>): List<Float> = TODO()
 
-    fun getShearForceDiagram(structure: Structure, bar: Bar, step: Float): Pair<List<Double>, List<Double>> {
+    fun getShearForceDiagram(structure: Structure, bar: Bar, step: Float): Pair<List<Float>, List<Float>> {
         val sections = getSections(structure, bar)
 
         val x = getXAxis(sections, step)
 
-        val quadratics = sections.indices.map { generateShearQuadratic(sections, it) }
+        val polynomial = sections.indices.map { generateShearPolynomial(sections, it) }
 
-        val y = getYAxis(sections, x, quadratics)
+        val y = getYAxis(sections, x, polynomial)
 
         return Pair(x, y)
     }
 
-    fun getBendingMomentDiagram(structure: Structure, bar: Bar, step: Float): Pair<List<Double>, List<Double>> {
+    fun getBendingMomentDiagram(structure: Structure, bar: Bar, step: Float): Pair<List<Float>, List<Float>> {
         val sections = getSections(structure, bar)
 
         val x = getXAxis(sections, step)
 
-        val quadratics = sections.indices.map { generateMomentQuadratic(sections, it) }
+        val polynomial = sections.indices.map { generateMomentPolynomial(sections, it) }
 
-        val y = getYAxis(sections, x, quadratics)
+        val y = getYAxis(sections, x, polynomial)
 
         return Pair(x, y)
     }
