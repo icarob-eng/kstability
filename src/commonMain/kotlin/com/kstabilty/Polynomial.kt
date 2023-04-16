@@ -44,7 +44,7 @@ object DistributedLoadPolynomials {
 }
 
 object MomentumLoadPolynomials{
-    fun normalStress() = 0
-    fun shearStress() = 0
+    fun normalStress() = Polynomial(0F,0F,0F)
+    fun shearStress() = Polynomial(0F,0F,0F)
     fun bendingMoment(m: Double) = Polynomial(a=0.0,b=0.0,c=m)
 }
