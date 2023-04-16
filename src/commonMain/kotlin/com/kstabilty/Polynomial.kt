@@ -36,7 +36,11 @@ object PointLoadPolynomials {
 object DistributedLoadPolynomials {
     fun normalStress(a: Vector, f: Vector): Polynomial = Polynomial(a=0F, b=f.x, c=-f.x*a.x)
 
+    fun normalStressEnd(a: Vector, f: Vector, end: Vector) = shearStress(a, f) + bendingMoment(end, -f)
+
     fun shearStress(a: Vector, f: Vector): Polynomial = Polynomial(a=0F, b=f.y, c=-f.y*a.x)
+
+    fun shearStressEnd(a: Vector, f: Vector, end: Vector) = shearStress(a, f) + bendingMoment(end, -f)
 
     fun bendingMoment(a: Vector, f: Vector): Polynomial = Polynomial(a=f.y/2, b=-f.y*a.x, c=(f.y*a.x*a.x)/2)
 

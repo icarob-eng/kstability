@@ -39,10 +39,29 @@ object Diagrams {
      * @see getSections
      * @see Polynomial
      */
-    fun generateMomentFunction(allSections: List<Section>, sectionId: Int): Polynomial = TODO()
+    fun generateMomentFunction(allSections: List<Section>, sectionId: Int): Polynomial {
+        val relevantSections = allSections.filterIndexed { index, _ -> index <= sectionId }
+        val pointLoads = relevantSections.flatMap { it.knot.pointLoads }
+        val distributedLoads = relevantSections.flatMap { it.knot.distributedLoads }
+        val momentum = relevantSections.map { it.knot.momentum }.sum()
+
+        var resultPolynomial = MomentumLoadPolynomials.bendingMoment(momentum.toDouble())
+        resultPolynomial = pointLoads.map { PointLoadPolynomials.bendingMoment(it.knot.pos, it.vector)}.fold(resultPolynomial) { i, j -> i+j}
+        // equivalent of: result += map.sum()
+
+        distributedLoads.forEach { dL ->
+            val limits = listOf(dL.knot1.pos, dL.knot2.pos).sortedBy { it.x }
+
+            resultPolynomial += if (limits.last().x >= relevantSections.last().knot.pos.x)
+                DistributedLoadPolynomials.bendingMomentEnd(limits.first(), dL.getEqvLoad().vector.normalize() * dL.norm, limits.last())
+            else DistributedLoadPolynomials.bendingMoment(limits.first(), dL.getEqvLoad().vector.normalize() * dL.norm)
+        }
+
+        return resultPolynomial
+    }
 
     /**
-     * Derives the polynomial expression for the shear force, for a section, been a piece in a Macaulay's function.
+     * Derives the polynomial expression for the shear stress, for a section, been a piece in a Macaulay's function.
      *
      * @param allSections A list with all the structure's sections, where the sections to the left will be actually
      * used.
@@ -53,7 +72,59 @@ object Diagrams {
      * @see getSections
      * @see Polynomial
      */
-    fun generateShearFunction(allSections: List<Section>, sectionId: Int): Polynomial = TODO()
+    fun generateShearFunction(allSections: List<Section>, sectionId: Int): Polynomial {
+        val relevantSections = allSections.filterIndexed { index, _ -> index <= sectionId }
+        val pointLoads = relevantSections.flatMap { it.knot.pointLoads }
+        val distributedLoads = relevantSections.flatMap { it.knot.distributedLoads }
+//        val momentum = relevantSections.map { it.knot.momentum }.sum()
+
+        var resultPolynomial = MomentumLoadPolynomials.shearStress()
+        resultPolynomial = pointLoads.map { PointLoadPolynomials.shearStress(it.vector)}.fold(resultPolynomial) { i, j -> i+j}
+        // equivalent of: result += map.sum()
+
+        distributedLoads.forEach { dL ->
+            val limits = listOf(dL.knot1.pos, dL.knot2.pos).sortedBy { it.x }
+
+            resultPolynomial += if (limits.last().x >= relevantSections.last().knot.pos.x)
+                DistributedLoadPolynomials.shearStressEnd(limits.first(), dL.getEqvLoad().vector.normalize() * dL.norm, limits.last())
+            else DistributedLoadPolynomials.shearStress(limits.first(), dL.getEqvLoad().vector.normalize() * dL.norm)
+        }
+
+        return resultPolynomial
+    }
+
+    /**
+     * Derives the polynomial expression for the normal stress, for a section, been a piece in a Macaulay's function.
+     *
+     * @param allSections A list with all the structure's sections, where the sections to the left will be actually
+     * used.
+     * @param sectionId Specify the section from which will be calculated the polynomial.
+     *
+     * @return The generated polynomial.
+     *
+     * @see getSections
+     * @see Polynomial
+     */
+    fun generateNormalFunction(allSections: List<Section>, sectionId: Int): Polynomial {
+        val relevantSections = allSections.filterIndexed { index, _ -> index <= sectionId }
+        val pointLoads = relevantSections.flatMap { it.knot.pointLoads }
+        val distributedLoads = relevantSections.flatMap { it.knot.distributedLoads }
+//        val momentum = relevantSections.map { it.knot.momentum }.sum()
+
+        var resultPolynomial = MomentumLoadPolynomials.shearStress()
+        resultPolynomial = pointLoads.map { PointLoadPolynomials.normalStress(it.vector)}.fold(resultPolynomial) { i, j -> i+j}
+        // equivalent of: result += map.sum()
+
+        distributedLoads.forEach { dL ->
+            val limits = listOf(dL.knot1.pos, dL.knot2.pos).sortedBy { it.x }
+
+            resultPolynomial += if (limits.last().x >= relevantSections.last().knot.pos.x)
+                DistributedLoadPolynomials.normalStressEnd(limits.first(), dL.getEqvLoad().vector.normalize() * dL.norm, limits.last())
+            else DistributedLoadPolynomials.normalStress(limits.first(), dL.getEqvLoad().vector.normalize() * dL.norm)
+        }
+
+        return resultPolynomial
+    }
 
     /**
      * Generates a chart's list of plot point's x values.
@@ -98,6 +169,7 @@ object Diagrams {
      *
      * @see getXAxis
      * @see Section
+     * @see generateNormalFunction
      * @see generateMomentFunction
      * @see generateShearFunction
      * @see Polynomial
@@ -129,6 +201,7 @@ object Diagrams {
      *
      * @see Stabilization
      * @see Structure
+     * @see generateNormalFunction
      * @see generateShearFunction
      * @see generateMomentFunction
      *
