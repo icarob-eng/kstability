@@ -3,9 +3,9 @@ package com.kstabilty
 object Stabilization {
     /**
      * Check if given structure is isostatic.
-     * Courrent algorithm checks if structure have 3 support genders.
+     * Current algorithm checks if structure have 3 support genders.
      *
-     * @param structure Structure to be chaked. Needs to have supports
+     * @param structure Structure to be checked. Needs to have supports
      * @return Boolean: true if structure have 3 degrees of support
      * @see isStable
      */
@@ -18,7 +18,7 @@ object Stabilization {
     }
 
     /**
-     * Checks if given structure is stabilazed i.e. resultant force and banding moment are both zero
+     * Checks if given structure is stabilized i.e. resultant force and banding moment are both zero
      *
      * @see isIsostatic
      * @see getReactionsAB
@@ -32,7 +32,7 @@ object Stabilization {
      *
      * @param structure Structure from witch the resultant bending moment is calculated
      * @param axis Axis of rotation to calculate the bending momentum
-     * @return Given structure's resultant beindig moment
+     * @return Given structure's resultant bending moment
      */
     fun getResultMomentum(structure: Structure, axis: Vector = Vector(0F, 0F)): Float {
         var momentum = structure.getMomentumLoads()
@@ -45,7 +45,7 @@ object Stabilization {
 
     /**
      * Sums all loads and equivalent loads in given structure.
-     * Note that the result type is a vector, not a laod, since the bending moment from
+     * Note that the result type is a vector, not a load, since the bending moment from
      * the resultant force is calculated in `getResultMomentum`.
      *
      * @param structure Structure from witch the resultant force is calculated
@@ -85,7 +85,7 @@ object Stabilization {
         val ay = - (c.x * ra.y * i.y - c.y * ra.y * i.x - c.y * phi + m * i.y)/(-phi + psi)
 
         val k = - (ax * ra.y - ay * ra.x + m)/phi
-        // I really don't know why it hat to be negative, but is how it works
+        // I really don't know why it had to be negative, but is how it works
 
         return Pair(Vector(ax, ay), i * k)
     }
@@ -94,7 +94,7 @@ object Stabilization {
      * Makes the passed structure stable by adding loads or momenta to the adequate
      * supports.
      *
-     * @throws AssertionError throwed if it doesn't have an algorithm to solve de structure.
+     * @throws AssertionError thrown if it doesn't have an algorithm to solve de structure.
      * @param structure Structure to be stabilized. It will be altered
      * @return Nothing
      * @see isIsostatic

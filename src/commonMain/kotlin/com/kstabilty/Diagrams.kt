@@ -24,7 +24,8 @@ object Diagrams {
      * @return List of sections.
      */
     fun getSections(structure: Structure, bar: Bar): List<Section> {
-        return structure.knots.map { Section(bar, it) }
+        val sections = structure.knots.sortedBy { it.pos.x }.map { Section(bar, it) }
+        return mutableListOf(sections).removeLast()
     }
 
     /**
@@ -111,7 +112,7 @@ object Diagrams {
         val distributedLoads = relevantSections.flatMap { it.knot.distributedLoads }
 //        val momentum = relevantSections.map { it.knot.momentum }.sum()
 
-        var resultPolynomial = MomentumLoadPolynomials.shearStress()
+        var resultPolynomial = MomentumLoadPolynomials.normalStress()
         resultPolynomial = pointLoads.map { PointLoadPolynomials.normalStress(it.vector)}.fold(resultPolynomial) { i, j -> i+j}
         // equivalent of: result += map.sum()
 
@@ -209,9 +210,9 @@ object Diagrams {
      */
     fun getDiagram(inputStructure: Structure, bar: Bar,
                    method: (List<Section>, Int) -> Polynomial,
-                   step: Float): Axes {
+                   step: Float): Pair<Axes, List<Polynomial>> {
 
-        val structure = inputStructure.rotateAll(bar.inclination)
+        val structure = inputStructure.getRotatedCopy(bar.inclination)
 
         val sections = getSections(structure, bar)
 
@@ -219,7 +220,7 @@ object Diagrams {
         val polynomials = sections.indices.map { method(sections, it) }
         val y = getYAxis(sections, x, polynomials)
 
-        return rotatePlot(Pair(x, y), -bar.inclination)
+        return Pair(rotatePlot(Pair(x, y), -bar.inclination), polynomials)
     }
 
 
@@ -233,5 +234,5 @@ object Diagrams {
         return Pair(vectorList.map { it.x }, vectorList.map { it.y })
     }
 
-    fun scaleAxis(axis: Axis, factor: Float) = axis.map { it * factor }
+//    fun scaleAxis(axis: Axis, factor: Float) = axis.map { it * factor }
 }

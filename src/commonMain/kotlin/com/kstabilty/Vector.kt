@@ -30,7 +30,6 @@ data class Vector(val x: Float, val y: Float) {
     operator fun unaryPlus() = this
 
     override operator fun equals(other: Any?) = when (other) {
-        // todo: check if that's the correct way of comparing types
         is Number -> this.modulus() == other
 
         is Vector -> this.x == other.x && this.y == other.y
@@ -46,7 +45,7 @@ data class Vector(val x: Float, val y: Float) {
 
     fun crossModule(other: Vector) = this.x * other.y - this.y * other.x
 
-    fun getOrhtogonal() = Vector(-y, x).normalize()
+    fun getOrthogonal() = Vector(-y, x).normalize()
 
     fun rotate(i: Float): Vector {
         return if (i == 0F) this
@@ -58,6 +57,13 @@ data class Vector(val x: Float, val y: Float) {
                 this.x * cosarctg - this.y * sinarctg,
                 this.x * sinarctg + this.y * cosarctg
             )
-        } else if (i == Float.POSITIVE_INFINITY) this.getOrhtogonal() else - this.getOrhtogonal()
+        } else if (i == Float.POSITIVE_INFINITY) this.getOrthogonal() else - this.getOrthogonal()
+    }
+
+    override fun hashCode(): Int {
+        // todo: check if its valid
+        var result = x.hashCode()
+        result = 31 * result + y.hashCode()
+        return result
     }
 }

@@ -53,7 +53,7 @@ data class PointLoad(val knot: Knot, val vector: Vector) {
 }
 
 // forces are assumed to be normal to the load length
-data class DistributedLoad(val knot1: Knot, val knot2: Knot, val norm: Float) {  // todo: subsituir norma por vetor de intensidade
+data class DistributedLoad(val knot1: Knot, val knot2: Knot, val norm: Float) {  // todo: substituir norma por vetor de intensidade
     init {
         knot1.distributedLoads.add(this)
         knot2.distributedLoads.add(this)
@@ -67,7 +67,7 @@ data class DistributedLoad(val knot1: Knot, val knot2: Knot, val norm: Float) { 
             (knot1.pos + knot2.pos) / 2,  // midpoint
             null
         ),
-        (knot2.pos - knot1.pos).getOrhtogonal() * (knot2.pos - knot1.pos).modulus() * norm
+        (knot2.pos - knot1.pos).getOrthogonal() * (knot2.pos - knot1.pos).modulus() * norm
         // bisector vector times modulus of the entire distributed force
     )
 }
@@ -80,7 +80,7 @@ data class Structure(val name: String, val knots: MutableList<Knot> = mutableLis
     fun getDistributedLoads() = knots.flatMap { it.distributedLoads }
     fun getEqvLoads() = getPointLoads() + getDistributedLoads().map { it.getEqvLoad() }
 
-    fun rotateAll(i: Float): Structure {
+    fun getRotatedCopy(i: Float): Structure {
         // todo: testar se rotacionar os nós e cargas pontuais já resolveria
 
         val newStructure = Structure(this.name + "'", mutableListOf())

@@ -23,6 +23,25 @@ data class Polynomial(val a: Double, val b: Double, val c: Double){
     operator fun plus(other: Polynomial) = Polynomial(this.a + other.a, this.b + other.b, this.c + other.c)
 
     operator fun minus(other: Polynomial) = Polynomial(this.a - other.a, this.b - other.b, this.c - other.c)
+
+    override fun toString(): String {
+        val expression = StringBuilder()
+        if (a != 0.0) {
+            if (a>0.0) expression.append("+")
+            expression.append(a.toString())
+            expression.append("x²")
+        }
+        if (b != 0.0) {
+            if (b>0.0) expression.append("+")
+            expression.append(b.toString())
+            expression.append("x")
+        }
+        if (c != 0.0) {
+            if (c>0.0) expression.append("+")
+            expression.append(c.toString())
+        }
+        return expression.toString()
+    }
 }
 
 object PointLoadPolynomials {
