@@ -132,8 +132,7 @@ Para o cálculo das forças de reação, se emprega dois algoritmos diferentes, 
 
 Após o cálculo, as reações de apoio são adicionadas à estrutura, tornando-a estável. O último passo do sistema é gerar os gráficos de esforços cortantes, valores dos esforços normais e gráficos de momento fletor, para a(s) barra(s) da estrutura. Atualmente só suporta-se uma barra.
 
-## Diagramas de esforço cortante, esforço 
-e momento fletor
+## Diagramas de esforço cortante, esforço normal e momento fletor
 
 O algorítmo usado para encontrar a lista de pontos do diagrama de uma barra consiste nos passos mostrados a seguir:
 1. É criada uma cópia da estrutura, com a barra em análise sendo rotacionada para sua inclinação ($\frac{\Delta y}{\Delta x}$) ser $0$, assim, todos os demais vetores são também rotacionados;
@@ -199,7 +198,7 @@ Se aplicando um momento fletor de intensidade $M$ no ponto $\vec{A}$ da barra, t
 $$ \left \{\begin{cases}
 N_n(x) = 0 \\
 Q_n(x) = 0 \\
-M_n(x) = m \implies c=m
+M_n(x) = M \implies c=M
 \end{cases}$$
 
 #### Determinando a função
