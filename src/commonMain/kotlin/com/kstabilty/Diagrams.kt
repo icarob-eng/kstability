@@ -24,7 +24,7 @@ object Diagrams {
      * @return List of sections.
      */
     fun getSections(structure: Structure, bar: Bar): List<Section> {
-        val sections = structure.knots.sortedBy { it.pos.x }.map { Section(bar, it) }
+        val sections = structure.knots.sortedBy { it.pos.x }.map { Section(bar, bar.makeTangentKnot(it)) }
         return mutableListOf(sections).removeLast()
     }
 

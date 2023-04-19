@@ -37,7 +37,13 @@ data class Bar(val knot1: Knot, val knot2: Knot) {
         knot2.bars.add(this)
     }
 
-    fun makeTangentKnot(knot: Knot): Knot = TODO()
+    fun makeTangentKnot(knot: Knot): Knot {
+        val barVector = knot2.pos - knot1.pos
+        return Knot(
+            knot.name + "'",
+            (barVector.normalize() / barVector.modulus()) * (-knot1.pos * (knot.pos + knot2.pos))
+        )
+    }
 }
 
 data class PointLoad(val knot: Knot, val vector: Vector) {
