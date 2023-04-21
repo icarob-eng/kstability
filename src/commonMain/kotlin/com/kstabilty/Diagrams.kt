@@ -54,8 +54,8 @@ object Diagrams {
             val limits = listOf(dL.knot1.pos, dL.knot2.pos).sortedBy { it.x }
 
             resultPolynomial += if (limits.last().x >= relevantSections.last().knot.pos.x)
-                DistributedLoadPolynomials.bendingMomentEnd(limits.first(), dL.getEqvLoad().vector.normalize() * dL.norm, limits.last())
-            else DistributedLoadPolynomials.bendingMoment(limits.first(), dL.getEqvLoad().vector.normalize() * dL.norm)
+                DistributedLoadPolynomials.bendingMomentEnd(limits.first(), dL.vector, limits.last())
+            else DistributedLoadPolynomials.bendingMoment(limits.first(), dL.vector)
         }
 
         return resultPolynomial
@@ -87,8 +87,8 @@ object Diagrams {
             val limits = listOf(dL.knot1.pos, dL.knot2.pos).sortedBy { it.x }
 
             resultPolynomial += if (limits.last().x >= relevantSections.last().knot.pos.x)
-                DistributedLoadPolynomials.shearStressEnd(limits.first(), dL.getEqvLoad().vector.normalize() * dL.norm, limits.last())
-            else DistributedLoadPolynomials.shearStress(limits.first(), dL.getEqvLoad().vector.normalize() * dL.norm)
+                DistributedLoadPolynomials.shearStressEnd(limits.first(), dL.vector, limits.last())
+            else DistributedLoadPolynomials.shearStress(limits.first(), dL.vector)
         }
 
         return resultPolynomial
@@ -120,8 +120,8 @@ object Diagrams {
             val limits = listOf(dL.knot1.pos, dL.knot2.pos).sortedBy { it.x }
 
             resultPolynomial += if (limits.last().x >= relevantSections.last().knot.pos.x)
-                DistributedLoadPolynomials.normalStressEnd(limits.first(), dL.getEqvLoad().vector.normalize() * dL.norm, limits.last())
-            else DistributedLoadPolynomials.normalStress(limits.first(), dL.getEqvLoad().vector.normalize() * dL.norm)
+                DistributedLoadPolynomials.normalStressEnd(limits.first(), dL.vector, limits.last())
+            else DistributedLoadPolynomials.normalStress(limits.first(), dL.vector)
         }
 
         return resultPolynomial

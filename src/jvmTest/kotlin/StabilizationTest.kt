@@ -18,7 +18,7 @@ class StabilizationTest {
     private val structureSample = Structure("My structure", mutableListOf(knotSampleA, knotSampleB, knotSampleC, knotSampleD))
 
     /**
-     * Structure Sample expectetions:
+     * Structure Sample expectations:
      * - Resultant force from loads: Vector(0, -30)
      * - Resultant bending moment from loads: - 20 * 1 - 10 * 3 = -50,
      * therefore, the positive rotation direction is counter-clockwise
@@ -37,10 +37,10 @@ class StabilizationTest {
     fun isostaticTest() {
         assertTrue(Stabilization.isIsostatic(structureSample))
     }
-    // todo: check isostacity in more complex strcutures
+    // todo: check isostacity in more complex structures
 
     @Test
-    fun getResultMomementumTest() {
+    fun getResultMomentumTest() {
         assertEquals(expectedBendingMoment, Stabilization.getResultMomentum(structureSample))
     }
 
@@ -70,9 +70,9 @@ class StabilizationTest {
     }
 
     @Test
-    fun checkSatabilizedForcesTest() {
+    fun checkStabilizedForcesTest() {
         /**
-         * Checks if the expected forces are put in the strucuture sample
+         * Checks if the expected forces are put in the structure sample
          */
 
         val expected = Pair(
@@ -161,7 +161,7 @@ class StabilizationTest {
         PointLoad(knotSampleA1, Vector(0, -3))
         Support(knotSampleB1, SupportGender.SECOND, Consts.HORIZONTAL)
 
-        val structureB = Structure("Fixed support strcuture",
+        val structureB = Structure("Fixed support structure",
             mutableListOf(knotSampleA1, knotSampleB1)
         )
 
@@ -176,7 +176,7 @@ class StabilizationTest {
         PointLoad(knotSampleA1, Vector(0, -3))
         Support(knotSampleB1, SupportGender.THIRD, Consts.HORIZONTAL)
 
-        val structureB = Structure("Fixed support strcuture",
+        val structureB = Structure("Fixed support structure",
             mutableListOf(knotSampleA1, knotSampleB1)
         )
 

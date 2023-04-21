@@ -9,8 +9,8 @@ class StructureModelTest {
     private val knotSampleD = Knot("D", Vector(4F, 2F))
 
     private val supportSampleA = Support(knotSampleA, SupportGender.SECOND, Vector(0F, 5F))
-    private val supportSampleB = Support(knotSampleD, SupportGender.FIRST, Consts.VERTICAL)
-    private val barSample = Bar(knotSampleA, knotSampleD)
+//    private val supportSampleB = Support(knotSampleD, SupportGender.FIRST, Consts.VERTICAL)
+//    private val barSample = Bar(knotSampleA, knotSampleD)
 
     private val structureSample = Structure("My structure", mutableListOf(knotSampleA, knotSampleB, knotSampleC, knotSampleD))
 
@@ -20,22 +20,22 @@ class StructureModelTest {
     }
 
     @Test
-    fun distrubutedLoadEq() {
+    fun distributedLoadEq() {
         /**
-         * Although unrecomended, this test covers:
+         * Although unrecommended, this test covers:
          * - `DistributedLoad.getEqvLoad()`
          * - `Knot.equals()`
          * - `Load.equals()`
          */
 
-        val distributedLoadSample = DistributedLoad(knotSampleB, knotSampleC, 10F)
+        val distributedLoadSample = DistributedLoad(knotSampleB, knotSampleC, Vector(0F, 10F))
         val eqvPointLoadSample = PointLoad(Knot("", Vector(2F, 2F)), Vector(0F, 20F))
         assertEquals(true, distributedLoadSample.getEqvLoad() == eqvPointLoadSample)
     }
 
     @Test
     fun structureLoadsHolding() {
-        val distributedLoadSampe = DistributedLoad(knotSampleB, knotSampleC, 10F)
+        val distributedLoadSampe = DistributedLoad(knotSampleB, knotSampleC, Vector(0F, 10F))
         val pointLoadSampleA = PointLoad(knotSampleB, Vector(0F, 10F))
         val pointLoadSampleB = PointLoad(knotSampleB, Consts.VERTICAL * 10F)
 
@@ -47,8 +47,8 @@ class StructureModelTest {
 
     @Test
     fun structure_getEqvLoads() {
-        val expected = setOf(  // using sets gurantees that the order will not matter
-            DistributedLoad(knotSampleB, knotSampleC, 10F).getEqvLoad(),
+        val expected = setOf(  // using sets guarantees that the order will not matter
+            DistributedLoad(knotSampleB, knotSampleC, Vector(0F, 10F)).getEqvLoad(),
             PointLoad(knotSampleB, Vector(0F, 10F)),
             PointLoad(knotSampleB, Consts.VERTICAL * 10F)
         )

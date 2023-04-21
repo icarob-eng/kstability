@@ -63,7 +63,7 @@ object DistributedLoadPolynomials {
 
     fun bendingMoment(a: Vector, f: Vector): Polynomial = Polynomial(a=f.y/2, b=-f.y*a.x, c=(f.y*a.x*a.x)/2)
 
-    inline fun bendingMomentEnd(a: Vector, f: Vector, end: Vector) = bendingMoment(a, f) + bendingMoment(end, -f)
+    fun bendingMomentEnd(a: Vector, f: Vector, end: Vector) = bendingMoment(a, f) + bendingMoment(end, -f)
 }
 
 object MomentumLoadPolynomials{

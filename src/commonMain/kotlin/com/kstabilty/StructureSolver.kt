@@ -63,7 +63,7 @@ class StructureSolver (val structure: Structure,
             if (labels) {
                 drawer.writeLabel(
                     (findLabelPos(it.knot1.pos) + findLabelPos(it.knot2.pos))/2,
-                    it.norm.toString() + forceUnit + '/' + lengthUnit
+                    it.vector.toString() + forceUnit + '/' + lengthUnit
                 )
             }
             drawer.drawDistributedLoad(it)
@@ -86,8 +86,8 @@ class StructureSolver (val structure: Structure,
     private fun plot(bar: Bar, method: (List<Section>, Int) -> Polynomial, step: Float, labels: Boolean) {
         val pair = Diagrams.getDiagram(structure, bar, method, step)
         val axes = pair.first
-        // todo: axis scalling
-        drawer.plotChart(pair.first.first, pair.first.second)
+        // todo: axis scaling
+        drawer.plotChart(axes.first, axes.second)
 
         if (labels) {
             val expressions = pair.second.map {it.toString()}

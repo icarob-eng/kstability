@@ -20,6 +20,17 @@ data class Knot(val name: String, val pos: Vector, val structure: Structure? = n
     }
 
     override operator fun equals(other: Any?) = if (other is Knot) this.pos == other.pos else false
+    override fun hashCode(): Int {
+        var result = name.hashCode()
+        result = 31 * result + pos.hashCode()
+        result = 31 * result + (structure?.hashCode() ?: 0)
+        result = 31 * result + (support?.hashCode() ?: 0)
+        result = 31 * result + momentum.hashCode()
+        result = 31 * result + bars.hashCode()
+        result = 31 * result + pointLoads.hashCode()
+        result = 31 * result + distributedLoads.hashCode()
+        return result
+    }
 }
 
 data class Support(val knot: Knot, val gender: SupportGender, val dir: Vector) {
@@ -56,10 +67,16 @@ data class PointLoad(val knot: Knot, val vector: Vector) {
 
         else -> false
     }
+
+    override fun hashCode(): Int {
+        var result = knot.pos.hashCode()
+        result = 31 * result + vector.hashCode()
+        return result
+    }
 }
 
 // forces are assumed to be normal to the load length
-data class DistributedLoad(val knot1: Knot, val knot2: Knot, val norm: Float) {  // todo: substituir norma por vetor de intensidade
+data class DistributedLoad(val knot1: Knot, val knot2: Knot, val vector: Vector) {  // todo: substituir norma por vetor de intensidade
     init {
         knot1.distributedLoads.add(this)
         knot2.distributedLoads.add(this)
@@ -73,9 +90,16 @@ data class DistributedLoad(val knot1: Knot, val knot2: Knot, val norm: Float) { 
             (knot1.pos + knot2.pos) / 2,  // midpoint
             null
         ),
-        (knot2.pos - knot1.pos).getOrthogonal() * (knot2.pos - knot1.pos).modulus() * norm
-        // bisector vector times modulus of the entire distributed force
+        vector * (knot2.pos - knot1.pos).modulus()
+        // distributes the load vector through all the bar's length
     )
+
+    override fun hashCode(): Int {
+        var result = knot1.pos.hashCode()
+        result = 31 * result + knot2.pos.hashCode()
+        result = 31 * result + vector.hashCode()
+        return result
+    }
 }
 
 data class Structure(val name: String, val knots: MutableList<Knot> = mutableListOf()) {
@@ -122,7 +146,7 @@ data class Structure(val name: String, val knots: MutableList<Knot> = mutableLis
             DistributedLoad(
                 newStructure.knots.first { knot -> knot.name == it.knot1.name },
                 newStructure.knots.first { knot -> knot.name == it.knot2.name },
-                it.norm
+                it.vector
                 )
         }
 

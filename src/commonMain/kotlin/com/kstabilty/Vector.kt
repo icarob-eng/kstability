@@ -61,7 +61,6 @@ data class Vector(val x: Float, val y: Float) {
     }
 
     override fun hashCode(): Int {
-        // todo: check if its valid
         var result = x.hashCode()
         result = 31 * result + y.hashCode()
         return result
