@@ -17,11 +17,11 @@ The library isn't ye publish and it's in experimental fase, so the only installa
 $ git clone https://github.com/icarob-eng/kstability.git
 ```
 
-## Use
+## Usage
 There are three steps to using this library:
 1. Implmenting the [ploting interface](https://github.com/icarob-eng/kstability/blob/main/src/commonMain/kotlin/com/kstabilty/IStructureDrawer.kt);
 2. Instantiating objects, decribing the structure;
-3. Putting all together in an [`StructureSolver`](https://github.com/icarob-eng/kstability/blob/main/src/commonMain/kotlin/com/kstabilty/ChartingRoutines.kt) instance.
+3. Putting all together in an [`ChartingRoutines`](https://github.com/icarob-eng/kstability/blob/main/src/commonMain/kotlin/com/kstabilty/ChartingRoutines.kt) instance.
 
 ### 1. Implementing an `IStructureDrawer`
 
@@ -48,3 +48,9 @@ By the way that the library is defined, a structure holds a list of knots and th
 
 The `StructureSolver` class is made to facilitate the calculations and ploting routines, simplifing the hole process to those given steps.
 All it's public filds and methods can be used. For more information read the source code's documentation.
+
+## Contribute
+For all changes, a issue is required, to discuss what you would like to change.
+
+## License
+[GNU General Public License v3.0](https://github.com/icarob-eng/kstability/blob/main/LICENSE)
