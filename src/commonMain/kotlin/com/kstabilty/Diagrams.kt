@@ -1,16 +1,16 @@
 package com.kstabilty
 
 
-/**
- * Defines a section along one bar, where the knot marks the **start** of the section, and the bar, the direction.
- *
- * @see Diagrams.getSections
- */
-data class Section (val bar: Bar, val knot: Knot)
 typealias Axis = List<Float>
 typealias Axes = Pair<Axis, Axis>
-
 object Diagrams {
+    /**
+     * Defines a section along one [bar], where the [knot] marks the **start** of the section, and the bar, the direction.
+     *
+     * @see Diagrams.getSections
+     */
+    data class Section (val bar: Bar, val knot: Knot)
+
     /**
      * Derives a list of sections from a structure. Each section is defined by a knot, where it begins.
      * The knots are divided by a line perpendicular to the given bar.
@@ -46,16 +46,16 @@ object Diagrams {
         val distributedLoads = relevantSections.flatMap { it.knot.distributedLoads }
         val momentum = relevantSections.map { it.knot.momentum }.sum()
 
-        var resultPolynomial = MomentumLoadPolynomials.bendingMoment(momentum.toDouble())
-        resultPolynomial = pointLoads.map { PointLoadPolynomials.bendingMoment(it.knot.pos, it.vector)}.fold(resultPolynomial) { i, j -> i+j}
+        var resultPolynomial = Polynomial.MomentumLoad.bendingMoment(momentum.toDouble())
+        resultPolynomial = pointLoads.map { Polynomial.PointLoad.bendingMoment(it.knot.pos, it.vector)}.fold(resultPolynomial) { i, j -> i+j}
         // equivalent of: result += map.sum()
 
         distributedLoads.forEach { dL ->
             val limits = listOf(dL.knot1.pos, dL.knot2.pos).sortedBy { it.x }
 
             resultPolynomial += if (limits.last().x >= relevantSections.last().knot.pos.x)
-                DistributedLoadPolynomials.bendingMomentEnd(limits.first(), dL.vector, limits.last())
-            else DistributedLoadPolynomials.bendingMoment(limits.first(), dL.vector)
+                Polynomial.DistributedLoad.bendingMomentEnd(limits.first(), dL.vector, limits.last())
+            else Polynomial.DistributedLoad.bendingMoment(limits.first(), dL.vector)
         }
 
         return resultPolynomial
@@ -79,16 +79,16 @@ object Diagrams {
         val distributedLoads = relevantSections.flatMap { it.knot.distributedLoads }
 //        val momentum = relevantSections.map { it.knot.momentum }.sum()
 
-        var resultPolynomial = MomentumLoadPolynomials.shearStress()
-        resultPolynomial = pointLoads.map { PointLoadPolynomials.shearStress(it.vector)}.fold(resultPolynomial) { i, j -> i+j}
+        var resultPolynomial = Polynomial.MomentumLoad.shearStress()
+        resultPolynomial = pointLoads.map { Polynomial.PointLoad.shearStress(it.vector)}.fold(resultPolynomial) { i, j -> i+j}
         // equivalent of: result += map.sum()
 
         distributedLoads.forEach { dL ->
             val limits = listOf(dL.knot1.pos, dL.knot2.pos).sortedBy { it.x }
 
             resultPolynomial += if (limits.last().x >= relevantSections.last().knot.pos.x)
-                DistributedLoadPolynomials.shearStressEnd(limits.first(), dL.vector, limits.last())
-            else DistributedLoadPolynomials.shearStress(limits.first(), dL.vector)
+                Polynomial.DistributedLoad.shearStressEnd(limits.first(), dL.vector, limits.last())
+            else Polynomial.DistributedLoad.shearStress(limits.first(), dL.vector)
         }
 
         return resultPolynomial
@@ -112,16 +112,16 @@ object Diagrams {
         val distributedLoads = relevantSections.flatMap { it.knot.distributedLoads }
 //        val momentum = relevantSections.map { it.knot.momentum }.sum()
 
-        var resultPolynomial = MomentumLoadPolynomials.normalStress()
-        resultPolynomial = pointLoads.map { PointLoadPolynomials.normalStress(it.vector)}.fold(resultPolynomial) { i, j -> i+j}
+        var resultPolynomial = Polynomial.MomentumLoad.normalStress()
+        resultPolynomial = pointLoads.map { Polynomial.PointLoad.normalStress(it.vector)}.fold(resultPolynomial) { i, j -> i+j}
         // equivalent of: result += map.sum()
 
         distributedLoads.forEach { dL ->
             val limits = listOf(dL.knot1.pos, dL.knot2.pos).sortedBy { it.x }
 
             resultPolynomial += if (limits.last().x >= relevantSections.last().knot.pos.x)
-                DistributedLoadPolynomials.normalStressEnd(limits.first(), dL.vector, limits.last())
-            else DistributedLoadPolynomials.normalStress(limits.first(), dL.vector)
+                Polynomial.DistributedLoad.normalStressEnd(limits.first(), dL.vector, limits.last())
+            else Polynomial.DistributedLoad.normalStress(limits.first(), dL.vector)
         }
 
         return resultPolynomial

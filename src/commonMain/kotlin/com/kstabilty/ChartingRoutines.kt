@@ -3,11 +3,18 @@ package com.kstabilty
 import kotlin.math.abs
 import kotlin.math.max
 
-class StructureSolver (val structure: Structure,
-                       private val drawer: IStructureDrawer,
-                       private val forceUnit: String = "N",
-                       private val lengthUnit: String = "m",
-                       private val labelDistancePercentage: Double = 0.05
+/**
+ * A class with basic routines of the library, including stabilize the structure by default, [drawStructure], and
+ * plotting many structure's charts: [drawBendingMoment], [drawShearStress], [drawNormalStress].
+ *
+ * @see IStructureDrawer
+ * @see Structure
+ */
+class ChartingRoutines (val structure: Structure,
+                        private val drawer: IStructureDrawer,
+                        private val forceUnit: String = "N",
+                        private val lengthUnit: String = "m",
+                        private val labelDistancePercentage: Double = 0.05
 ) {
     private val majorAxisLength: Float
 
@@ -52,7 +59,7 @@ class StructureSolver (val structure: Structure,
             if (labels) {
                 drawer.writeLabel(
                     findLabelPos(it.knot.pos) +
-                        Consts.VERTICAL * majorAxisLength * labelDistancePercentage,
+                        Vector.Consts.VERTICAL * majorAxisLength * labelDistancePercentage,
                     it.vector.modulus().toString() + forceUnit
                 )
             }
@@ -83,7 +90,7 @@ class StructureSolver (val structure: Structure,
         structure.getBars().map { plot(it, Diagrams::generateNormalFunction, step, labels) }
     }
 
-    private fun plot(bar: Bar, method: (List<Section>, Int) -> Polynomial, step: Float, labels: Boolean) {
+    private fun plot(bar: Bar, method: (List<Diagrams.Section>, Int) -> Polynomial, step: Float, labels: Boolean) {
         val pair = Diagrams.getDiagram(structure, bar, method, step)
         val axes = pair.first
         // todo: axis scaling

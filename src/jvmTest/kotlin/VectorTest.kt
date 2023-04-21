@@ -1,4 +1,4 @@
-import com.kstabilty.Consts
+import com.kstabilty.Vector.Consts
 import com.kstabilty.Vector
 import org.junit.jupiter.api.Test
 

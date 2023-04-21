@@ -21,7 +21,7 @@ $ git clone https://github.com/icarob-eng/kstability.git
 There are three steps to using this library:
 1. Implmenting the [ploting interface](https://github.com/icarob-eng/kstability/blob/main/src/commonMain/kotlin/com/kstabilty/IStructureDrawer.kt);
 2. Instantiating objects, decribing the structure;
-3. Putting all together in an [`StructureSolver`](https://github.com/icarob-eng/kstability/blob/main/src/commonMain/kotlin/com/kstabilty/StructureSolver.kt) instance.
+3. Putting all together in an [`StructureSolver`](https://github.com/icarob-eng/kstability/blob/main/src/commonMain/kotlin/com/kstabilty/ChartingRoutines.kt) instance.
 
 ### 1. Implementing an `IStructureDrawer`
 

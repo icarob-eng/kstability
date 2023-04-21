@@ -182,8 +182,8 @@ data class DistributedLoad(val knot1: Knot, val knot2: Knot, val vector: Vector)
  * This is the main class in this library, used to aggregate all other instances.
  * It only _actually_ holds all the knots.
  *
- * Has many methods to sum up all the data, for example, `getEqvLoads()` it's the resultant force in the project.
- * And also has a method for rotate all of it.
+ * Has many methods to sum up all the data, for example, [getEqvLoads] it's the resultant force in the project.
+ * And also has [getRotatedCopy], a method for rotate all of it.
  *
  * @property name It's just a name, use at your will.
  * @property knots A list of all knots, that actually holds the data.

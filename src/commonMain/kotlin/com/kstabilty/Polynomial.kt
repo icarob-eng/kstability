@@ -3,9 +3,9 @@ package com.kstabilty
 import kotlin.math.sqrt
 
 /**
- * Represents a polynomial function defining the `invoke` operator as f(x). Calculates vertex and roots for a != 0.
+ * Represents a polynomial function, defining the [invoke] operator as f(x).
  *
- * Automatically calculates the expression's delta, roots and vertex.
+ * Automatically calculates the expression's [delta], [roots] and [vertex], for `a != 0`.
  */
 data class Polynomial(val a: Double, val b: Double, val c: Double){
     constructor(a: Float, b: Float, c: Float) : this (a.toDouble(), b.toDouble(), c.toDouble())
@@ -42,32 +42,32 @@ data class Polynomial(val a: Double, val b: Double, val c: Double){
         }
         return expression.toString()
     }
+    object PointLoad {
+        fun normalStress(f: Vector): Polynomial = Polynomial(a=0F, b=0F, c=f.x)
+
+        fun shearStress(f: Vector): Polynomial = Polynomial(a=0F, b=0F, c=f.y)
+
+        fun bendingMoment(a: Vector, f: Vector): Polynomial = Polynomial(a=0F, b=f.y, c=-f.y*a.x)
+    }
+
+    object DistributedLoad {
+        fun normalStress(a: Vector, f: Vector): Polynomial = Polynomial(a=0F, b=f.x, c=-f.x*a.x)
+
+        fun normalStressEnd(a: Vector, f: Vector, end: Vector) = shearStress(a, f) + bendingMoment(end, -f)
+
+        fun shearStress(a: Vector, f: Vector): Polynomial = Polynomial(a=0F, b=f.y, c=-f.y*a.x)
+
+        fun shearStressEnd(a: Vector, f: Vector, end: Vector) = shearStress(a, f) + bendingMoment(end, -f)
+
+        fun bendingMoment(a: Vector, f: Vector): Polynomial = Polynomial(a=f.y/2, b=-f.y*a.x, c=(f.y*a.x*a.x)/2)
+
+        fun bendingMomentEnd(a: Vector, f: Vector, end: Vector) = bendingMoment(a, f) + bendingMoment(end, -f)
+    }
+
+    object MomentumLoad{
+        fun normalStress() = Polynomial(0F,0F,0F)
+        fun shearStress() = Polynomial(0F,0F,0F)
+        fun bendingMoment(m: Double) = Polynomial(a=0.0,b=0.0,c=m)
+    }
 }
 
-object PointLoadPolynomials {
-    fun normalStress(f: Vector): Polynomial = Polynomial(a=0F, b=0F, c=f.x)
-
-    fun shearStress(f: Vector): Polynomial = Polynomial(a=0F, b=0F, c=f.y)
-
-    fun bendingMoment(a: Vector, f: Vector): Polynomial = Polynomial(a=0F, b=f.y, c=-f.y*a.x)
-}
-
-object DistributedLoadPolynomials {
-    fun normalStress(a: Vector, f: Vector): Polynomial = Polynomial(a=0F, b=f.x, c=-f.x*a.x)
-
-    fun normalStressEnd(a: Vector, f: Vector, end: Vector) = shearStress(a, f) + bendingMoment(end, -f)
-
-    fun shearStress(a: Vector, f: Vector): Polynomial = Polynomial(a=0F, b=f.y, c=-f.y*a.x)
-
-    fun shearStressEnd(a: Vector, f: Vector, end: Vector) = shearStress(a, f) + bendingMoment(end, -f)
-
-    fun bendingMoment(a: Vector, f: Vector): Polynomial = Polynomial(a=f.y/2, b=-f.y*a.x, c=(f.y*a.x*a.x)/2)
-
-    fun bendingMomentEnd(a: Vector, f: Vector, end: Vector) = bendingMoment(a, f) + bendingMoment(end, -f)
-}
-
-object MomentumLoadPolynomials{
-    fun normalStress() = Polynomial(0F,0F,0F)
-    fun shearStress() = Polynomial(0F,0F,0F)
-    fun bendingMoment(m: Double) = Polynomial(a=0.0,b=0.0,c=m)
-}

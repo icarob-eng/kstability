@@ -1,4 +1,5 @@
 import com.kstabilty.*
+import com.kstabilty.Vector.Consts
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 

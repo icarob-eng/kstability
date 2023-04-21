@@ -4,14 +4,18 @@ import kotlin.jvm.JvmField
 import kotlin.math.sqrt
 
 
-object Consts {
-    @JvmField
-    val HORIZONTAL = Vector(1, 0)
-    @JvmField
-    val VERTICAL = Vector(0, 1)
-}
-
+/**
+ * All relevant methods are documented in `memoria_de_calculo.md`. The class also have many overloads to convert
+ * Ints and Doubles to Floats.
+ */
 data class Vector(val x: Float, val y: Float) {
+    object Consts {
+        @JvmField
+        val HORIZONTAL = Vector(1, 0)
+        @JvmField
+        val VERTICAL = Vector(0, 1)
+    }
+
     constructor(x: Int, y: Int) : this(x.toFloat(), y.toFloat())
     constructor(x: Double, y: Double) : this(x.toFloat(), y.toFloat())
 
