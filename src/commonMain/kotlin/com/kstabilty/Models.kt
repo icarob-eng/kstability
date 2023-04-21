@@ -1,16 +1,29 @@
 package com.kstabilty
 
 
-enum class SupportGender (val reactions: Int){
-    FIRST(1), // roller
-    SECOND(2),  // pinned
-    THIRD(3), // fixed
-}
-
+/**
+ * The knot class holds all load, support and bar information. It also could have a reference to the hole structure.
+ *
+ * @property name An (preferably) unique point name.
+ * @property pos The knot's position.
+ * @property structure A circular reference to the hole structure. Nullable.
+ * @property momentum The resultant bending moment applied at the knot, as a Float.
+ * @property bars List of bars that start or end at the knot. The bars also have a circular reference to the knot.
+ * @property pointLoads List of point loads applied at the knot. The loads also have a circular reference to the knot.
+ * @property distributedLoads List of distributed loads that start or end at the knot.
+ * The loads also have a circular reference to the knot.
+ *
+ * @see Vector
+ * @see PointLoad
+ * @see DistributedLoad
+ * @see Support
+ * @see Bar
+ * @see Structure
+ */
 data class Knot(val name: String, val pos: Vector, val structure: Structure? = null) {
     // todo: garantir que os nomes serão únicos
     var support: Support? = null  // only one support by knot
-    var momentum = 0F
+    var momentum = 0F  // todo: checar a quê corresponde o sinal
     val bars: MutableList<Bar> = mutableListOf()
     val pointLoads: MutableList<PointLoad> = mutableListOf()
     val distributedLoads: MutableList<DistributedLoad> = mutableListOf()
@@ -33,12 +46,50 @@ data class Knot(val name: String, val pos: Vector, val structure: Structure? = n
     }
 }
 
-data class Support(val knot: Knot, val gender: SupportGender, val dir: Vector) {
+/**
+ * A support object represents a place where the system will apply a reaction load, been it a point load or a bending
+ * moment. The support also specifies restrictions on the point load direction.
+ *
+ * @property knot A circular reference to the knot. When instantiated, it adds itself to the knot.
+ * @property gender A value from the inner enum class `Gender` Values could be:
+ *  - `FIRST`: representing a roller support or a simple contact, with no friction.
+ *  Requires to specify the restricted direction, that the reaction force will be parallel to;
+ *  - `SECOND`: representing a pinned support or a simple contact, with infinite friction.
+ *  Has no need to specify a restricted direction, cause all directions are restricted;
+ *  - `THIRD`: representing a fixed support, where all movements are restricted;
+ * @property dir Vector used to specify reaction force direction restrictions, when needed. Also **required** for plotting
+ * purposes.
+ *
+ * @see Knot
+ * @see PointLoad
+ */
+data class Support(val knot: Knot, val gender: Gender, val dir: Vector) {
     val direction: Vector = dir.normalize()  // unit vector
 
     init { knot.support = this }
+
+    enum class Gender (val reactions: Int){
+        FIRST(1), // roller
+        SECOND(2),  // pinned
+        THIRD(3), // fixed
+    }
 }
 
+/**
+ * Represents a physical connexion between 2 knots. In this library, we mainly use it for charts and plots,
+ * at the moment.
+ *
+ * _This API will change in the future._
+ *
+ * @property knot1 Represents the position where the bar starts. When instantiated, it adds itself to the knot.
+ * @property knot2 Represents the position where the bar ends. When instantiated, it adds itself to the knot.
+ * @property inclination Equals to the rise/run, i.e. dy/dx between the knots. Returns `Float.POSITIVE_INFINITY` if
+ * the bar is vertical with `knot2` is above `knot1` and `Float.NEGATIVE_INFINITY` if it has `knot1` above `knot2`.
+ *
+ * @see Knot
+ * @see Vector
+ * @see Structure
+ */
 data class Bar(val knot1: Knot, val knot2: Knot) {
     val inclination = if (knot1.pos.x != knot2.pos.x) (knot2.pos.y - knot1.pos.y)/(knot2.pos.x - knot1.pos.x)
     else if (knot2.pos.y >= knot1.pos.y) Float.POSITIVE_INFINITY else Float.NEGATIVE_INFINITY
@@ -57,6 +108,15 @@ data class Bar(val knot1: Knot, val knot2: Knot) {
     }
 }
 
+/**
+ * Represents a force applied at the given knot.
+ *
+ * @property knot Where the force is applied. When instantiated, it adds itself to the knot.
+ * @property vector Represents the actual force vector.
+ *
+ * @see Knot
+ * @see Vector
+ */
 data class PointLoad(val knot: Knot, val vector: Vector) {
     init { knot.pointLoads.add(this) }
 
@@ -75,8 +135,19 @@ data class PointLoad(val knot: Knot, val vector: Vector) {
     }
 }
 
-// forces are assumed to be normal to the load length
-data class DistributedLoad(val knot1: Knot, val knot2: Knot, val vector: Vector) {  // todo: substituir norma por vetor de intensidade
+/**
+ * Represents a force applied to a line segment.
+ *
+ * @property knot1 Represents the position where the load starts. starts. When instantiated, it adds itself to the knot.
+ * @property knot2 Represents the position where the load ends. When instantiated, it adds itself to the knot.
+ * @property vector Represents the force vector that is distributed through the line segment.
+ *
+ * @see Knot
+ * @see Vector
+ *
+ * @see getEqvLoad
+ */
+data class DistributedLoad(val knot1: Knot, val knot2: Knot, val vector: Vector) {
     init {
         knot1.distributedLoads.add(this)
         knot2.distributedLoads.add(this)
@@ -84,6 +155,12 @@ data class DistributedLoad(val knot1: Knot, val knot2: Knot, val vector: Vector)
 
     override operator fun equals(other: Any?) = this.getEqvLoad() == other
 
+    /**
+     * Returns the integral of the force vector through the line segment, i.e. distributes the load vector
+     * through all the bar's length.
+     *
+     * @return A point load applied between the two knots.
+     */
     fun getEqvLoad() = PointLoad(
         Knot(
             knot1.name + knot2.name,
@@ -91,7 +168,6 @@ data class DistributedLoad(val knot1: Knot, val knot2: Knot, val vector: Vector)
             null
         ),
         vector * (knot2.pos - knot1.pos).modulus()
-        // distributes the load vector through all the bar's length
     )
 
     override fun hashCode(): Int {
@@ -102,6 +178,16 @@ data class DistributedLoad(val knot1: Knot, val knot2: Knot, val vector: Vector)
     }
 }
 
+/**
+ * This is the main class in this library, used to aggregate all other instances.
+ * It only _actually_ holds all the knots.
+ *
+ * Has many methods to sum up all the data, for example, `getEqvLoads()` it's the resultant force in the project.
+ * And also has a method for rotate all of it.
+ *
+ * @property name It's just a name, use at your will.
+ * @property knots A list of all knots, that actually holds the data.
+ */
 data class Structure(val name: String, val knots: MutableList<Knot> = mutableListOf()) {
     fun getSupports() = knots.mapNotNull { it.support }
     fun getBars() = knots.flatMap { it.bars }

@@ -42,9 +42,9 @@ class StructureSolver (val structure: Structure,
         structure.getBars().forEach { drawer.drawBar(it) }
 
         structure.getSupports().forEach { when(it.gender){
-                SupportGender.FIRST -> drawer.drawFirstGenderSupport(it)
-                SupportGender.SECOND -> drawer.drawSecondGenderSupport(it)
-                SupportGender.THIRD -> drawer.drawThirdGenderSupport(it)
+                Support.Gender.FIRST -> drawer.drawFirstGenderSupport(it)
+                Support.Gender.SECOND -> drawer.drawSecondGenderSupport(it)
+                Support.Gender.THIRD -> drawer.drawThirdGenderSupport(it)
             }
         }
 

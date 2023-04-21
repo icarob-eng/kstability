@@ -11,8 +11,8 @@ class StabilizationTest {
     private val pointLoadSampleA = PointLoad(knotSampleB, Vector(0, -20))
     private val pointLoadSampleB = PointLoad(knotSampleC, Vector(0, -10))
 
-    private val supportSampleA = Support(knotSampleA, SupportGender.SECOND, Consts.VERTICAL)
-    private val supportSampleB = Support(knotSampleD, SupportGender.FIRST, Consts.VERTICAL)
+    private val supportSampleA = Support(knotSampleA, Support.Gender.SECOND, Consts.VERTICAL)
+    private val supportSampleB = Support(knotSampleD, Support.Gender.FIRST, Consts.VERTICAL)
     private val barSample = Bar(knotSampleA, knotSampleD)
 
     private val structureSample = Structure("My structure", mutableListOf(knotSampleA, knotSampleB, knotSampleC, knotSampleD))
@@ -159,7 +159,7 @@ class StabilizationTest {
         val knotSampleB1 = Knot("B", Vector(4F, 2F))
 
         PointLoad(knotSampleA1, Vector(0, -3))
-        Support(knotSampleB1, SupportGender.SECOND, Consts.HORIZONTAL)
+        Support(knotSampleB1, Support.Gender.SECOND, Consts.HORIZONTAL)
 
         val structureB = Structure("Fixed support structure",
             mutableListOf(knotSampleA1, knotSampleB1)
@@ -174,7 +174,7 @@ class StabilizationTest {
         val knotSampleB1 = Knot("B", Vector(4F, 2F))
 
         PointLoad(knotSampleA1, Vector(0, -3))
-        Support(knotSampleB1, SupportGender.THIRD, Consts.HORIZONTAL)
+        Support(knotSampleB1, Support.Gender.THIRD, Consts.HORIZONTAL)
 
         val structureB = Structure("Fixed support structure",
             mutableListOf(knotSampleA1, knotSampleB1)
