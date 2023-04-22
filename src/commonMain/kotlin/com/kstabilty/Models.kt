@@ -83,29 +83,34 @@ data class Support(val knot: Knot, val gender: Gender, val dir: Vector) {
  *
  * @property knot1 Represents the position where the bar starts. When instantiated, it adds itself to the knot.
  * @property knot2 Represents the position where the bar ends. When instantiated, it adds itself to the knot.
- * @property inclination Equals to the rise/run, i.e. dy/dx between the knots. Returns `Float.POSITIVE_INFINITY` if
- * the bar is vertical with `knot2` is above `knot1` and `Float.NEGATIVE_INFINITY` if it has `knot1` above `knot2`.
+ * @property barVector A vector from [knot1] to [knot2].
+ * @property inclination Equals to the rise/run, i.e. dy/dx between the knots, or the inclination of the [barVector].
+ * Returns `Float.POSITIVE_INFINITY` if the bar is vertical with `barVector.y >= 0` and `Float.NEGATIVE_INFINITY` if
+ * `barVector.y < 0`
  *
  * @see Knot
  * @see Vector
  * @see Structure
  */
 data class Bar(val knot1: Knot, val knot2: Knot) {
-    val inclination = if (knot1.pos.x != knot2.pos.x) (knot2.pos.y - knot1.pos.y)/(knot2.pos.x - knot1.pos.x)
-    else if (knot2.pos.y >= knot1.pos.y) Float.POSITIVE_INFINITY else Float.NEGATIVE_INFINITY
+    val barVector = knot2.pos - knot1.pos
+
+    val inclination = if (barVector.x != 0F) (barVector.y)/(barVector.x) else
+        if (barVector.y >= 0) Float.POSITIVE_INFINITY else Float.NEGATIVE_INFINITY
 
     init {
         knot1.bars.add(this)
         knot2.bars.add(this)
     }
 
-    fun makeTangentKnot(knot: Knot): Knot {
-        val barVector = knot2.pos - knot1.pos
-        return Knot(
-            knot.name + "'",
-            (barVector.normalize() / barVector.modulus()) * (-knot1.pos * (knot.pos + knot2.pos))
-        )
-    }
+    fun makeTangentKnot(knot: Knot) = Knot(
+        knot.name + "'",
+        (barVector.normalize() / barVector.modulus()) * (-knot1.pos * (knot.pos + knot2.pos))
+    )
+
+    // C is aligned with AB if |AC| + |CB| == |AB|
+    fun isAligned(vector: Vector) =
+        ((vector - knot1.pos).modulus() + (knot2.pos - vector).modulus()) == (barVector).modulus()
 }
 
 /**
