@@ -1,13 +1,13 @@
 # Memória de cálculo de kstability
 
-Modificado por último: 16/04/2023
+Modificado por último: 21/04/2023
 
 Neste documento serão transcritos os procedimentos de cálculo e fórmulas
 utlizadas pelo projeto kstability.
 
-## Algebra linear
+## Algebra vetorial
 
-As operações de algebra linear foram definidas na classe [`Vector`](https://github.com/icarob-eng/kstability/blob/main/src/commonMain/kotlin/com/kstabilty/Models.kt), transcrita abaixo:
+As operações de algebra vetorial foram definidas na classe [`Vector`](https://github.com/icarob-eng/kstability/blob/main/src/commonMain/kotlin/com/kstabilty/Vector.kt), transcrita abaixo:
 
 ```kotlin
 data class Vector(val x: Float, val y: Float) {
@@ -30,48 +30,48 @@ data class Vector(val x: Float, val y: Float) {
 
 Em notação matemática, as operações listadas podem ser transcritas, respectivamente, como:
 
-$\vec{A} + \vec{B} = \langle A_x + B_x; A_y + B_y \rangle$
+- $\vec{A} + \vec{B} = \langle A_x + B_x; A_y + B_y \rangle$
 
-$\vec{A} - \vec{B} = \langle A_x - B_x; A_y - B_y \rangle$
+- $\vec{A} - \vec{B} = \langle A_x - B_x; A_y - B_y \rangle$
 
-$\vec{A} \times c = \langle A_x \times c; A_y \times c \rangle$
+- $\vec{A} \times c = \langle A_x \times c; A_y \times c \rangle$
 
-$\vec{A} \div c = \langle A_x \div c; A_y \div c \rangle$
+- $\vec{A} \div c = \langle A_x \div c; A_y \div c \rangle$
 
-$|\vec{A}| = \sqrt{\vec{A} \cdot \vec{A}}$
+- $|\vec{A}| = \sqrt{\vec{A} \cdot \vec{A}}$
 
-$\hat{A} = \frac{\vec{A}}{|\vec{A}|}$
+- $\hat{A} = \frac{\vec{A}}{|\vec{A}|}$
 
-Produto escalar:
+- Produto escalar:
 
-$\vec{A} \cdot \vec{B} = A_x \times B_x + A_y \times B_y$
+    $\vec{A} \cdot \vec{B} = A_x \times B_x + A_y \times B_y$
 
-Para o produto vetorial, se obtêm apenas seu módulo, uma vez que o projeto se limita a duas dimensões
+- Para o produto vetorial, se obtêm apenas seu módulo, uma vez que o projeto se limita a $\mathbb{R}^2$
 
-$|\vec{A} \times \vec{B}| = A_x \times B_x - A_y \times B_y$
+    $|\vec{A} \times \vec{B}| = A_x \times B_x - A_y \times B_y$
 
-Para obter um vetor $\hat{B}$ tal que $\hat{B} \perp \vec{A}$ a função `getOrthogonal()` faz:
+- Para obter um vetor $\hat{B}$ tal que $\hat{B} \perp \vec{A}$ a função `getOrthogonal()` faz:
 
-$getOrthogonal(\vec{A}) = \langle - A_y; A_x\rangle = \hat{B}$
+    $getOrthogonal(\vec{A}) = \langle - A_y; A_x\rangle = \hat{B}$
+
+- Rotações de vetores s definidas numa seção adiante.
 
 ## Considerações de modelo
 
 Na presente concepção do modelo do projeto, vale-se destacar alguns aspectos:
 
-Um nó é onde ficam armazenados os dados das barras atreladas a ele; cargas distirbuidas e pontuais; 
-um único suporte, que pode ser de primeiro, segundo ou terceiro gênero; e um nome, 
+- Um nó é onde ficam armazenados os dados das barras atreladas a ele; cargas distirbuidas e pontuais;
+um único suporte, que pode ser de primeiro, segundo ou terceiro gênero; e um nome,
 que pode ser definido pelo usuário.
 
-*Ainda não foi definida a forma de interação entre múltiplas barras, de modo que devem funcionar 
-como rótulas.*
+- *A biblioteca ainda não funciona adequadamente para distinguir forças em múltiplas barras,
+de modo que só a primeira barra é considerada.*
 
-Uma barra tem como única propriedade atrelada a ela, seus nós, assim, as cargas precisam ser 
-atreladas às barras posteriomente, no momento de se definir os gráficos de esforços.
+- Cargas distribuidas tem como prorpiedades o nó inicial, o final e seu vetor unitário. 
+Uma carga pontual equivalente é encontrada por um método definido na seção de considerações físicas.
 
-Cargas distribuidas tem como prorpiedades o nó inicial, o final e sua norma. É obtida uma força 
-pontual equivalente por um método definido na seção de considerações físicas.
-
-Todos os nós são armazenados numa classe `Structure`, que representa um projeto como um todo sendo usada como base para calcular os parâmetros físicos.
+- Todos os nós são armazenados numa instância da classe `Structure`, que representa um projeto
+como um todo sendo usada como base para calcular os parâmetros físicos.
 
 
 ## Considerações físicas
@@ -80,33 +80,33 @@ Todos os nós são armazenados numa classe `Structure`, que representa um projet
 
 Até o momento, o teste de estabilidade de uma estrutura é feito apenas pela somatória dos gêneros 
 dos suportes da estrutura, comparando-os com $3$. Isto foi feito desta forma, pois nem todos os nós 
-possuem barras e não foi determinada forma de se especificar a ligação entre as barras. 
-Necessita-se discutir a utilidade da funcionalidade deste teste. 
-
+possuem barras e não foi determinada forma de se especificar a ligação entre as barras.
 
 ### Carga pontual equivalente a carga distirbuida
 
 Para este cáculo se faz necessário obter dois valores: o ponto de aplicação da força equivalente e 
 o vetor desta: $\vec{P_e}, \vec{F_e}$.
 
-Defina-se $\vec{P_1}, \vec{P_2}, N$ como respectivamente, o ponto inicial da carga distribuída, o 
-ponto final e sua norma. Com isto, temos que:
+Defina-se $\vec{P_1}, \vec{P_2}, \vec{F_u}$ como respectivamente, o ponto inicial da carga distribuída, o 
+ponto final e sua intensidade uniária. Com isto, temos que:
 
 $\vec{P_e} = \frac{\vec{P_1} + \vec{P_2}}{2}$
 
 e
 
-$\vec{F_e} = (getOrthogonal(\vec{P_2} - \vec{P_1}) \cdot |\vec{P_2} - \vec{P_1}|) \times N$
+$\vec{F_e} = |\vec{P_2} - \vec{P_1}| \vec{F_u}$
 
 A implementação das equações foi esta:
 
 ```kotlin
-fun getEqvLoad() = Load(
-        Knot(knot1.name + knot2.name,
-            (knot1.pos + knot2.pos) / 2F,  // midpoint
-            null),
-        (knot2.pos - knot1.pos).getOrthogonal() * (knot2.pos - knot1.pos).modulus() * norm
-        )
+    fun getEqvLoad() = PointLoad(
+        Knot(
+            knot1.name + knot2.name,
+            (knot1.pos + knot2.pos) / 2,  // midpoint
+            null
+        ),
+        vector * (knot2.pos - knot1.pos).modulus()
+    )
 ```
 
 ### Somatório de cargas e momentos fletores
