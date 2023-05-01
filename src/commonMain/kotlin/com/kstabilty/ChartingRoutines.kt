@@ -60,7 +60,7 @@ class ChartingRoutines (val structure: Structure,
                 drawer.writeLabel(
                     findLabelPos(it.knot.pos) +
                         Vector.Consts.VERTICAL * majorAxisLength * labelDistancePercentage,
-                    it.vector.modulus().toString() + forceUnit
+                    it.vector.length().toString() + forceUnit
                 )
             }
             drawer.drawArrow(it)

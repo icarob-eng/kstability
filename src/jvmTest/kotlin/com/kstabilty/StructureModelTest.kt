@@ -1,4 +1,5 @@
-import com.kstabilty.*
+package com.kstabilty
+
 import com.kstabilty.Vector.Consts
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -10,7 +11,7 @@ class StructureModelTest {
     private val knotSampleD = Knot("D", Vector(4F, 2F))
 
     private val supportSampleA = Support(knotSampleA, Support.Gender.SECOND, Vector(0F, 5F))
-//    private val supportSampleB = Support(knotSampleD, Gender.FIRST, Consts.VERTICAL)
+    private val supportSampleB = Support(knotSampleD, Support.Gender.FIRST, Consts.VERTICAL)
 //    private val barSample = Bar(knotSampleA, knotSampleD)
 
     private val structureSample = Structure("My structure", mutableListOf(knotSampleA, knotSampleB, knotSampleC, knotSampleD))
@@ -40,9 +41,11 @@ class StructureModelTest {
         val pointLoadSampleA = PointLoad(knotSampleB, Vector(0F, 10F))
         val pointLoadSampleB = PointLoad(knotSampleB, Consts.VERTICAL * 10F)
 
-        assertEquals(distributedLoadSampe, structureSample.getDistributedLoads()[0])
-        assertEquals(pointLoadSampleA, structureSample.getPointLoads()[0])
-        assertEquals(pointLoadSampleB, structureSample.getPointLoads()[1])
+        assertAll( "LoadsHolding",
+            {assertEquals(distributedLoadSampe, structureSample.getDistributedLoads()[0])},
+            {assertEquals(pointLoadSampleA, structureSample.getPointLoads()[0])},
+            {assertEquals(pointLoadSampleB, structureSample.getPointLoads()[1])}
+        )
         // kinda surprise that this passes
     }
 
@@ -55,5 +58,25 @@ class StructureModelTest {
         )
 
         assertEquals(expected, structureSample.getEqvLoads().toSet())
+    }
+
+    @Test
+    fun rotateAll() {
+        val i = Float.POSITIVE_INFINITY
+        val rotatedKnotPosSampleC = knotSampleC.pos.getRotated(i)
+        val rotatedSupportDirSampleB = supportSampleB.direction.getRotated(i)
+
+        val samplePointLoad = PointLoad(knotSampleD, Vector(0,3))
+        val rotatedPointLoadVector = samplePointLoad.vector.getRotated(i)
+
+
+        val rotatedStructure = structureSample.getRotatedCopy(i)
+
+        assertAll("rotateAll",
+            { assertEquals(rotatedKnotPosSampleC, rotatedStructure.knots.first{ it.name == "C"}.pos) },
+            { assertEquals(rotatedSupportDirSampleB, rotatedStructure.getSupports()[1].direction) },
+            { assertEquals(i, rotatedStructure.getBars().first().inclination) }, // bar inclination == i
+            { assertEquals(rotatedPointLoadVector, rotatedStructure.getPointLoads().first().vector) },
+        )
     }
 }

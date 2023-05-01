@@ -1,5 +1,6 @@
+package com.kstabilty
+
 import com.kstabilty.Vector.Consts
-import com.kstabilty.Vector
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
@@ -16,7 +17,7 @@ class VectorTest {
     @Test
     fun modulus() {
         val expected = 5F
-        assertEquals(expected, sample.modulus())
+        assertEquals(expected, sample.length())
     }
 
     @Test
@@ -56,5 +57,14 @@ class VectorTest {
     @Test
     fun getOrthogonal() {
         assertEquals(Consts.VERTICAL, sampleC.getOrthogonal())
+    }
+
+    @Test
+    fun rotate() {
+        assertAll("getRotated",
+            { assertEquals(sampleC.getOrthogonal() * 2, sampleC.getRotated(Float.POSITIVE_INFINITY))},
+            { assertEquals(Vector(1, 3).normalize()*2, sampleC.getRotated(3F/1)) },
+            { assertEquals(Vector(7, 5).normalize()*2, sampleC.getRotated(5F/7)) }
+        )
     }
 }

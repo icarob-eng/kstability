@@ -34,16 +34,16 @@ data class Vector(val x: Float, val y: Float) {
     operator fun unaryPlus() = this
 
     override operator fun equals(other: Any?) = when (other) {
-        is Number -> this.modulus() == other
+        is Number -> this.length() == other
 
         is Vector -> this.x == other.x && this.y == other.y
 
         else -> false
     }
 
-    fun modulus() = sqrt(this*this)  // = sqrt(x**2 + y**2)
+    fun length() = sqrt(this*this)  // = sqrt(x**2 + y**2)
 
-    fun normalize() = this/modulus()
+    fun normalize() = this/length()
 
     operator fun times(other: Vector) = this.x * other.x + this.y * other.y  // dot product
 
@@ -51,7 +51,7 @@ data class Vector(val x: Float, val y: Float) {
 
     fun getOrthogonal() = Vector(-y, x).normalize()
 
-    fun rotate(i: Float): Vector {
+    fun getRotated(i: Float): Vector {
         return if (i == 0F) this
         else if (i.isFinite()) {
             // sin and cos arctg formulae from wolfram alpha
@@ -61,7 +61,8 @@ data class Vector(val x: Float, val y: Float) {
                 this.x * cosarctg - this.y * sinarctg,
                 this.x * sinarctg + this.y * cosarctg
             )
-        } else if (i == Float.POSITIVE_INFINITY) this.getOrthogonal() else - this.getOrthogonal()
+        } else if (i == Float.POSITIVE_INFINITY) this.getOrthogonal() * this.length()
+        else -this.getOrthogonal() * this.length()
     }
 
     override fun hashCode(): Int {

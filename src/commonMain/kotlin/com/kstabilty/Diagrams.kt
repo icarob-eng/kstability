@@ -229,7 +229,7 @@ object Diagrams {
      */
     fun rotatePlot(axes: Axes, i: Float): Axes{
         val vectorList: List<Vector> = axes.first.mapIndexed { index, it -> Vector(it, axes.second[index])}
-        vectorList.forEach { it.rotate(i) }
+        vectorList.forEach { it.getRotated(i) }
 
         return Pair(vectorList.map { it.x }, vectorList.map { it.y })
     }

@@ -76,7 +76,7 @@ object Stabilization {
         val rb = supportB.knot.pos
         val c = resultForce
         val m = resultMomentum
-        val i = supportB.dir
+        val i = supportB.direction
 
         val phi = rb.crossModule(i)
         val psi = ra.crossModule(i)

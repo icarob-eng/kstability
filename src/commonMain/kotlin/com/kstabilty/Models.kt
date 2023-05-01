@@ -63,7 +63,7 @@ data class Knot(val name: String, val pos: Vector, val structure: Structure? = n
  * @see Knot
  * @see PointLoad
  */
-data class Support(val knot: Knot, val gender: Gender, val dir: Vector) {
+data class Support(val knot: Knot, val gender: Gender, private val dir: Vector) {
     val direction: Vector = dir.normalize()  // unit vector
 
     init { knot.support = this }
@@ -105,12 +105,12 @@ data class Bar(val knot1: Knot, val knot2: Knot) {
 
     fun makeTangentKnot(knot: Knot) = Knot(
         knot.name + "'",
-        (barVector.normalize() / barVector.modulus()) * (-knot1.pos * (knot.pos + knot2.pos))
+        (barVector.normalize() / barVector.length()) * (-knot1.pos * (knot.pos + knot2.pos))
     )
 
     // C is aligned with AB if |AC| + |CB| == |AB|
     fun isAligned(vector: Vector) =
-        ((vector - knot1.pos).modulus() + (knot2.pos - vector).modulus()) == (barVector).modulus()
+        ((vector - knot1.pos).length() + (knot2.pos - vector).length()) == (barVector).length()
 }
 
 /**
@@ -172,7 +172,7 @@ data class DistributedLoad(val knot1: Knot, val knot2: Knot, val vector: Vector)
             (knot1.pos + knot2.pos) / 2,  // midpoint
             null
         ),
-        vector * (knot2.pos - knot1.pos).modulus()
+        vector * (knot2.pos - knot1.pos).length()
     )
 
     override fun hashCode(): Int {
@@ -202,11 +202,11 @@ data class Structure(val name: String, val knots: MutableList<Knot> = mutableLis
     fun getEqvLoads() = getPointLoads() + getDistributedLoads().map { it.getEqvLoad() }
 
     fun getRotatedCopy(i: Float): Structure {
-        // todo: testar se rotacionar os nós e cargas pontuais já resolveria
+        // todo: testar se rotacionar os nós e cargas já resolveria
 
         val newStructure = Structure(this.name + "'", mutableListOf())
         this.knots.forEach {
-            val knot = Knot(it.name, it.pos.rotate(i), newStructure)
+            val knot = Knot(it.name, it.pos.getRotated(i), newStructure)
             knot.momentum = it.momentum
         }
         // passa todos os nós e depois altera procurando um a um
@@ -215,7 +215,7 @@ data class Structure(val name: String, val knots: MutableList<Knot> = mutableLis
             Support(
                 newStructure.knots.first { knot -> knot.name == it.knot.name },
                 it.gender,
-                it.dir.rotate(i)
+                it.direction.getRotated(i)
             )
         }
 
@@ -229,7 +229,7 @@ data class Structure(val name: String, val knots: MutableList<Knot> = mutableLis
         this.getPointLoads().forEach {
             PointLoad(
                 newStructure.knots.first { knot -> knot.name == it.knot.name },
-                it.vector.rotate(i)
+                it.vector.getRotated(i)
             )
         }
 
