@@ -84,9 +84,6 @@ data class Support(val knot: Knot, val gender: Gender, private val dir: Vector) 
  * @property knot1 Represents the position where the bar starts. When instantiated, it adds itself to the knot.
  * @property knot2 Represents the position where the bar ends. When instantiated, it adds itself to the knot.
  * @property barVector A vector from [knot1] to [knot2].
- * @property inclination Equals to the rise/run, i.e. dy/dx between the knots, or the inclination of the [barVector].
- * Returns `Float.POSITIVE_INFINITY` if the bar is vertical with `barVector.y >= 0` and `Float.NEGATIVE_INFINITY` if
- * `barVector.y < 0`
  *
  * @see Knot
  * @see Vector

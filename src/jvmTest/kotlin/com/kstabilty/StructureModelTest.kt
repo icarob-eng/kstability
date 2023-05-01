@@ -9,10 +9,10 @@ class StructureModelTest {
     private val knotSampleB = Knot("B", Vector(1F, 2F))
     private val knotSampleC = Knot("C", Vector(3F, 2F))
     private val knotSampleD = Knot("D", Vector(4F, 2F))
+        .also { Bar(knotSampleA, it) }
 
     private val supportSampleA = Support(knotSampleA, Support.Gender.SECOND, Vector(0F, 5F))
     private val supportSampleB = Support(knotSampleD, Support.Gender.FIRST, Consts.VERTICAL)
-    private val barSample = Bar(knotSampleA, knotSampleD)
 
     private val structureSample = Structure("My structure", mutableListOf(knotSampleA, knotSampleB, knotSampleC, knotSampleD))
 

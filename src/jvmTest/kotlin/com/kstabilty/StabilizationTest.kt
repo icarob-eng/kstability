@@ -7,15 +7,14 @@ import org.junit.jupiter.api.Assertions.*
 class StabilizationTest {
     private val knotSampleA = Knot("A", Vector(0F, 2F))
     private val knotSampleB = Knot("B", Vector(1F, 2F))
+        .also{ PointLoad(it, Vector(0, -20)) } // applies load sample
     private val knotSampleC = Knot("C", Vector(3F, 2F))
+        .also { PointLoad(it, Vector(0, -10)) }
     private val knotSampleD = Knot("D", Vector(4F, 2F))
-
-    private val pointLoadSampleA = PointLoad(knotSampleB, Vector(0, -20))
-    private val pointLoadSampleB = PointLoad(knotSampleC, Vector(0, -10))
+        .also { Bar(knotSampleA, it) }
 
     private val supportSampleA = Support(knotSampleA, Support.Gender.SECOND, Consts.VERTICAL)
     private val supportSampleB = Support(knotSampleD, Support.Gender.FIRST, Consts.VERTICAL)
-    private val barSample = Bar(knotSampleA, knotSampleD)
 
     private val structureSample = Structure("My structure", mutableListOf(knotSampleA, knotSampleB, knotSampleC, knotSampleD))
 
@@ -39,7 +38,7 @@ class StabilizationTest {
     fun isostaticTest() {
         assertTrue(Stabilization.isIsostatic(structureSample))
     }
-    // todo: check isostacity in more complex structures
+    // todo: check isostaticity in more complex structures
 
     @Test
     fun getResultMomentumTest() {
