@@ -49,7 +49,7 @@ data class Vector(val x: Float, val y: Float) {
 
     fun crossModule(other: Vector) = this.x * other.y - this.y * other.x
 
-    fun getOrthogonal() = Vector(-y, x).normalize()
+    fun orthogonal() = Vector(-y, x).normalize()
 
     fun getRotated(i: Float): Vector {
         return if (i == 0F) this
@@ -61,8 +61,8 @@ data class Vector(val x: Float, val y: Float) {
                 this.x * cosarctg - this.y * sinarctg,
                 this.x * sinarctg + this.y * cosarctg
             )
-        } else if (i == Float.POSITIVE_INFINITY) this.getOrthogonal() * this.length()
-        else -this.getOrthogonal() * this.length()
+        } else if (i == Float.POSITIVE_INFINITY) this.orthogonal() * this.length()
+        else -this.orthogonal() * this.length()
     }
 
     fun inclination() = if (this.x != 0F) (this.y)/(this.x) else

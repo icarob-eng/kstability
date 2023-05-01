@@ -56,15 +56,26 @@ class VectorTest {
 
     @Test
     fun getOrthogonal() {
-        assertEquals(Consts.VERTICAL, sampleC.getOrthogonal())
+        assertEquals(Consts.VERTICAL, sampleC.orthogonal())
     }
 
     @Test
-    fun rotate() {
+    fun getRotated() {
         assertAll("getRotated",
-            { assertEquals(sampleC.getOrthogonal() * 2, sampleC.getRotated(Float.POSITIVE_INFINITY))},
+            { assertEquals(sampleC.orthogonal() * 2, sampleC.getRotated(Float.POSITIVE_INFINITY))},
             { assertEquals(Vector(1, 3).normalize()*2, sampleC.getRotated(3F/1)) },
             { assertEquals(Vector(7, 5).normalize()*2, sampleC.getRotated(5F/7)) }
+        )
+    }
+
+    @Test
+    fun inclination() {
+        assertAll("inclination",
+            { assertEquals(4F/3, sample.inclination()) },
+            { assertEquals(2F/1, sampleB.inclination()) },
+            { assertEquals(0F, sampleC.inclination()) },
+            { assertEquals(Float.POSITIVE_INFINITY, Consts.VERTICAL.inclination()) },
+            { assertEquals(Float.NEGATIVE_INFINITY, -Consts.VERTICAL.inclination()) },
         )
     }
 }

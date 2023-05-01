@@ -36,7 +36,7 @@ class ChartingRoutines (val structure: Structure,
             drawer.writeLabel(findLabelPos(it.pos), it.name)
 
             if (it.momentum != 0F && labels) drawer.writeLabel(
-                findLabelPos(it.pos).getOrthogonal(),
+                findLabelPos(it.pos).orthogonal(),
                 it.momentum.toString() + forceUnit  + lengthUnit
             )
             if (it.momentum > 0F) {
