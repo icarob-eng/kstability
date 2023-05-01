@@ -10,7 +10,7 @@ object Stabilization {
      * @see isStable
      */
     fun isIsostatic(structure: Structure): Boolean {
-        // todo: advanced method for checking isostacity
+        // todo: advanced method for checking isostaticity
         var genders = 0
         for (support in structure.getSupports())
             genders += support.gender.reactions

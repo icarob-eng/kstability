@@ -46,7 +46,7 @@ object Diagrams {
         val distributedLoads = relevantSections.flatMap { it.knot.distributedLoads }
         val momentum = relevantSections.map { it.knot.momentum }.sum()
 
-        var resultPolynomial = Polynomial.MomentumLoad.bendingMoment(momentum.toDouble())
+        var resultPolynomial = Polynomial.MomentumLoad.bendingMoment(momentum)
         resultPolynomial = pointLoads.map { Polynomial.PointLoad.bendingMoment(it.knot.pos, it.vector)}.fold(resultPolynomial) { i, j -> i+j}
         // equivalent of: result += map.sum()
 
@@ -181,7 +181,7 @@ object Diagrams {
             var i = sections.indexOfLast { x >= it.knot.pos.x }  // this is responsible to actually divide the sections
             // if the next x is equal to current, make the section be the last one, else, use the new one
             i = if (x == xAxis[xAxis.indexOf(x) + 1]) i - 1 else i
-            yAxis.add(polynomials[i](x).toFloat())
+            yAxis.add(polynomials[i](x))
         }
         return yAxis
     }

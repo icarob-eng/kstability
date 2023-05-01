@@ -7,14 +7,13 @@ import kotlin.math.sqrt
  *
  * Automatically calculates the expression's [delta], [roots] and [vertex], for `a != 0`.
  */
-data class Polynomial(val a: Double, val b: Double, val c: Double){
-    constructor(a: Float, b: Float, c: Float) : this (a.toDouble(), b.toDouble(), c.toDouble())
+data class Polynomial(val a: Float, val b: Float, val c: Float){
     private val delta = b * b - 4 * a * c
-    val roots = if (a != 0.toDouble()) Pair(
+    val roots = if (a != 0F) Pair(
         (- b + sqrt(delta))/ (2 * a),
         (- b - sqrt(delta))/ (2 * a)
     ) else null
-    val vertex = if (a != 0.toDouble()) Vector(-b / (2 * a), delta / (4 * a)) else null
+    val vertex = if (a != 0F) Vector(-b / (2 * a), delta / (4 * a)) else null
 
     operator fun invoke(x: Int) = a * x * x + b * x + c
     operator fun invoke(x: Float) = a * x * x + b * x + c
@@ -26,18 +25,18 @@ data class Polynomial(val a: Double, val b: Double, val c: Double){
 
     override fun toString(): String {
         val expression = StringBuilder()
-        if (a != 0.0) {
-            if (a>0.0) expression.append("+")
+        if (a != 0F) {
+            if (a>0F) expression.append("+")
             expression.append(a.toString())
             expression.append("x²")
         }
-        if (b != 0.0) {
-            if (b>0.0) expression.append("+")
+        if (b != 0F) {
+            if (b>0F) expression.append("+")
             expression.append(b.toString())
             expression.append("x")
         }
-        if (c != 0.0) {
-            if (c>0.0) expression.append("+")
+        if (c != 0F) {
+            if (c>0F) expression.append("+")
             expression.append(c.toString())
         }
         return expression.toString()
@@ -67,7 +66,7 @@ data class Polynomial(val a: Double, val b: Double, val c: Double){
     object MomentumLoad{
         fun normalStress() = Polynomial(0F,0F,0F)
         fun shearStress() = Polynomial(0F,0F,0F)
-        fun bendingMoment(m: Double) = Polynomial(a=0.0,b=0.0,c=m)
+        fun bendingMoment(m: Float) = Polynomial(a=0F,b=0F,c=m)
     }
 }
 
