@@ -212,7 +212,7 @@ object Diagrams {
                    method: (List<Section>, Int) -> Polynomial,
                    step: Float): Pair<Axes, List<Polynomial>> {
 
-        val structure = inputStructure.getRotatedCopy(bar.inclination)
+        val structure = inputStructure.getRotatedCopy(bar.barVector.inclination())
 
         val sections = getSections(structure, bar)
 
@@ -220,7 +220,7 @@ object Diagrams {
         val polynomials = sections.indices.map { method(sections, it) }
         val y = getYAxis(sections, x, polynomials)
 
-        return Pair(rotatePlot(Pair(x, y), -bar.inclination), polynomials)
+        return Pair(rotatePlot(Pair(x, y), -bar.barVector.inclination()), polynomials)
     }
 
 

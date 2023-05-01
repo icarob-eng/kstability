@@ -95,9 +95,6 @@ data class Support(val knot: Knot, val gender: Gender, private val dir: Vector) 
 data class Bar(val knot1: Knot, val knot2: Knot) {
     val barVector = knot2.pos - knot1.pos
 
-    val inclination = if (barVector.x != 0F) (barVector.y)/(barVector.x) else
-        if (barVector.y >= 0) Float.POSITIVE_INFINITY else Float.NEGATIVE_INFINITY
-
     init {
         knot1.bars.add(this)
         knot2.bars.add(this)
@@ -202,9 +199,8 @@ data class Structure(val name: String, val knots: MutableList<Knot> = mutableLis
     fun getEqvLoads() = getPointLoads() + getDistributedLoads().map { it.getEqvLoad() }
 
     fun getRotatedCopy(i: Float): Structure {
-        // todo: testar se rotacionar os nós e cargas já resolveria
-
-        val newStructure = Structure(this.name + "'", mutableListOf())
+        // não seria possível rotacionar apenas os nós e direções, pois as direções são valores imutáveis
+        val newStructure = Structure(this.name + "'")
         this.knots.forEach {
             val knot = Knot(it.name, it.pos.getRotated(i), newStructure)
             knot.momentum = it.momentum

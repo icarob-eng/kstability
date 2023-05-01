@@ -65,6 +65,9 @@ data class Vector(val x: Float, val y: Float) {
         else -this.getOrthogonal() * this.length()
     }
 
+    fun inclination() = if (this.x != 0F) (this.y)/(this.x) else
+        if (this.y >= 0) Float.POSITIVE_INFINITY else Float.NEGATIVE_INFINITY
+
     override fun hashCode(): Int {
         var result = x.hashCode()
         result = 31 * result + y.hashCode()

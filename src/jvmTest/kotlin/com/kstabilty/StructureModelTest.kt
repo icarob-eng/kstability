@@ -12,7 +12,7 @@ class StructureModelTest {
 
     private val supportSampleA = Support(knotSampleA, Support.Gender.SECOND, Vector(0F, 5F))
     private val supportSampleB = Support(knotSampleD, Support.Gender.FIRST, Consts.VERTICAL)
-//    private val barSample = Bar(knotSampleA, knotSampleD)
+    private val barSample = Bar(knotSampleA, knotSampleD)
 
     private val structureSample = Structure("My structure", mutableListOf(knotSampleA, knotSampleB, knotSampleC, knotSampleD))
 
@@ -75,7 +75,7 @@ class StructureModelTest {
         assertAll("rotateAll",
             { assertEquals(rotatedKnotPosSampleC, rotatedStructure.knots.first{ it.name == "C"}.pos) },
             { assertEquals(rotatedSupportDirSampleB, rotatedStructure.getSupports()[1].direction) },
-            { assertEquals(i, rotatedStructure.getBars().first().inclination) }, // bar inclination == i
+            { assertEquals(i, rotatedStructure.getBars().first().barVector.inclination()) }, // bar inclination == i
             { assertEquals(rotatedPointLoadVector, rotatedStructure.getPointLoads().first().vector) },
         )
     }
