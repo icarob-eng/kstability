@@ -97,9 +97,10 @@ data class Bar(val knot1: Knot, val knot2: Knot) {
         knot2.bars.add(this)
     }
 
+    // proj_a b =  (a * b) * a / |a|² = (a * b) * â / |a|
     fun makeTangentKnot(knot: Knot) = Knot(
         knot.name + "'",
-        (barVector.normalize() / barVector.length()) * (-knot1.pos * (knot.pos + knot2.pos))
+        (barVector.normalize() / barVector.length()) * ((knot.pos - knot1.pos) * barVector)
     )
 
     // C is aligned with AB if |AC| + |CB| == |AB|

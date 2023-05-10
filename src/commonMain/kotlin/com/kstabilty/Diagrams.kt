@@ -152,10 +152,10 @@ object Diagrams {
 
         for (section in sections) {
             val i = section.knot.pos.x
-            if (i !in axis) axis.add(i)
-            axis.add(i)  // guarantees that there's 2 points at intersection
+            axis.add(i)
+            axis.add(i)  // guarantees that there's at least 2 points at intersection
         }
-        return axis
+        return axis.sorted()
     }
 
 
@@ -181,7 +181,9 @@ object Diagrams {
             var i = sections.indexOfLast { x >= it.knot.pos.x }  // this is responsible to actually divide the sections
             // if the next x is equal to current, make the section be the last one, else, use the new one
             i = if (x == xAxis[xAxis.indexOf(x) + 1]) i - 1 else i
-            yAxis.add(polynomials[i](x))
+            yAxis.add(
+                if (i >= 0) polynomials[i](x) else 0F  // avoid i = -1 for duplicate 0.0
+            )
         }
         return yAxis
     }
@@ -228,11 +230,12 @@ object Diagrams {
      * Rotates a pair of axes, by the given inclination (rise/run).
      */
     fun rotatePlot(axes: Axes, i: Float): Axes{
-        val vectorList: List<Vector> = axes.first.mapIndexed { index, it -> Vector(it, axes.second[index])}
-        vectorList.forEach { it.getRotated(i) }
+        val vectorList: List<Vector> = axes.first
+            .mapIndexed { index, it -> Vector(it, axes.second[index])}  // transforms axis to vector list
+            .map { it.getRotated(i) }  // rotate each vector and return the list of results
 
         return Pair(vectorList.map { it.x }, vectorList.map { it.y })
     }
 
-//    fun scaleAxis(axis: Axis, factor: Float) = axis.map { it * factor }
+    fun scaleAxis(axis: Axis, factor: Float) = axis.map { it * factor }
 }
