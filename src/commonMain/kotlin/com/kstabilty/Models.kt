@@ -20,7 +20,7 @@ package com.kstabilty
  * @see Bar
  * @see Structure
  */
-data class Knot(val name: String, val pos: Vector, val structure: Structure? = null) {
+data class Knot(var name: String, val pos: Vector, val structure: Structure? = null) {
     // todo: garantir que os nomes serão únicos
     var support: Support? = null  // only one support by knot
     var momentum = 0F  // todo: checar a quê corresponde o sinal
