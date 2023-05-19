@@ -89,6 +89,7 @@ class Node(private val arg:Map<String,Any> = mapOf()){
  * @see Node
  * @see Knot
  * **/
+@Suppress("UNCHECKED_CAST")
 class Nodes(private val arg: Map<String,Any>){
 
     val isANodeSection = run{
@@ -153,7 +154,7 @@ class Nodes(private val arg: Map<String,Any>){
  * @see Vector
  *
  * **/
-
+@Suppress("UNCHECKED_CAST")
 class Holder(private val arg:Map<String,Any>){
 
     constructor(entry: Map.Entry<String, Any>): this(mapOf(entry.toPair()))
@@ -209,6 +210,7 @@ class Holder(private val arg:Map<String,Any>){
     }
 }
 
+@Suppress("UNCHECKED_CAST")
 class Holders(private val arg:Map<String, Any>){
 
     val isAHolderSection:Boolean = run{
@@ -348,6 +350,7 @@ class Beams(private val arg: Map<String,Any>){
     }
 }
 
+@Suppress("UNCHECKED_CAST")
 class Load(private val arg: Map<String, Any>){
 
     val isLoad: Boolean = run{
