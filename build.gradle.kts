@@ -43,7 +43,11 @@ kotlin {
                 implementation(kotlin("test"))
             }
         }
-        val jvmMain by getting
+        val jvmMain by getting {
+            dependencies {
+                implementation("org.yaml:snakeyaml:1.29")
+            }
+        }
         val jvmTest by getting
         val jsMain by getting
         val jsTest by getting
