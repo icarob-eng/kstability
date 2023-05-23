@@ -1,15 +1,15 @@
 package com.kstabilty
 
 import com.kstabilty.Vector.Consts
-import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
 
 class StabilizationTest {
     private val knotSampleA = Knot("A", Vector(0F, 2F))
     private val knotSampleB = Knot("B", Vector(1F, 2F))
-        .also{ PointLoad(it, Vector(0, -20)) } // applies load sample
+        .also{ PointLoad(it, Vector(0f, -20f)) } // applies load sample
     private val knotSampleC = Knot("C", Vector(3F, 2F))
-        .also { PointLoad(it, Vector(0, -10)) }
+        .also { PointLoad(it, Vector(0f, -10f)) }
     private val knotSampleD = Knot("D", Vector(4F, 2F))
         .also { Bar(knotSampleA, it) }
 
@@ -28,10 +28,10 @@ class StabilizationTest {
      * Also, the resultant force after stabilization should be 0.
       */
 
-    private val expectedResultForce = Vector(0, -30)
+    private val expectedResultForce = Vector(0f, -30f)
     private val expectedBendingMoment = -20 * 1 - 10 * 3F
-    private val expectedReactionA = Vector(0.0, 17.5)
-    private val expectedReactionD = Vector(0.0, 12.5)
+    private val expectedReactionA = Vector(0.0f, 17.5f)
+    private val expectedReactionD = Vector(0.0f, 12.5f)
 
 
     @Test
@@ -96,7 +96,7 @@ class StabilizationTest {
          * Checks if the expected reaction forces in the structure makes the result force 0
          */
 
-        val expected = Vector(0, 0)
+        val expected = Vector(0f, 0f)
 
         PointLoad(knotSampleA, expectedReactionA)
         PointLoad(knotSampleD, expectedReactionD)
@@ -119,7 +119,7 @@ class StabilizationTest {
 
     @Test
     fun resultForceStabilizedTest() {
-        val expected = Vector(0, 0)
+        val expected = Vector(0f, 0f)
 
         Stabilization.stabilize(structureSample)
 
@@ -159,7 +159,7 @@ class StabilizationTest {
         val knotSampleA1 = Knot("A", Vector(0F, 2F))
         val knotSampleB1 = Knot("B", Vector(4F, 2F))
 
-        PointLoad(knotSampleA1, Vector(0, -3))
+        PointLoad(knotSampleA1, Vector(0f, -3f))
         Support(knotSampleB1, Support.Gender.SECOND, Consts.HORIZONTAL)
 
         val structureB = Structure("Fixed support structure",
@@ -174,7 +174,7 @@ class StabilizationTest {
         val knotSampleA1 = Knot("A", Vector(0F, 2F))
         val knotSampleB1 = Knot("B", Vector(4F, 2F))
 
-        PointLoad(knotSampleA1, Vector(0, -3))
+        PointLoad(knotSampleA1, Vector(0f, -3f))
         Support(knotSampleB1, Support.Gender.THIRD, Consts.HORIZONTAL)
 
         val structureB = Structure("Fixed support structure",
@@ -183,7 +183,7 @@ class StabilizationTest {
 
         Stabilization.stabilize(structureB)
 
-        val expectedResultForce = Vector(0, 0)
+        val expectedResultForce = Vector(0f, 0f)
         val expectedResultMomenta = 0F
 
         assertEquals(expectedResultForce, Stabilization.getResultForce(structureB))

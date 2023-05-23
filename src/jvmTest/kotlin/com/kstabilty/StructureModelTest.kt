@@ -1,7 +1,8 @@
 package com.kstabilty
 
 import com.kstabilty.Vector.Consts
-import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Assertions.assertAll
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 class StructureModelTest {
@@ -66,7 +67,7 @@ class StructureModelTest {
         val rotatedKnotPosSampleC = knotSampleC.pos.getRotated(i)
         val rotatedSupportDirSampleB = supportSampleB.direction.getRotated(i)
 
-        val samplePointLoad = PointLoad(knotSampleD, Vector(0,3))
+        val samplePointLoad = PointLoad(knotSampleD, Vector(0f,3f))
         val rotatedPointLoadVector = samplePointLoad.vector.getRotated(i)
 
 

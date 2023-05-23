@@ -1,14 +1,13 @@
 package com.kstabilty
 
 import com.kstabilty.Vector.Consts
+import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
-import org.junit.jupiter.api.Assertions.*
-
 class VectorTest {
-    private val sample = Vector(3, 4)
-    private val sampleB = Vector(1, 2)
-    private val sampleC = Vector(2, 0)
+    private val sample = Vector(3f, 4f)
+    private val sampleB = Vector(1f, 2f)
+    private val sampleC = Vector(2f, 0f)
 
     /**
      * Expected values calculated by numpy
@@ -23,7 +22,7 @@ class VectorTest {
     @Test
     fun normalize() {
         // [0.6, 0.8]
-        val expected = Vector(0.6, 0.8)
+        val expected = Vector(0.6f, 0.8f)
         assertEquals(expected, sample.normalize())
     }
 
