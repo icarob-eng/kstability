@@ -11,7 +11,7 @@ import com.kstabilty.*
  * @see Node
  * @see Vector
  * **/
-class Node(private val arg:Map<String,Any> = mapOf()){
+class NodeCreator(private val arg:Map<String,Any> = mapOf()){
 
     constructor(entry: Map.Entry<String,Any>) : this(mapOf(entry.toPair()))
 
@@ -39,7 +39,7 @@ class Node(private val arg:Map<String,Any> = mapOf()){
 
     @Suppress("UNCHECKED_CAST")
     @Throws(ClassCastException::class, IllegalArgumentException::class)
-    fun makeNode(): com.kstabilty.Node? {
+    fun createNode(): Node? {
         if(this.isNode){
             if(arg.values.all {it is String && (it.lowercase() =="vertical" || it.lowercase()=="horizontal")}){
                 val name:String = arg.entries.first().key
@@ -76,7 +76,7 @@ class Node(private val arg:Map<String,Any> = mapOf()){
 
 /**
  * Class responsible for managing a support, regarding the argument passed to it.
- * @property isHolder property responsible for indicating, preliminarily, if the
+ * @property isSupport property responsible for indicating, preliminarily, if the
  * argument passed to the class is a support.
  *
  * @see Support
@@ -84,14 +84,14 @@ class Node(private val arg:Map<String,Any> = mapOf()){
  * @see Vector
  *
  * **/
-class Holder(private val arg:Map<String,Any>){
+class SupportCreator(private val arg:Map<String,Any>){
 
     constructor(entry: Map.Entry<String, Any>): this(mapOf(entry.toPair()))
 
-    val isHolder:Boolean
-        get() = _isHolder()
+    val isSupport:Boolean
+        get() = _isSupport()
 
-    private fun _isHolder():Boolean{
+    private fun _isSupport():Boolean{
         if(arg.entries.size!=1){
             return false
         }
@@ -101,9 +101,9 @@ class Holder(private val arg:Map<String,Any>){
 
     @Suppress("UNCHECKED_CAST")
     @Throws(ClassCastException::class, IllegalArgumentException::class)
-    fun makeSupport(nodes:MutableList<com.kstabilty.Node>): Support? {
+    fun createSupport(nodes:MutableList<Node>): Support? {
         val holder:Map<String, Any> = (arg.entries.first().value as Map<String,Map<String, Any>>)
-        if(this.isHolder){
+        if(this.isSupport){
             if(holder["direção"] is String){
                 return if(holder["gênero"]==1){
                     nodes.find{it.name==arg.entries.first().key}
@@ -152,17 +152,17 @@ class Holder(private val arg:Map<String,Any>){
  * @see Beam
  * **/
 
-class Beam(private val beam:ArrayList<*>){
+class BeamCreator(private val beams:ArrayList<*>){
 
     val isBeam:Boolean
         get() = _isBeam()
 
     private fun _isBeam():Boolean{
-        return beam.all { it is String }
+        return beams.all { it is String }
     }
 
-    fun isValidBeam(nodes:MutableList<com.kstabilty.Node>):Boolean{
-        for(name in beam){
+    fun isValidBeam(nodes:MutableList<Node>):Boolean{
+        for(name in beams){
             if(name !in nodes.map { it.name }){
                 return false
             }
@@ -171,10 +171,10 @@ class Beam(private val beam:ArrayList<*>){
     }
 
     @Throws(IllegalArgumentException::class)
-    fun makeBar(nodes:MutableList<com.kstability.Node>): com.kstability.Beam? {
-        if(this.isBeam && this.isValidBeam(knots)){
-            return Bar(node1 = nodes.find { it.name == beam.get(0) }!!,
-                knot2 = nodes.find { it.name == node.get(1) }!!)
+    fun createBeam(nodes:MutableList<Node>): Beam? {
+        if(this.isBeam && this.isValidBeam(nodes)){
+            return Beam(node1 = nodes.find { it.name == beams[0] }!!,
+                node2 = nodes.find { it.name == beams[1] }!!)
         }
         else{
             throw IllegalArgumentException("As barras informadas são inválidas.")
@@ -190,7 +190,7 @@ class Beam(private val beam:ArrayList<*>){
  * @see DistributedLoad
  * @see PointLoad
  * **/
-class Load(private val arg: Map<String, Any>){
+class PointLoadCreator(private val arg: Map<String, Any>){
 
     constructor(arg:Map.Entry<String,Any>):this(mapOf(arg.toPair()))
 
@@ -209,16 +209,16 @@ class Load(private val arg: Map<String, Any>){
 
     @Suppress("UNCHECKED_CAST")
     @Throws(ClassCastException::class)
-    fun makeLoad(nodes: MutableList<com.kstabilty.Node>): Any? {
+    fun createLoad(nodes: MutableList<Node>): Any? {
         if(this.isLoad){
             val content = arg.entries.first().value as Map<String, Any>
             if(content.keys.containsAll(setOf("nó","direção","módulo")) || content["no"] is ArrayList<*>){
-                val knotsNames = (content["no"] as ArrayList<String>)
-                if(knotsNames.size!=2){
+                val nodesNames = (content["no"] as ArrayList<String>)
+                if(nodesNames.size!=2){
                     throw Exception("Número de nós inválidos.")
                 }
-                return DistributedLoad(node1 = nodes.find { it.name == knotsNames[0]}!!,
-                    node2 = nodes.find { it.name == knotsNames[1]}!!,
+                return DistributedLoad(node1 = nodes.find { it.name == nodesNames[0]}!!,
+                    node2 = nodes.find { it.name == nodesNames[1]}!!,
                     vector = Vector(content["direção"] as String)*(content["módulo"] as Float))
             }
             else if(content.keys.containsAll(setOf("nó","direção","módulo")) || content["no"] is String){
@@ -226,12 +226,12 @@ class Load(private val arg: Map<String, Any>){
                     vector=Vector(content["direção"] as String)*(content["módulo"] as Float))
             }
             else if(content.keys.containsAll(setOf("nó","vetor")) || content["no"] is ArrayList<*>){
-                val knotsNames = (content["no"] as ArrayList<String>)
-                if(knotsNames.size!=2){
+                val nodesNames = (content["no"] as ArrayList<String>)
+                if(nodesNames.size!=2){
                     throw Exception("Número de nós inválidos.")
                 }
-                return DistributedLoad(node1 = nodes.find { it.name == knotsNames[0]}!!,
-                    node2 = nodes.find { it.name == knotsNames[1]}!!, Vector(content["vetor"] as ArrayList<Number>))
+                return DistributedLoad(node1 = nodes.find { it.name == nodesNames[0]}!!,
+                    node2 = nodes.find { it.name == nodesNames[1]}!!, Vector(content["vetor"] as ArrayList<Number>))
             }
             else if(content.keys.containsAll(setOf("nó","vetor")) || content["no"] is String){
                 return PointLoad(node = nodes.find { it.name == content["nó"]}!!,
