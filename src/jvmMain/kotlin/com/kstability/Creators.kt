@@ -1,8 +1,6 @@
 package com.kstability
 
 import com.kstabilty.*
-import org.yaml.snakeyaml.Yaml
-import java.io.File
 
 /**
  * Class responsible for converting a node, and its respective properties,
@@ -13,7 +11,6 @@ import java.io.File
  * @see Node
  * @see Vector
  * **/
-@Suppress("UNCHECKED_CAST")
 class Node(private val arg:Map<String,Any> = mapOf()){
 
     constructor(entry: Map.Entry<String,Any>) : this(mapOf(entry.toPair()))
@@ -40,6 +37,8 @@ class Node(private val arg:Map<String,Any> = mapOf()){
         return false
     }
 
+    @Suppress("UNCHECKED_CAST")
+    @Throws(ClassCastException::class, IllegalArgumentException::class)
     fun makeNode(): com.kstabilty.Node? {
         if(this.isNode){
             if(arg.values.all {it is String && (it.lowercase() =="vertical" || it.lowercase()=="horizontal")}){
@@ -76,73 +75,6 @@ class Node(private val arg:Map<String,Any> = mapOf()){
 }
 
 /**
- * Class responsible for managing all the nodes contained in the appropriate section: node.
- *
- * @property isANodeSection property responsible for checking whether the passed argument is a node section.
- * @property isAllNodes property responsible for checking if the content of the section is only composed of nodes.
- * @property isAnyNode property responsible for checking whether there is at least one node in the section.
- *
- * @see Node
- * @see Node
- * **/
-@Suppress("UNCHECKED_CAST")
-class Nodes(private val arg: Map<String,Any>){
-
-    val isANodeSection:Boolean
-        get() = _isANodeSection()
-    private fun _isANodeSection():Boolean {
-        if(arg.entries.size!=1){
-            return false
-        }
-        for((outerKey,outerValue) in arg as Map<String,Map<String,Any>>){
-            for(innerMap in outerValue){
-                if(!Node(innerMap).isNode){
-                    return false
-                }
-            }
-        }
-        return true
-    }
-
-    val isAllNodes:Boolean = _isANodeSection()
-
-    val isAnyNode:Boolean
-        get() = _isAnyNode()
-    private fun _isAnyNode():Boolean {
-        if(arg.entries.size!=1){
-            return false
-        }
-        for((outerKey,outerValue) in arg as Map<String,Map<String,Any>>){
-            for(innerMap in outerValue){
-                if(Node(innerMap).isNode){
-                    return true
-                }
-            }
-        }
-        return false
-    }
-    fun makeNodes():MutableList<com.kstabilty.Node>{
-        val nodes: MutableList<com.kstabilty.Node> = mutableListOf()
-        if(this.isANodeSection){
-            for((_,outerValue) in arg as Map<String,Map<String,Any>>){
-                for(innerNode in outerValue){
-                    Node(innerNode).makeNode()?.let { nodes.add(it) }
-                }
-            }
-        }
-        else if(this.isAnyNode){
-            for((_,outerValue) in arg as Map<String,Map<String,Any>>){
-                for(innerNode in outerValue){
-                    if(Node(innerNode).isNode)
-                    Node(innerNode).makeNode()?.let { nodes.add(it) }
-                }
-            }
-        }
-        return nodes
-    }
-}
-
-/**
  * Class responsible for managing a support, regarding the argument passed to it.
  * @property isHolder property responsible for indicating, preliminarily, if the
  * argument passed to the class is a support.
@@ -152,7 +84,6 @@ class Nodes(private val arg: Map<String,Any>){
  * @see Vector
  *
  * **/
-@Suppress("UNCHECKED_CAST")
 class Holder(private val arg:Map<String,Any>){
 
     constructor(entry: Map.Entry<String, Any>): this(mapOf(entry.toPair()))
@@ -167,6 +98,9 @@ class Holder(private val arg:Map<String,Any>){
         return arg.values.all{ it -> (it as Map<*, *>).values.all { it == 1 || it == 2 || it == 3 || it =="vertical" ||
                 it =="horizontal" || (it is ArrayList<*> && it.all { it is Number })}}
     }
+
+    @Suppress("UNCHECKED_CAST")
+    @Throws(ClassCastException::class, IllegalArgumentException::class)
     fun makeSupport(nodes:MutableList<com.kstabilty.Node>): Support? {
         val holder:Map<String, Any> = (arg.entries.first().value as Map<String,Map<String, Any>>)
         if(this.isHolder){
@@ -209,80 +143,6 @@ class Holder(private val arg:Map<String,Any>){
 }
 
 /**
- * Class responsible for managing the supports contained in the appropriate section: supports
- * @property isAHolderSection property responsible for checking whether the argument passed to
- * the class is a support section.
- * @property isAllHolders property responsible for checking whether all arguments in the section are brackets.
- * @property isAnyHolder property responsible for checking if any arguments of the section are supports.
- *
- * @see Holder
- * **/
-
-@Suppress("UNCHECKED_CAST")
-class Holders(private val arg:Map<String, Any>){
-
-    val isAHolderSection:Boolean
-        get() = _isAHolderSection()
-
-    private fun _isAHolderSection():Boolean{
-        if(arg.entries.size!=1) {
-            return false
-        }
-        for((_, outerValue) in arg as Map<String,Map<String,Any>>){
-            for(holder in outerValue){
-                if(!Holder(outerValue).isHolder){
-                    return false
-                }
-            }
-        }
-        return true
-    }
-
-    val isAllHolders:Boolean
-        get() = _isAllHolders()
-
-    private fun _isAllHolders():Boolean{
-        for((_, outerValue) in arg as Map<String, Map<String,Any>>){
-            for(holder in outerValue){
-                if(!Holder(outerValue).isHolder){
-                    return false
-                }
-            }
-        }
-        return true
-    }
-
-    val isAnyHolder: Boolean
-        get() = _isAnyHolder()
-
-    private fun _isAnyHolder():Boolean {
-        for((_, outerValue) in arg as Map<String, Map<String, Any>>){
-            for(holder in outerValue){
-                if(!Holder(outerValue).isHolder){
-                    return false
-                }
-            }
-        }
-        return false
-    }
-
-    fun makeSupports(nodes: MutableList<com.kstabilty.Node>):MutableList<Support>?{
-        val supports:MutableList<Support> = mutableListOf()
-        if(this.isAHolderSection){
-            for((_,outerValue) in arg as Map<String,Map<String,Any>>){
-                for(holder in outerValue){
-                    Holder(holder).makeSupport(nodes)?.let { supports.add(it) }
-                }
-            }
-        }
-        else{
-            throw IllegalArgumentException("O argumento da classe não é uma seção de suportes.")
-        }
-        return null
-    }
-
-}
-/**
  * Class responsible for managing the construction and evaluation of a slash candidate argument.
  *
  * @property isBeam property responsible for preliminarily checking whether the argument is a slash.
@@ -310,10 +170,11 @@ class Beam(private val beam:ArrayList<*>){
         return true
     }
 
-    fun makeBar(nodes:MutableList<com.kstabilty.Node>): com.kstabilty.Beam? {
-        if(this.isBeam && this.isValidBeam(nodes)){
-            return Beam(node1 = nodes.find { it.name == beam.get(0) }!!,
-                node2 = nodes.find { it.name == beam.get(1) }!!)
+    @Throws(IllegalArgumentException::class)
+    fun makeBar(nodes:MutableList<com.kstability.Node>): com.kstability.Beam? {
+        if(this.isBeam && this.isValidBeam(knots)){
+            return Bar(node1 = nodes.find { it.name == beam.get(0) }!!,
+                knot2 = nodes.find { it.name == node.get(1) }!!)
         }
         else{
             throw IllegalArgumentException("As barras informadas são inválidas.")
@@ -321,43 +182,7 @@ class Beam(private val beam:ArrayList<*>){
         return null
     }
 }
-/**
- * Class responsible for managing the construction and verification of bars according to the argument passed to it.
- * @property isABeamSection property responsible for checking whether the argument passed to the class
- * constitutes a section of slashes.
- *
- * @see Beam
- * **/
-class Beams(private val arg: Map<String,Any>){
 
-    val isABeamSection:Boolean
-        get() = _isABeamSection()
-
-    private fun _isABeamSection():Boolean{
-        return !(arg.entries.size !=1 || arg.entries.first().key!="barras")
-    }
-
-    fun isValidListOfBeams(nodes:MutableList<com.kstabilty.Node>): Boolean {
-        for (beam in arg.entries.first().value as ArrayList<*>) {
-            if (!Beam(beam as ArrayList<*>).isValidBeam(nodes)) {
-                return false
-            }
-        }
-        return true
-    }
-
-    fun makeBars(nodes:MutableList<com.kstabilty.Node>):List<com.kstabilty.Beam>{
-        val out:MutableList<com.kstabilty.Beam> = mutableListOf()
-        if(this.isValidListOfBeams(nodes)){
-            for(beam in arg.entries.first().value as ArrayList<*>)
-                Beam(beam as ArrayList<*>).makeBar(nodes)?.let { out.add(it) }
-        }
-        else{
-            throw IllegalArgumentException("A lista de barras é inválida.")
-        }
-        return out
-    }
-}
 /**
  * Class responsible for managing the argument passed to it regarding loads.
  * @property isLoad checks if the argument passed to the class is a payload.
@@ -365,7 +190,6 @@ class Beams(private val arg: Map<String,Any>){
  * @see DistributedLoad
  * @see PointLoad
  * **/
-@Suppress("UNCHECKED_CAST")
 class Load(private val arg: Map<String, Any>){
 
     constructor(arg:Map.Entry<String,Any>):this(mapOf(arg.toPair()))
@@ -373,6 +197,8 @@ class Load(private val arg: Map<String, Any>){
     val isLoad: Boolean
         get() = _isLoad()
 
+    @Suppress("UNCHECKED_CAST")
+    @Throws(ClassCastException::class)
     private fun _isLoad():Boolean{
         if(arg.entries.size!=1){
             return false
@@ -381,6 +207,8 @@ class Load(private val arg: Map<String, Any>){
         return content.keys.containsAll(setOf("nó","direção","módulo")) || content.keys.containsAll(setOf("nó","vetor"))
     }
 
+    @Suppress("UNCHECKED_CAST")
+    @Throws(ClassCastException::class)
     fun makeLoad(nodes: MutableList<com.kstabilty.Node>): Any? {
         if(this.isLoad){
             val content = arg.entries.first().value as Map<String, Any>
@@ -413,70 +241,4 @@ class Load(private val arg: Map<String, Any>){
         return null
     }
 
-}
-
-class Loads(private val arg: Map<String,Any>){
-
-    val isALoadSection:Boolean
-        get() = _isALoadSection()
-
-    private fun _isALoadSection():Boolean{
-        if(arg.entries.size!=1 && arg["cargas"]==null){
-            return false
-        }
-        for((_, outerValue) in arg as Map<String,Map<String, Any>>){
-            for(load in outerValue){
-                if(!Load(load).isLoad){
-                    return false
-                }
-            }
-        }
-        return true
-    }
-
-    val isNotALoadSection: Boolean
-        get() = !_isALoadSection()
-
-
-    val isAllLoads: Boolean
-        get() = _isAllLoads()
-
-    private fun _isAllLoads():Boolean{
-        for((_, outerValue) in arg as Map<String,Map<String, Any>>){
-            for(load in outerValue){
-                if(Load(load).isLoad){
-                    return false
-                }
-            }
-        }
-        return true
-    }
-
-    val isAnyALoad:Boolean
-        get() = _isAnyLoad()
-
-    private fun _isAnyLoad():Boolean{
-        for((_, outerValue) in arg as Map<String,Map<String, Any>>){
-            for(load in outerValue){
-                if(Load(load).isLoad){
-                    return true
-                }
-            }
-        }
-        return false
-    }
-
-}
-/**
- * General class responsible for doing the whole process and handling the other classes.
- * **/
-class Parse(path:String){
-    val data: Map<String,Any> = Yaml().load(File(path).inputStream())
-
-    fun getProjectName(): String? {
-        if(data["projeto"]!=null && data["projeto"] is String){
-            return data["projeto"] as String
-        }
-        return null
-    }
 }
