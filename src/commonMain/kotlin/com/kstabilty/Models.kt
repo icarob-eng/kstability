@@ -2,44 +2,44 @@ package com.kstabilty
 
 
 /**
- * The knot class holds all load, support and bar information. It also could have a reference to the hole structure.
+ * The node class holds all load, support and r information. It also could have a reference to the hole structure.
  *
  * @property name An (preferably) unique point name.
- * @property pos The knot's position.
+ * @property pos The node's position.
  * @property structure A circular reference to the hole structure. Nullable.
- * @property momentum The resultant bending moment applied at the knot, as a Float.
- * @property bars List of bars that start or end at the knot. The bars also have a circular reference to the knot.
- * @property pointLoads List of point loads applied at the knot. The loads also have a circular reference to the knot.
- * @property distributedLoads List of distributed loads that start or end at the knot.
- * The loads also have a circular reference to the knot.
+ * @property momentum The resultant bending moment applied at the node, as a Float.
+ * @property beams List of beams that start or end at the node. The beams also have a circular reference to the node.
+ * @property pointLoads List of point loads applied at the node. The loads also have a circular reference to the node.
+ * @property distributedLoads List of distributed loads that start or end at the node.
+ * The loads also have a circular reference to the node.
  *
  * @see Vector
  * @see PointLoad
  * @see DistributedLoad
  * @see Support
- * @see Bar
+ * @see Beam
  * @see Structure
  */
-data class Knot(var name: String, val pos: Vector, val structure: Structure? = null) {
+data class Node(var name: String, val pos: Vector, val structure: Structure? = null) {
     // todo: garantir que os nomes serão únicos
-    var support: Support? = null  // only one support by knot
+    var support: Support? = null  // only one support by node
     var momentum = 0F  // todo: checar a quê corresponde o sinal
-    val bars: MutableList<Bar> = mutableListOf()
+    val beams: MutableList<Beam> = mutableListOf()
     val pointLoads: MutableList<PointLoad> = mutableListOf()
     val distributedLoads: MutableList<DistributedLoad> = mutableListOf()
 
     init {
-        structure?.knots?.add(this)  // null for temporary knots
+        structure?.nodes?.add(this)  // null for temporary nodes
     }
 
-    override operator fun equals(other: Any?) = if (other is Knot) this.pos == other.pos else false
+    override operator fun equals(other: Any?) = if (other is Node) this.pos == other.pos else false
     override fun hashCode(): Int {
         var result = name.hashCode()
         result = 31 * result + pos.hashCode()
         result = 31 * result + (structure?.hashCode() ?: 0)
         result = 31 * result + (support?.hashCode() ?: 0)
         result = 31 * result + momentum.hashCode()
-        result = 31 * result + bars.hashCode()
+        result = 31 * result + beams.hashCode()
         result = 31 * result + pointLoads.hashCode()
         result = 31 * result + distributedLoads.hashCode()
         return result
@@ -50,7 +50,7 @@ data class Knot(var name: String, val pos: Vector, val structure: Structure? = n
  * A support object represents a place where the system will apply a reaction load, been it a point load or a bending
  * moment. The support also specifies restrictions on the point load direction.
  *
- * @property knot A circular reference to the knot. When instantiated, it adds itself to the knot.
+ * @property node A circular reference to the node. When instantiated, it adds itself to the node.
  * @property gender A value from the inner enum class `Gender` Values could be:
  *  - `FIRST`: representing a roller support or a simple contact, with no friction.
  *  Requires to specify the restricted direction, that the reaction force will be parallel to;
@@ -60,13 +60,13 @@ data class Knot(var name: String, val pos: Vector, val structure: Structure? = n
  * @property dir Vector used to specify reaction force direction restrictions, when needed. Also **required** for plotting
  * purposes.
  *
- * @see Knot
+ * @see Node
  * @see PointLoad
  */
-data class Support(val knot: Knot, val gender: Gender, private val dir: Vector) {
+data class Support(val node: Node, val gender: Gender, private val dir: Vector) {
     val direction: Vector = dir.normalize()  // unit vector
 
-    init { knot.support = this }
+    init { node.support = this }
 
     enum class Gender (val reactions: Int){
         FIRST(1), // roller
@@ -76,52 +76,52 @@ data class Support(val knot: Knot, val gender: Gender, private val dir: Vector) 
 }
 
 /**
- * Represents a physical connexion between 2 knots. In this library, we mainly use it for charts and plots,
+ * Represents a physical connexion between 2 nodes. In this library, we mainly use it for charts and plots,
  * at the moment.
  *
  * _This API will change in the future._
  *
- * @property knot1 Represents the position where the bar starts. When instantiated, it adds itself to the knot.
- * @property knot2 Represents the position where the bar ends. When instantiated, it adds itself to the knot.
- * @property barVector A vector from [knot1] to [knot2].
+ * @property node1 Represents the position where the beam starts. When instantiated, it adds itself to the node.
+ * @property node2 Represents the position where the beam ends. When instantiated, it adds itself to the node.
+ * @property beamVector A vector from [node1] to [node2].
  *
- * @see Knot
+ * @see Node
  * @see Vector
  * @see Structure
  */
-data class Bar(val knot1: Knot, val knot2: Knot) {
-    val barVector = knot2.pos - knot1.pos
+data class Beam(val node1: Node, val node2: Node) {
+    val beamVector = node2.pos - node1.pos
 
     init {
-        knot1.bars.add(this)
-        knot2.bars.add(this)
+        node1.beams.add(this)
+        node2.beams.add(this)
     }
 
     // proj_a b =  (a * b) * a / |a|² = (a * b) * â / |a|
-    fun makeTangentKnot(knot: Knot) = Knot(
-        knot.name + "'",
-        (barVector.normalize() / barVector.length()) * ((knot.pos - knot1.pos) * barVector)
+    fun makeTangentNode(node: Node) = Node(
+        node.name + "'",
+        (beamVector.normalize() / beamVector.length()) * ((node.pos - node1.pos) * beamVector)
     )
 
     // C is aligned with AB if |AC| + |CB| == |AB|
     fun isAligned(vector: Vector) =
-        ((vector - knot1.pos).length() + (knot2.pos - vector).length()) == (barVector).length()
+        ((vector - node1.pos).length() + (node2.pos - vector).length()) == (beamVector).length()
 }
 
 /**
- * Represents a force applied at the given knot.
+ * Represents a force applied at the given node.
  *
- * @property knot Where the force is applied. When instantiated, it adds itself to the knot.
+ * @property node Where the force is applied. When instantiated, it adds itself to the node.
  * @property vector Represents the actual force vector.
  *
- * @see Knot
+ * @see Node
  * @see Vector
  */
-data class PointLoad(val knot: Knot, val vector: Vector) {
-    init { knot.pointLoads.add(this) }
+data class PointLoad(val node: Node, val vector: Vector) {
+    init { node.pointLoads.add(this) }
 
     override operator fun equals(other: Any?): Boolean = when (other) {
-        is PointLoad -> this.vector == other.vector && this.knot == other.knot
+        is PointLoad -> this.vector == other.vector && this.node == other.node
 
         is DistributedLoad -> this == other.getEqvLoad()
 
@@ -129,7 +129,7 @@ data class PointLoad(val knot: Knot, val vector: Vector) {
     }
 
     override fun hashCode(): Int {
-        var result = knot.pos.hashCode()
+        var result = node.pos.hashCode()
         result = 31 * result + vector.hashCode()
         return result
     }
@@ -138,41 +138,41 @@ data class PointLoad(val knot: Knot, val vector: Vector) {
 /**
  * Represents a force applied to a line segment.
  *
- * @property knot1 Represents the position where the load starts. starts. When instantiated, it adds itself to the knot.
- * @property knot2 Represents the position where the load ends. When instantiated, it adds itself to the knot.
+ * @property node1 Represents the position where the load starts. starts. When instantiated, it adds itself to the node.
+ * @property node2 Represents the position where the load ends. When instantiated, it adds itself to the node.
  * @property vector Represents the force vector that is distributed through the line segment.
  *
- * @see Knot
+ * @see Node
  * @see Vector
  *
  * @see getEqvLoad
  */
-data class DistributedLoad(val knot1: Knot, val knot2: Knot, val vector: Vector) {
+data class DistributedLoad(val node1: Node, val node2: Node, val vector: Vector) {
     init {
-        knot1.distributedLoads.add(this)
-        knot2.distributedLoads.add(this)
+        node1.distributedLoads.add(this)
+        node2.distributedLoads.add(this)
     }
 
     override operator fun equals(other: Any?) = this.getEqvLoad() == other
 
     /**
      * Returns the integral of the force vector through the line segment, i.e. distributes the load vector
-     * through all the bar's length.
+     * through all the beam's length.
      *
-     * @return A point load applied between the two knots.
+     * @return A point load applied between the two nodes.
      */
     fun getEqvLoad() = PointLoad(
-        Knot(
-            knot1.name + knot2.name,
-            (knot1.pos + knot2.pos) / 2,  // midpoint
+        Node(
+            node1.name + node2.name,
+            (node1.pos + node2.pos) / 2,  // midpoint
             null
         ),
-        vector * (knot2.pos - knot1.pos).length()
+        vector * (node2.pos - node1.pos).length()
     )
 
     override fun hashCode(): Int {
-        var result = knot1.pos.hashCode()
-        result = 31 * result + knot2.pos.hashCode()
+        var result = node1.pos.hashCode()
+        result = 31 * result + node2.pos.hashCode()
         result = 31 * result + vector.hashCode()
         return result
     }
@@ -180,57 +180,57 @@ data class DistributedLoad(val knot1: Knot, val knot2: Knot, val vector: Vector)
 
 /**
  * This is the main class in this library, used to aggregate all other instances.
- * It only _actually_ holds all the knots.
+ * It only _actually_ holds all the nodes.
  *
  * Has many methods to sum up all the data, for example, [getEqvLoads] it's the resultant force in the project.
  * And also has [getRotatedCopy], a method for rotate all of it.
  *
  * @property name It's just a name, use at your will.
- * @property knots A list of all knots, that actually holds the data.
+ * @property nodes A list of all nodes, that actually holds the data.
  */
-data class Structure(val name: String, val knots: MutableList<Knot> = mutableListOf()) {
-    fun getSupports() = knots.mapNotNull { it.support }
-    fun getBars() = knots.flatMap { it.bars }
-    fun getMomentumLoads() = knots.sumOf { it.momentum.toDouble() }.toFloat()
-    fun getPointLoads() = knots.flatMap { it.pointLoads }
-    fun getDistributedLoads() = knots.flatMap { it.distributedLoads }
+data class Structure(val name: String, val nodes: MutableList<Node> = mutableListOf()) {
+    fun getSupports() = nodes.mapNotNull { it.support }
+    fun getBeam() = nodes.flatMap { it.beams }
+    fun getMomentumLoads() = nodes.sumOf { it.momentum.toDouble() }.toFloat()
+    fun getPointLoads() = nodes.flatMap { it.pointLoads }
+    fun getDistributedLoads() = nodes.flatMap { it.distributedLoads }
     fun getEqvLoads() = getPointLoads() + getDistributedLoads().map { it.getEqvLoad() }
 
     fun getRotatedCopy(i: Float): Structure {
         // não seria possível rotacionar apenas os nós e direções, pois as direções são valores imutáveis
         val newStructure = Structure(this.name + "'")
-        this.knots.forEach {
-            val knot = Knot(it.name, it.pos.getRotated(i), newStructure)
-            knot.momentum = it.momentum
+        this.nodes.forEach {
+            val node = Node(it.name, it.pos.getRotated(i), newStructure)
+            node.momentum = it.momentum
         }
         // passa todos os nós e depois altera procurando um a um
 
         this.getSupports().forEach {
             Support(
-                newStructure.knots.first { knot -> knot.name == it.knot.name },
+                newStructure.nodes.first { node -> node.name == it.node.name },
                 it.gender,
                 it.direction.getRotated(i)
             )
         }
 
-        this.getBars().forEach {
-            Bar(
-                newStructure.knots.first { knot -> knot.name == it.knot1.name },
-                newStructure.knots.first { knot -> knot.name == it.knot2.name }
+        this.getBeam().forEach {
+            Beam(
+                newStructure.nodes.first { node -> node.name == it.node1.name },
+                newStructure.nodes.first { node -> node.name == it.node2.name }
             )
         }
 
         this.getPointLoads().forEach {
             PointLoad(
-                newStructure.knots.first { knot -> knot.name == it.knot.name },
+                newStructure.nodes.first { node -> node.name == it.node.name },
                 it.vector.getRotated(i)
             )
         }
 
         this.getDistributedLoads().forEach {
             DistributedLoad(
-                newStructure.knots.first { knot -> knot.name == it.knot1.name },
-                newStructure.knots.first { knot -> knot.name == it.knot2.name },
+                newStructure.nodes.first { node -> node.name == it.node1.name },
+                newStructure.nodes.first { node -> node.name == it.node2.name },
                 it.vector
                 )
         }

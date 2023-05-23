@@ -5,18 +5,18 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 class StabilizationTest {
-    private val knotSampleA = Knot("A", Vector(0F, 2F))
-    private val knotSampleB = Knot("B", Vector(1F, 2F))
+    private val nodeSampleA = Node("A", Vector(0F, 2F))
+    private val nodeSampleB = Node("B", Vector(1F, 2F))
         .also{ PointLoad(it, Vector(0f, -20f)) } // applies load sample
-    private val knotSampleC = Knot("C", Vector(3F, 2F))
+    private val nodeSampleC = Node("C", Vector(3F, 2F))
         .also { PointLoad(it, Vector(0f, -10f)) }
-    private val knotSampleD = Knot("D", Vector(4F, 2F))
-        .also { Bar(knotSampleA, it) }
+    private val nodeSampleD = Node("D", Vector(4F, 2F))
+        .also { Beam(nodeSampleA, it) }
 
-    private val supportSampleA = Support(knotSampleA, Support.Gender.SECOND, Consts.VERTICAL)
-    private val supportSampleB = Support(knotSampleD, Support.Gender.FIRST, Consts.VERTICAL)
+    private val supportSampleA = Support(nodeSampleA, Support.Gender.SECOND, Consts.VERTICAL)
+    private val supportSampleB = Support(nodeSampleD, Support.Gender.FIRST, Consts.VERTICAL)
 
-    private val structureSample = Structure("My structure", mutableListOf(knotSampleA, knotSampleB, knotSampleC, knotSampleD))
+    private val structureSample = Structure("My structure", mutableListOf(nodeSampleA, nodeSampleB, nodeSampleC, nodeSampleD))
 
     /**
      * Structure Sample expectations:
@@ -83,8 +83,8 @@ class StabilizationTest {
 
         Stabilization.stabilize(structureSample)
         val data = Pair(
-            structureSample.getSupports()[0].knot.pointLoads[0].vector,
-            structureSample.getSupports()[1].knot.pointLoads[0].vector
+            structureSample.getSupports()[0].node.pointLoads[0].vector,
+            structureSample.getSupports()[1].node.pointLoads[0].vector
         )
 
         assertEquals(expected, data)
@@ -98,8 +98,8 @@ class StabilizationTest {
 
         val expected = Vector(0f, 0f)
 
-        PointLoad(knotSampleA, expectedReactionA)
-        PointLoad(knotSampleD, expectedReactionD)
+        PointLoad(nodeSampleA, expectedReactionA)
+        PointLoad(nodeSampleD, expectedReactionD)
 
         assertEquals(expected, Stabilization.getResultForce(structureSample))
     }
@@ -111,8 +111,8 @@ class StabilizationTest {
          */
         val expected = 0F
 
-        PointLoad(knotSampleA, expectedReactionA)
-        PointLoad(knotSampleD, expectedReactionD)
+        PointLoad(nodeSampleA, expectedReactionA)
+        PointLoad(nodeSampleD, expectedReactionD)
 
         assertEquals(expected, Stabilization.getResultMomentum(structureSample))
     }
@@ -142,8 +142,8 @@ class StabilizationTest {
 
     @Test
     fun isManuallyStableTest() {
-        PointLoad(knotSampleA, expectedReactionA)
-        PointLoad(knotSampleD, expectedReactionD)
+        PointLoad(nodeSampleA, expectedReactionA)
+        PointLoad(nodeSampleD, expectedReactionD)
 
         assertTrue(Stabilization.isStable(structureSample))
     }
@@ -156,14 +156,14 @@ class StabilizationTest {
 
     @Test
     fun isNotIsostaticTest() {
-        val knotSampleA1 = Knot("A", Vector(0F, 2F))
-        val knotSampleB1 = Knot("B", Vector(4F, 2F))
+        val nodeSampleA1 = Node("A", Vector(0F, 2F))
+        val nodeSampleB1 = Node("B", Vector(4F, 2F))
 
-        PointLoad(knotSampleA1, Vector(0f, -3f))
-        Support(knotSampleB1, Support.Gender.SECOND, Consts.HORIZONTAL)
+        PointLoad(nodeSampleA1, Vector(0f, -3f))
+        Support(nodeSampleB1, Support.Gender.SECOND, Consts.HORIZONTAL)
 
         val structureB = Structure("Fixed support structure",
-            mutableListOf(knotSampleA1, knotSampleB1)
+            mutableListOf(nodeSampleA1, nodeSampleB1)
         )
 
         assertThrows(IllegalArgumentException::class.java) {Stabilization.stabilize(structureB)}
@@ -171,14 +171,14 @@ class StabilizationTest {
 
     @Test
     fun isStabilizationStableFixedSupportTest() {
-        val knotSampleA1 = Knot("A", Vector(0F, 2F))
-        val knotSampleB1 = Knot("B", Vector(4F, 2F))
+        val nodeSampleA1 = Node("A", Vector(0F, 2F))
+        val nodeSampleB1 = Node("B", Vector(4F, 2F))
 
-        PointLoad(knotSampleA1, Vector(0f, -3f))
-        Support(knotSampleB1, Support.Gender.THIRD, Consts.HORIZONTAL)
+        PointLoad(nodeSampleA1, Vector(0f, -3f))
+        Support(nodeSampleB1, Support.Gender.THIRD, Consts.HORIZONTAL)
 
         val structureB = Structure("Fixed support structure",
-            mutableListOf(knotSampleA1, knotSampleB1)
+            mutableListOf(nodeSampleA1, nodeSampleB1)
         )
 
         Stabilization.stabilize(structureB)

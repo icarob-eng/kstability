@@ -21,8 +21,8 @@ class ChartingRoutines (val structure: Structure,
     init {
         Stabilization.stabilize(structure)
 
-        val xAxis = structure.knots.map { it.pos.x }.sorted()
-        val yAxis = structure.knots.map { it.pos.y }.sorted()
+        val xAxis = structure.nodes.map { it.pos.x }.sorted()
+        val yAxis = structure.nodes.map { it.pos.y }.sorted()
 
         // necessary to obtain plot scales
         majorAxisLength = max (
@@ -32,7 +32,7 @@ class ChartingRoutines (val structure: Structure,
 
 
     fun drawStructure(labels: Boolean = true) {
-        structure.knots.forEach {
+        structure.nodes.forEach {
             drawer.writeLabel(findLabelPos(it.pos), it.name)
 
             if (it.momentum != 0F && labels) drawer.writeLabel(
@@ -46,7 +46,7 @@ class ChartingRoutines (val structure: Structure,
             }
         }
 
-        structure.getBars().forEach { drawer.drawBar(it) }
+        structure.getBeam().forEach { drawer.drawBeam(it) }
 
         structure.getSupports().forEach { when(it.gender){
                 Support.Gender.FIRST -> drawer.drawFirstGenderSupport(it)
@@ -58,7 +58,7 @@ class ChartingRoutines (val structure: Structure,
         structure.getPointLoads().forEach {
             if (labels) {
                 drawer.writeLabel(
-                    findLabelPos(it.knot.pos) +
+                    findLabelPos(it.node.pos) +
                         Vector.Consts.VERTICAL * majorAxisLength * labelDistancePercentage,
                     it.vector.length().toString() + forceUnit
                 )
@@ -69,7 +69,7 @@ class ChartingRoutines (val structure: Structure,
         structure.getDistributedLoads().forEach {
             if (labels) {
                 drawer.writeLabel(
-                    (findLabelPos(it.knot1.pos) + findLabelPos(it.knot2.pos))/2,
+                    (findLabelPos(it.node1.pos) + findLabelPos(it.node2.pos))/2,
                     it.vector.toString() + forceUnit + '/' + lengthUnit
                 )
             }
@@ -79,19 +79,19 @@ class ChartingRoutines (val structure: Structure,
 
 
     fun drawBendingMoment(step: Float = 0.05F, labels: Boolean = true) {
-        structure.getBars().map { plot(it, Diagrams::generateMomentFunction, step, labels) }
+        structure.getBeam().map { plot(it, Diagrams::generateMomentFunction, step, labels) }
     }
 
     fun drawShearStress(step: Float = 0.05F, labels: Boolean = true) {
-        structure.getBars().map { plot(it, Diagrams::generateShearFunction, step, labels) }
+        structure.getBeam().map { plot(it, Diagrams::generateShearFunction, step, labels) }
     }
 
     fun drawNormalStress(step: Float = 0.05F, labels: Boolean = true) {
-        structure.getBars().map { plot(it, Diagrams::generateNormalFunction, step, labels) }
+        structure.getBeam().map { plot(it, Diagrams::generateNormalFunction, step, labels) }
     }
 
-    private fun plot(bar: Bar, method: (List<Diagrams.Section>, Int) -> Polynomial, step: Float, labels: Boolean) {
-        val pair = Diagrams.getDiagram(structure, bar, method, step)
+    private fun plot(beam: Beam, method: (List<Diagrams.Section>, Int) -> Polynomial, step: Float, labels: Boolean) {
+        val pair = Diagrams.getDiagram(structure, beam, method, step)
         val axes = pair.first
         // todo: axis scaling
         drawer.plotChart(axes.first, axes.second)
@@ -99,7 +99,7 @@ class ChartingRoutines (val structure: Structure,
         if (labels) {
             val expressions = pair.second.map {it.toString()}
             expressions.indices.forEach { i ->
-                val sectionMiddle = (structure.knots[i].pos + structure.knots[i + 1].pos)/2
+                val sectionMiddle = (structure.nodes[i].pos + structure.nodes[i + 1].pos)/2
                 drawer.writeLabel(findLabelPos(sectionMiddle), expressions[i])
             }
         }

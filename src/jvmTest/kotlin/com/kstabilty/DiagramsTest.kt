@@ -5,11 +5,11 @@ import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.Assertions.*
 
 class DiagramsTest {
-    private val knotSampleA = Knot("A", Vector(0F, 0F))
-    private val knotSampleB = Knot("B", Vector(1F, 0F))
-    private val knotSampleC = Knot("C", Vector(3F, 0F))
-    private val knotSampleD = Knot("D", Vector(4F, 0F))
-    private val barSample = Bar(knotSampleA, knotSampleD)
+    private val nodeSampleA = Node("A", Vector(0F, 0F))
+    private val nodeSampleB = Node("B", Vector(1F, 0F))
+    private val nodeSampleC = Node("C", Vector(3F, 0F))
+    private val nodeSampleD = Node("D", Vector(4F, 0F))
+    private val beamSample = Beam(nodeSampleA, nodeSampleD)
 
     private val samplePolynomials = listOf(
         Polynomial(0F, 0F, 1F),
@@ -18,13 +18,13 @@ class DiagramsTest {
         Polynomial(0F, 0F, 4F)
     )
 
-    private val structureSample = Structure("My structure", mutableListOf(knotSampleA, knotSampleB, knotSampleC, knotSampleD))
-    private val sectionSamples = Diagrams.getSections(structureSample, barSample)
+    private val structureSample = Structure("My structure", mutableListOf(nodeSampleA, nodeSampleB, nodeSampleC, nodeSampleD))
+    private val sectionSamples = Diagrams.getSections(structureSample, beamSample)
 
 
     @Test
     fun getSectionsTest() {
-        assertEquals(structureSample.knots.size, sectionSamples.size)
+        assertEquals(structureSample.nodes.size, sectionSamples.size)
     }
 
     @Test
@@ -33,7 +33,7 @@ class DiagramsTest {
 
         val xAxisSample = Diagrams.getXAxis(sectionSamples, randomResolution)
 
-        val expectedSize = barSample.barVector.length()/randomResolution + structureSample.knots.size * 2 + 1
+        val expectedSize = beamSample.beamVector.length()/randomResolution + structureSample.nodes.size * 2 + 1
 
         assertEquals(expectedSize.toInt(), xAxisSample.size)
     }
@@ -49,7 +49,7 @@ class DiagramsTest {
             samplePolynomials
         )
 
-        val expectedSize = barSample.barVector.length()/randomResolution + structureSample.knots.size * 2 + 1
+        val expectedSize = beamSample.beamVector.length()/randomResolution + structureSample.nodes.size * 2 + 1
 
         assertEquals(expectedSize.toInt(), yAxisSample.size)
 

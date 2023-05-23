@@ -10,12 +10,12 @@ package com.kstabilty
 interface IStructureDrawer {
 
     /**
-     * Draws a simple line representing a bar.
+     * Draws a simple line representing a beam.
      *
-     * @param bar the bar that will be drawn
+     * @param beam the beam that will be drawn
      * @return void
      */
-    fun drawBar(bar: Bar)
+    fun drawBeam(beambar: Beam)
 
     /**
      * Draws a **circle** tangent to the specified point, representing a roller support,
@@ -89,11 +89,11 @@ interface IStructureDrawer {
     /**
      * Draws a circle with a knot in the middle, representing a pinned connection, or hinge.
      *
-     * @param knot The center of the circle.
+     * @param node The center of the circle.
      * @return void
      * @see drawFirstGenderSupport
      */
-    fun drawHinge(knot: Knot)
+    fun drawHinge(node: Node)
 
     /**
      * Writes a label from the side of the given position. This could be associate to a knot to identify its name, or a

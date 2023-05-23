@@ -5,26 +5,26 @@ typealias Axis = List<Float>
 typealias Axes = Pair<Axis, Axis>
 object Diagrams {
     /**
-     * Defines a section along one [bar], where the [knot] marks the **start** of the section, and the bar, the direction.
+     * Defines a section along one [beam], where the [node] marks the **start** of the section, and the beam, the direction.
      *
      * @see Diagrams.getSections
      */
-    data class Section (val bar: Bar, val knot: Knot)
+    data class Section (val beam: Beam, val node: Node)
 
     /**
-     * Derives a list of sections from a structure. Each section is defined by a knot, where it begins.
-     * The knots are divided by a line perpendicular to the given bar.
+     * Derives a list of sections from a structure. Each section is defined by a node, where it begins.
+     * The nodes are divided by a line perpendicular to the given beam.
      *
-     * **By now this function considers all loads in the structure, not just loads in the bar**
+     * **By now this function considers all loads in the structure, not just loads in the beam**
      *
      * @see Section
      * @param structure The structure that will be divided.
-     * @param bar The direction that the sections will be divided.
+     * @param beam The direction that the sections will be divided.
      *
      * @return List of sections.
      */
-    fun getSections(structure: Structure, bar: Bar): List<Section> {
-        val sections = structure.knots.sortedBy { it.pos.x }.map { Section(bar, bar.makeTangentKnot(it)) }
+    fun getSections(structure: Structure, beam: Beam): List<Section> {
+        val sections = structure.nodes.sortedBy { it.pos.x }.map { Section(beam, beam.makeTangentNode(it)) }
         return mutableListOf(sections).removeLast()
     }
 
@@ -42,18 +42,18 @@ object Diagrams {
      */
     fun generateMomentFunction(allSections: List<Section>, sectionId: Int): Polynomial {
         val relevantSections = allSections.filterIndexed { index, _ -> index <= sectionId }
-        val pointLoads = relevantSections.flatMap { it.knot.pointLoads }
-        val distributedLoads = relevantSections.flatMap { it.knot.distributedLoads }
-        val momentum = relevantSections.map { it.knot.momentum }.sum()
+        val pointLoads = relevantSections.flatMap { it.node.pointLoads }
+        val distributedLoads = relevantSections.flatMap { it.node.distributedLoads }
+        val momentum = relevantSections.map { it.node.momentum }.sum()
 
         var resultPolynomial = Polynomial.MomentumLoad.bendingMoment(momentum)
-        resultPolynomial = pointLoads.map { Polynomial.PointLoad.bendingMoment(it.knot.pos, it.vector)}.fold(resultPolynomial) { i, j -> i+j}
+        resultPolynomial = pointLoads.map { Polynomial.PointLoad.bendingMoment(it.node.pos, it.vector)}.fold(resultPolynomial) { i, j -> i+j}
         // equivalent of: result += map.sum()
 
         distributedLoads.forEach { dL ->
-            val limits = listOf(dL.knot1.pos, dL.knot2.pos).sortedBy { it.x }
+            val limits = listOf(dL.node1.pos, dL.node2.pos).sortedBy { it.x }
 
-            resultPolynomial += if (limits.last().x >= relevantSections.last().knot.pos.x)
+            resultPolynomial += if (limits.last().x >= relevantSections.last().node.pos.x)
                 Polynomial.DistributedLoad.bendingMomentEnd(limits.first(), dL.vector, limits.last())
             else Polynomial.DistributedLoad.bendingMoment(limits.first(), dL.vector)
         }
@@ -75,18 +75,18 @@ object Diagrams {
      */
     fun generateShearFunction(allSections: List<Section>, sectionId: Int): Polynomial {
         val relevantSections = allSections.filterIndexed { index, _ -> index <= sectionId }
-        val pointLoads = relevantSections.flatMap { it.knot.pointLoads }
-        val distributedLoads = relevantSections.flatMap { it.knot.distributedLoads }
-//        val momentum = relevantSections.map { it.knot.momentum }.sum()
+        val pointLoads = relevantSections.flatMap { it.node.pointLoads }
+        val distributedLoads = relevantSections.flatMap { it.node.distributedLoads }
+//        val momentum = relevantSections.map { it.node.momentum }.sum()
 
         var resultPolynomial = Polynomial.MomentumLoad.shearStress()
         resultPolynomial = pointLoads.map { Polynomial.PointLoad.shearStress(it.vector)}.fold(resultPolynomial) { i, j -> i+j}
         // equivalent of: result += map.sum()
 
         distributedLoads.forEach { dL ->
-            val limits = listOf(dL.knot1.pos, dL.knot2.pos).sortedBy { it.x }
+            val limits = listOf(dL.node1.pos, dL.node2.pos).sortedBy { it.x }
 
-            resultPolynomial += if (limits.last().x >= relevantSections.last().knot.pos.x)
+            resultPolynomial += if (limits.last().x >= relevantSections.last().node.pos.x)
                 Polynomial.DistributedLoad.shearStressEnd(limits.first(), dL.vector, limits.last())
             else Polynomial.DistributedLoad.shearStress(limits.first(), dL.vector)
         }
@@ -108,18 +108,18 @@ object Diagrams {
      */
     fun generateNormalFunction(allSections: List<Section>, sectionId: Int): Polynomial {
         val relevantSections = allSections.filterIndexed { index, _ -> index <= sectionId }
-        val pointLoads = relevantSections.flatMap { it.knot.pointLoads }
-        val distributedLoads = relevantSections.flatMap { it.knot.distributedLoads }
-//        val momentum = relevantSections.map { it.knot.momentum }.sum()
+        val pointLoads = relevantSections.flatMap { it.node.pointLoads }
+        val distributedLoads = relevantSections.flatMap { it.node.distributedLoads }
+//        val momentum = relevantSections.map { it.node.momentum }.sum()
 
         var resultPolynomial = Polynomial.MomentumLoad.normalStress()
         resultPolynomial = pointLoads.map { Polynomial.PointLoad.normalStress(it.vector)}.fold(resultPolynomial) { i, j -> i+j}
         // equivalent of: result += map.sum()
 
         distributedLoads.forEach { dL ->
-            val limits = listOf(dL.knot1.pos, dL.knot2.pos).sortedBy { it.x }
+            val limits = listOf(dL.node1.pos, dL.node2.pos).sortedBy { it.x }
 
-            resultPolynomial += if (limits.last().x >= relevantSections.last().knot.pos.x)
+            resultPolynomial += if (limits.last().x >= relevantSections.last().node.pos.x)
                 Polynomial.DistributedLoad.normalStressEnd(limits.first(), dL.vector, limits.last())
             else Polynomial.DistributedLoad.normalStress(limits.first(), dL.vector)
         }
@@ -142,16 +142,16 @@ object Diagrams {
      * @see Section
      */
     fun getXAxis(sections: List<Section>, resolution: Float): Axis{
-        val referenceBar = sections.first().bar
+        val referenceBeam = sections.first().beam
         val axis = mutableListOf<Float>()
-        var x = referenceBar.knot1.pos.x
-        while (x < referenceBar.knot2.pos.x) {
+        var x = referenceBeam.node1.pos.x
+        while (x < referenceBeam.node2.pos.x) {
             axis.add(x)
             x += resolution
         }
 
         for (section in sections) {
-            val i = section.knot.pos.x
+            val i = section.node.pos.x
             axis.add(i)
             axis.add(i)  // guarantees that there's at least 2 points at intersection
         }
@@ -178,7 +178,7 @@ object Diagrams {
     fun getYAxis(sections: List<Section>, xAxis: Axis, polynomials: List<Polynomial>): Axis {
         val yAxis = mutableListOf<Float>()
         for (x in xAxis) {
-            var i = sections.indexOfLast { x >= it.knot.pos.x }  // this is responsible to actually divide the sections
+            var i = sections.indexOfLast { x >= it.node.pos.x }  // this is responsible to actually divide the sections
             // if the next x is equal to current, make the section be the last one, else, use the new one
             i = if (x == xAxis[xAxis.indexOf(x) + 1]) i - 1 else i
             yAxis.add(
@@ -196,7 +196,7 @@ object Diagrams {
      * `generateNormalFunction`.
      *
      * @param inputStructure A structure with all data that will be used. It needs to be stabilized.
-     * @param bar The bar to analyze the stresses.
+     * @param beam The beam to analyze the stresses.
      * @param method A Macaulay's function that could be used to plot the diagrams.
      * @param step This defines the horizontal distance between points, which defines how many points there will be.
      *
@@ -210,19 +210,19 @@ object Diagrams {
      *
      * @see IStructureDrawer
      */
-    fun getDiagram(inputStructure: Structure, bar: Bar,
+    fun getDiagram(inputStructure: Structure, beam: Beam,
                    method: (List<Section>, Int) -> Polynomial,
                    step: Float): Pair<Axes, List<Polynomial>> {
 
-        val structure = inputStructure.getRotatedCopy(bar.barVector.inclination())
+        val structure = inputStructure.getRotatedCopy(beam.beamVector.inclination())
 
-        val sections = getSections(structure, bar)
+        val sections = getSections(structure, beam)
 
         val x = getXAxis(sections, step)
         val polynomials = sections.indices.map { method(sections, it) }
         val y = getYAxis(sections, x, polynomials)
 
-        return Pair(rotatePlot(Pair(x, y), -bar.barVector.inclination()), polynomials)
+        return Pair(rotatePlot(Pair(x, y), -beam.beamVector.inclination()), polynomials)
     }
 
 

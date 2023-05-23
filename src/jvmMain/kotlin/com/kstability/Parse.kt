@@ -10,7 +10,7 @@ import java.io.File
  * @property isNode property responsible for indicating whether the argument
  * passed to the class is, preliminarily, a node.
  *
- * @see Knot
+ * @see Node
  * @see Vector
  * **/
 @Suppress("UNCHECKED_CAST")
@@ -40,32 +40,32 @@ class Node(private val arg:Map<String,Any> = mapOf()){
         return false
     }
 
-    fun makeNode():Knot? {
+    fun makeNode(): com.kstabilty.Node? {
         if(this.isNode){
             if(arg.values.all {it is String && (it.lowercase() =="vertical" || it.lowercase()=="horizontal")}){
                 val name:String = arg.entries.first().key
                 val vector = Vector(arg.entries.first().value as String)
-                return Knot(name,vector)
+                return Node(name,vector)
             }
             else if(arg.values.all {it is Map<*,*> } &&
                 arg.values.all{ it -> (it as Map<String,Any>).values.all { it is Number }}){
                 val name:String = arg.entries.first().key
                 val coordinatesNotation:Map<String,Any> = arg.entries.first() as Map<String,Any>
                 val vector = Vector(coordinatesNotation["x"] as Float,coordinatesNotation["y"] as Float)
-                return Knot(name,vector)
+                return Node(name,vector)
             }
             else if(arg.values.all { it -> it is Array<*> && it.all { it is Number }}){
                 val name:String = arg.entries.first().key
                 val listNotation: Array<Number> = arg.entries.first().value as Array<Number>
                 val vector = Vector(listNotation)
-                return Knot(name,vector)
+                return Node(name,vector)
 
             }
             else if(arg.values.all{ it -> (it is ArrayList<*>) && it.all { it is Number }}){
                 val name:String = arg.entries.first().key
                 val lisNotation: ArrayList<Number> = arg.entries.first().value as ArrayList<Number>
                 val vector = Vector(lisNotation)
-                return Knot(name, vector)
+                return Node(name, vector)
             }
             else{
                 throw IllegalArgumentException("Tipo de notação inválida.")
@@ -83,7 +83,7 @@ class Node(private val arg:Map<String,Any> = mapOf()){
  * @property isAnyNode property responsible for checking whether there is at least one node in the section.
  *
  * @see Node
- * @see Knot
+ * @see Node
  * **/
 @Suppress("UNCHECKED_CAST")
 class Nodes(private val arg: Map<String,Any>){
@@ -121,8 +121,8 @@ class Nodes(private val arg: Map<String,Any>){
         }
         return false
     }
-    fun makeNodes():MutableList<Knot>{
-        val nodes: MutableList<Knot> = mutableListOf()
+    fun makeNodes():MutableList<com.kstabilty.Node>{
+        val nodes: MutableList<com.kstabilty.Node> = mutableListOf()
         if(this.isANodeSection){
             for((_,outerValue) in arg as Map<String,Map<String,Any>>){
                 for(innerNode in outerValue){
@@ -148,7 +148,7 @@ class Nodes(private val arg: Map<String,Any>){
  * argument passed to the class is a support.
  *
  * @see Support
- * @see Knot
+ * @see Node
  * @see Vector
  *
  * **/
@@ -167,36 +167,36 @@ class Holder(private val arg:Map<String,Any>){
         return arg.values.all{ it -> (it as Map<*, *>).values.all { it == 1 || it == 2 || it == 3 || it =="vertical" ||
                 it =="horizontal" || (it is ArrayList<*> && it.all { it is Number })}}
     }
-    fun makeSupport(knots:MutableList<Knot>): Support? {
+    fun makeSupport(nodes:MutableList<com.kstabilty.Node>): Support? {
         val holder:Map<String, Any> = (arg.entries.first().value as Map<String,Map<String, Any>>)
         if(this.isHolder){
             if(holder["direção"] is String){
                 return if(holder["gênero"]==1){
-                    knots.find{it.name==arg.entries.first().key}
-                        ?.let { Support(knot = it, gender = Support.Gender.FIRST,
+                    nodes.find{it.name==arg.entries.first().key}
+                        ?.let { Support(node = it, gender = Support.Gender.FIRST,
                             dir = Vector(holder["direção"] as String)) }
                 } else if(holder["gênero"]==2){
-                    knots.find{it.name==arg.entries.first().key}
-                        ?.let { Support(knot = it, gender = Support.Gender.SECOND,
+                    nodes.find{it.name==arg.entries.first().key}
+                        ?.let { Support(node = it, gender = Support.Gender.SECOND,
                             dir = Vector(holder["direção"] as String)) }
                 } else{
-                    knots.find{it.name==arg.entries.first().key}
-                        ?.let { Support(knot = it, gender = Support.Gender.THIRD,
+                    nodes.find{it.name==arg.entries.first().key}
+                        ?.let { Support(node = it, gender = Support.Gender.THIRD,
                             dir = Vector(holder["direção"] as String)) }
                 }
             }
             else{
                 return if(holder["gênero"]==1){
-                    knots.find{it.name==arg.entries.first().key}
-                        ?.let { Support(knot = it, gender = Support.Gender.FIRST,
+                    nodes.find{it.name==arg.entries.first().key}
+                        ?.let { Support(node = it, gender = Support.Gender.FIRST,
                             dir = Vector(holder["direção"] as ArrayList<Number>)) }
                 } else if(holder["gênero"]==2){
-                    knots.find{it.name==arg.entries.first().key}
-                        ?.let { Support(knot = it, gender = Support.Gender.SECOND,
+                    nodes.find{it.name==arg.entries.first().key}
+                        ?.let { Support(node = it, gender = Support.Gender.SECOND,
                             dir = Vector(holder["direção"] as ArrayList<Number>)) }
                 } else{
-                    knots.find{it.name==arg.entries.first().key}
-                        ?.let { Support(knot = it, gender = Support.Gender.THIRD,
+                    nodes.find{it.name==arg.entries.first().key}
+                        ?.let { Support(node = it, gender = Support.Gender.THIRD,
                             dir = Vector(holder["direção"] as ArrayList<Number>)) }
                 }
             }
@@ -266,12 +266,12 @@ class Holders(private val arg:Map<String, Any>){
         return false
     }
 
-    fun makeSupports(knots: MutableList<Knot>):MutableList<Support>?{
+    fun makeSupports(nodes: MutableList<com.kstabilty.Node>):MutableList<Support>?{
         val supports:MutableList<Support> = mutableListOf()
         if(this.isAHolderSection){
             for((_,outerValue) in arg as Map<String,Map<String,Any>>){
                 for(holder in outerValue){
-                    Holder(holder).makeSupport(knots)?.let { supports.add(it) }
+                    Holder(holder).makeSupport(nodes)?.let { supports.add(it) }
                 }
             }
         }
@@ -289,7 +289,7 @@ class Holders(private val arg:Map<String, Any>){
  * @property isValidBeam Property responsible for checking if the argument passed is a valid slash
  * based on the nodes on the file.
  *
- * @see Bar
+ * @see Beam
  * **/
 
 class Beam(private val beam:ArrayList<*>){
@@ -301,19 +301,19 @@ class Beam(private val beam:ArrayList<*>){
         return beam.all { it is String }
     }
 
-    fun isValidBeam(knots:MutableList<Knot>):Boolean{
+    fun isValidBeam(nodes:MutableList<com.kstabilty.Node>):Boolean{
         for(name in beam){
-            if(name !in knots.map { it.name }){
+            if(name !in nodes.map { it.name }){
                 return false
             }
         }
         return true
     }
 
-    fun makeBar(knots:MutableList<Knot>): Bar? {
-        if(this.isBeam && this.isValidBeam(knots)){
-            return Bar(knot1 = knots.find { it.name == beam.get(0) }!!,
-                knot2 = knots.find { it.name == beam.get(1) }!!)
+    fun makeBar(nodes:MutableList<com.kstabilty.Node>): com.kstabilty.Beam? {
+        if(this.isBeam && this.isValidBeam(nodes)){
+            return Beam(node1 = nodes.find { it.name == beam.get(0) }!!,
+                node2 = nodes.find { it.name == beam.get(1) }!!)
         }
         else{
             throw IllegalArgumentException("As barras informadas são inválidas.")
@@ -337,20 +337,20 @@ class Beams(private val arg: Map<String,Any>){
         return !(arg.entries.size !=1 || arg.entries.first().key!="barras")
     }
 
-    fun isValidListOfBeams(knots:MutableList<Knot>): Boolean {
+    fun isValidListOfBeams(nodes:MutableList<com.kstabilty.Node>): Boolean {
         for (beam in arg.entries.first().value as ArrayList<*>) {
-            if (!Beam(beam as ArrayList<*>).isValidBeam(knots)) {
+            if (!Beam(beam as ArrayList<*>).isValidBeam(nodes)) {
                 return false
             }
         }
         return true
     }
 
-    fun makeBars(knots:MutableList<Knot>):List<Bar>{
-        val out:MutableList<Bar> = mutableListOf()
-        if(this.isValidListOfBeams(knots)){
+    fun makeBars(nodes:MutableList<com.kstabilty.Node>):List<com.kstabilty.Beam>{
+        val out:MutableList<com.kstabilty.Beam> = mutableListOf()
+        if(this.isValidListOfBeams(nodes)){
             for(beam in arg.entries.first().value as ArrayList<*>)
-                Beam(beam as ArrayList<*>).makeBar(knots)?.let { out.add(it) }
+                Beam(beam as ArrayList<*>).makeBar(nodes)?.let { out.add(it) }
         }
         else{
             throw IllegalArgumentException("A lista de barras é inválida.")
@@ -381,7 +381,7 @@ class Load(private val arg: Map<String, Any>){
         return content.keys.containsAll(setOf("nó","direção","módulo")) || content.keys.containsAll(setOf("nó","vetor"))
     }
 
-    fun makeLoad(knots: MutableList<Knot>): Any? {
+    fun makeLoad(nodes: MutableList<com.kstabilty.Node>): Any? {
         if(this.isLoad){
             val content = arg.entries.first().value as Map<String, Any>
             if(content.keys.containsAll(setOf("nó","direção","módulo")) || content["no"] is ArrayList<*>){
@@ -389,12 +389,12 @@ class Load(private val arg: Map<String, Any>){
                 if(knotsNames.size!=2){
                     throw Exception("Número de nós inválidos.")
                 }
-                return DistributedLoad(knot1 = knots.find { it.name == knotsNames[0]}!!,
-                    knot2 = knots.find { it.name == knotsNames[1]}!!,
+                return DistributedLoad(node1 = nodes.find { it.name == knotsNames[0]}!!,
+                    node2 = nodes.find { it.name == knotsNames[1]}!!,
                     vector = Vector(content["direção"] as String)*(content["módulo"] as Float))
             }
             else if(content.keys.containsAll(setOf("nó","direção","módulo")) || content["no"] is String){
-                return PointLoad(knot = knots.find { it.name == content["nó"]}!!,
+                return PointLoad(node = nodes.find { it.name == content["nó"]}!!,
                     vector=Vector(content["direção"] as String)*(content["módulo"] as Float))
             }
             else if(content.keys.containsAll(setOf("nó","vetor")) || content["no"] is ArrayList<*>){
@@ -402,11 +402,11 @@ class Load(private val arg: Map<String, Any>){
                 if(knotsNames.size!=2){
                     throw Exception("Número de nós inválidos.")
                 }
-                return DistributedLoad(knot1 = knots.find { it.name == knotsNames[0]}!!,
-                    knot2 = knots.find { it.name == knotsNames[1]}!!, Vector(content["vetor"] as ArrayList<Number>))
+                return DistributedLoad(node1 = nodes.find { it.name == knotsNames[0]}!!,
+                    node2 = nodes.find { it.name == knotsNames[1]}!!, Vector(content["vetor"] as ArrayList<Number>))
             }
             else if(content.keys.containsAll(setOf("nó","vetor")) || content["no"] is String){
-                return PointLoad(knot = knots.find { it.name == content["nó"]}!!,
+                return PointLoad(node = nodes.find { it.name == content["nó"]}!!,
                     vector=Vector(content["vetor"] as ArrayList<Number>))
             }
         }
