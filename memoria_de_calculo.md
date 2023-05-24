@@ -100,7 +100,7 @@ A implementação das equações foi esta:
 
 ```kotlin
     fun getEqvLoad() = PointLoad(
-        Knot(
+        Node(
             knot1.name + knot2.name,
             (knot1.pos + knot2.pos) / 2,  // midpoint
             null
