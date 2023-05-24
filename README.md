@@ -31,7 +31,7 @@ There are three steps to using this library:
 
 There are 6 classes used to describe a structure:
 - Node: a defined point where loads can be applied and beams and supports can be based on;
-- Support: a structure support, with unkwon reaction loads to be calculated;
+- Support: a structure support, with unknown reaction loads to be calculated;
 - Beam: the library's object of analysis. It's used to determine the plot orientations and it's defined by two node, at the ends;
 - Point Load: a load vector applied in a given node;
 - Distributted Load: a load vector distributed in a given line (constrained by two node);
@@ -46,7 +46,7 @@ By the way that the library is defined, a structure holds a list of node and the
 
 ### 3. Using the `StructureSolver`
 
-The `StructureSolver` class is made to facilitate the calculations and ploting routines, simplifing the hole process to those given steps.
+The `StructureSolver` class is made to facilitate the calculations and ploting routines, simplifing the entire process to those given steps.
 All it's public filds and methods can be used. For more information read the source code's documentation.
 
 ## Contribute
