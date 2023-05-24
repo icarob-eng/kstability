@@ -11,7 +11,7 @@ The algorithm explanations are shown in the [calculation log (pt-Br)](https://gi
 **For now the library isn't fully tested, so use it at your own risk.**
 
 ## Installation
-The library isn't ye publish and it's in experimental fase, so the only installation method is cloning this repository.
+The library isn't yet publish and it's in experimental fase, so the only installation method is cloning this repository.
 
 ```bash
 $ git clone https://github.com/icarob-eng/kstability.git
