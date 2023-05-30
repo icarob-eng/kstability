@@ -24,7 +24,10 @@ object Diagrams {
      * @return List of sections.
      */
     fun getSections(structure: Structure, beam: Beam): List<Section> {
-        val sections = structure.nodes.sortedBy { it.pos.x }.map { Section(beam, beam.makeTangentNode(it)) }
+        val sections = structure.nodes.sortedBy { it.pos.x }.map { Section(beam,
+//            beam.makeTangentNode(it)) // fixme: generating only nodes at (0,0)
+            it)
+        }
         return mutableListOf(sections).removeLast()
     }
 
@@ -41,7 +44,7 @@ object Diagrams {
      * @see Polynomial
      */
     fun generateMomentFunction(allSections: List<Section>, sectionId: Int): Polynomial {
-        val relevantSections = allSections.filterIndexed { index, _ -> index <= sectionId }
+        val relevantSections = allSections.subList(0, sectionId + 1)
         val pointLoads = relevantSections.flatMap { it.node.pointLoads }
         val distributedLoads = relevantSections.flatMap { it.node.distributedLoads }
         val momentum = relevantSections.map { it.node.momentum }.sum()
@@ -74,7 +77,7 @@ object Diagrams {
      * @see Polynomial
      */
     fun generateShearFunction(allSections: List<Section>, sectionId: Int): Polynomial {
-        val relevantSections = allSections.filterIndexed { index, _ -> index <= sectionId }
+        val relevantSections = allSections.subList(0, sectionId + 1)
         val pointLoads = relevantSections.flatMap { it.node.pointLoads }
         val distributedLoads = relevantSections.flatMap { it.node.distributedLoads }
 //        val momentum = relevantSections.map { it.node.momentum }.sum()
@@ -107,7 +110,7 @@ object Diagrams {
      * @see Polynomial
      */
     fun generateNormalFunction(allSections: List<Section>, sectionId: Int): Polynomial {
-        val relevantSections = allSections.filterIndexed { index, _ -> index <= sectionId }
+        val relevantSections = allSections.subList(0, sectionId + 1)
         val pointLoads = relevantSections.flatMap { it.node.pointLoads }
         val distributedLoads = relevantSections.flatMap { it.node.distributedLoads }
 //        val momentum = relevantSections.map { it.node.momentum }.sum()
