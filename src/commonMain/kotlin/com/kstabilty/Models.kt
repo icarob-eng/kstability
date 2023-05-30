@@ -34,14 +34,10 @@ data class Node(var name: String, val pos: Vector, val structure: Structure? = n
 
     override operator fun equals(other: Any?) = if (other is Node) this.pos == other.pos else false
     override fun hashCode(): Int {
+        // support, beams, momentum, point loads and distributed loads removed to prevent infinity recursion
         var result = name.hashCode()
         result = 31 * result + pos.hashCode()
-        result = 31 * result + (structure?.hashCode() ?: 0)
-        result = 31 * result + (support?.hashCode() ?: 0)
-        result = 31 * result + momentum.hashCode()
-        result = 31 * result + beams.hashCode()
-        result = 31 * result + pointLoads.hashCode()
-        result = 31 * result + distributedLoads.hashCode()
+        result = 31 * result + (structure?.name.hashCode())
         return result
     }
 }
@@ -190,10 +186,10 @@ data class DistributedLoad(val node1: Node, val node2: Node, val vector: Vector)
  */
 data class Structure(val name: String, val nodes: MutableList<Node> = mutableListOf()) {
     fun getSupports() = nodes.mapNotNull { it.support }
-    fun getBeam() = nodes.flatMap { it.beams }
+    fun getBeams() = nodes.flatMap { it.beams }.distinct()
     fun getMomentumLoads() = nodes.sumOf { it.momentum.toDouble() }.toFloat()
     fun getPointLoads() = nodes.flatMap { it.pointLoads }
-    fun getDistributedLoads() = nodes.flatMap { it.distributedLoads }
+    fun getDistributedLoads() = nodes.flatMap { it.distributedLoads }.distinct()
     fun getEqvLoads() = getPointLoads() + getDistributedLoads().map { it.getEqvLoad() }
 
     fun getRotatedCopy(i: Float): Structure {
@@ -213,7 +209,7 @@ data class Structure(val name: String, val nodes: MutableList<Node> = mutableLis
             )
         }
 
-        this.getBeam().forEach {
+        this.getBeams().forEach {
             Beam(
                 newStructure.nodes.first { node -> node.name == it.node1.name },
                 newStructure.nodes.first { node -> node.name == it.node2.name }

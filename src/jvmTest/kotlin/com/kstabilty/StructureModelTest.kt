@@ -10,7 +10,7 @@ class StructureModelTest {
     private val nodeSampleB = Node("B", Vector(1F, 2F))
     private val nodeSampleC = Node("C", Vector(3F, 2F))
     private val nodeSampleD = Node("D", Vector(4F, 2F))
-        .also { Beam(nodeSampleA, it) }
+        .apply { Beam(nodeSampleA, this) }
 
     private val supportSampleA = Support(nodeSampleA, Support.Gender.SECOND, Vector(0F, 5F))
     private val supportSampleB = Support(nodeSampleD, Support.Gender.FIRST, Consts.VERTICAL)
@@ -76,7 +76,7 @@ class StructureModelTest {
         assertAll("rotateAll",
             { assertEquals(rotatedKnotPosSampleC, rotatedStructure.nodes.first{ it.name == "C"}.pos) },
             { assertEquals(rotatedSupportDirSampleB, rotatedStructure.getSupports()[1].direction) },
-            { assertEquals(i, rotatedStructure.getBeam().first().beamVector.inclination()) }, // bar inclination == i
+            { assertEquals(i, rotatedStructure.getBeams().first().beamVector.inclination()) }, // bar inclination == i
             { assertEquals(rotatedPointLoadVector, rotatedStructure.getPointLoads().first().vector) },
         )
     }

@@ -2,7 +2,6 @@ package com.kstabilty
 
 import org.junit.jupiter.api.Test
 
-import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeAll
 
 import kotlin.io.path.*
@@ -32,5 +31,87 @@ class IntegrationTest {
         }
     }
 
+    /*
+    PROBLEMA RESOLVIDO 7.4 (p.378) do livro MECÂNICA VETORIAL PARA ENGENHEIROS: ESTÁTICA.
+    Ferdinand P. Beer...(et al.) 9ª edição, 2012.
+    */
+    private val structureSampleA = Structure("Sample A", mutableListOf(
+        Node("A", Vector(0, 0)).apply {
+            Support(this, Support.Gender.SECOND, Vector.Consts.VERTICAL)
+        },
+        Node("B", Vector(1.8, 0)).apply {
+            PointLoad(this, Vector(0, -90.0))
+        },
+        Node("C", Vector(2.4 + 1.8, 0)).apply {
+            PointLoad(this, Vector(0, 54.0))
+        },
+        Node("D", Vector(3 + 2.4 + 1.8, 0)).apply {
+            Support(this, Support.Gender.FIRST, Vector.Consts.VERTICAL)
+        },
+        Node("E", Vector(2.4 + 3 + 2.4 + 1.8, 0))
+    )).also {
+        Beam(it.nodes.first(), it.nodes.last())
+        DistributedLoad(it.nodes[3], it.nodes[4], Vector(0, 22.50))
+    }
 
+    /*
+    PROBLEMA RESOLVIDO 7.6 (p.379) do livro MECÂNICA VETORIAL PARA ENGENHEIROS: ESTÁTICA.
+    Ferdinand P. Beer...(et al.) 9ª edição, 2012.
+    */
+    private val structureSampleB = Structure("Sample B", mutableListOf(
+        Node("A", Vector(0,0)).apply {
+            Support(this, Support.Gender.SECOND, Vector.Consts.VERTICAL)
+        },
+        Node("B", Vector(6,0)),
+        Node("C", Vector(3 + 6,0)).apply {
+            Support(this, Support.Gender.FIRST, Vector.Consts.VERTICAL)
+        }
+    )).also {
+        Beam(it.nodes.first(), it.nodes.last())
+        DistributedLoad(it.nodes[0], it.nodes[1], Vector(0, 20))
+    }
+
+    @Test
+    fun writeCsvFromShearSampleA() {
+        Stabilization.stabilize(structureSampleA)
+        writeCsv("sample_a_shear_stress", Diagrams.getDiagram(
+            structureSampleA,
+            structureSampleA.getBeams().first(),
+            Diagrams::generateShearFunction,
+            0.1F
+        ).first)
+    }
+
+    @Test
+    fun writeCsvFromMomentSampleA() {
+        Stabilization.stabilize(structureSampleA)
+        writeCsv("sample_a_bending_moment", Diagrams.getDiagram(
+            structureSampleA,
+            structureSampleA.getBeams().first(),
+            Diagrams::generateMomentFunction,
+            0.1F
+        ).first)
+    }
+
+    @Test
+    fun writeCsvFromShearSampleB() {
+        Stabilization.stabilize(structureSampleB)
+        writeCsv("sample_b_shear_stress", Diagrams.getDiagram(
+            structureSampleB,
+            structureSampleB.getBeams().first(),
+            Diagrams::generateShearFunction,
+            0.1F
+        ).first)
+    }
+
+    @Test
+    fun writeCsvFromMomentSampleB() {
+        Stabilization.stabilize(structureSampleB)
+        writeCsv("sample_b_bending_moment", Diagrams.getDiagram(
+            structureSampleB,
+            structureSampleB.getBeams().first(),
+            Diagrams::generateMomentFunction,
+            0.1F
+        ).first)
+    }
 }

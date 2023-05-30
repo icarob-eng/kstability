@@ -46,7 +46,7 @@ class ChartingRoutines (val structure: Structure,
             }
         }
 
-        structure.getBeam().forEach { drawer.drawBeam(it) }
+        structure.getBeams().forEach { drawer.drawBeam(it) }
 
         structure.getSupports().forEach { when(it.gender){
                 Support.Gender.FIRST -> drawer.drawFirstGenderSupport(it)
@@ -79,15 +79,15 @@ class ChartingRoutines (val structure: Structure,
 
 
     fun drawBendingMoment(step: Float = 0.05F, labels: Boolean = true) {
-        structure.getBeam().map { plot(it, Diagrams::generateMomentFunction, step, labels) }
+        structure.getBeams().map { plot(it, Diagrams::generateMomentFunction, step, labels) }
     }
 
     fun drawShearStress(step: Float = 0.05F, labels: Boolean = true) {
-        structure.getBeam().map { plot(it, Diagrams::generateShearFunction, step, labels) }
+        structure.getBeams().map { plot(it, Diagrams::generateShearFunction, step, labels) }
     }
 
     fun drawNormalStress(step: Float = 0.05F, labels: Boolean = true) {
-        structure.getBeam().map { plot(it, Diagrams::generateNormalFunction, step, labels) }
+        structure.getBeams().map { plot(it, Diagrams::generateNormalFunction, step, labels) }
     }
 
     private fun plot(beam: Beam, method: (List<Diagrams.Section>, Int) -> Polynomial, step: Float, labels: Boolean) {
