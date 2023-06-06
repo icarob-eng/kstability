@@ -3,8 +3,10 @@ package com.kstabilty
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.BeforeAll
+import org.junit.jupiter.api.assertAll
 
 import kotlin.io.path.*
+import kotlin.test.assertEquals
 
 class IntegrationTest {
     companion object {
@@ -29,6 +31,98 @@ class IntegrationTest {
 
             writer.flush()
         }
+    }
+
+    private val basicStructureSampleA = Structure("Basic Sample A", mutableListOf(
+        Node("A", Vector(0,0)).apply {
+            Support(this, Support.Gender.SECOND, Vector.Consts.VERTICAL)
+        },
+        Node("B", Vector(1, 0)).apply {
+            PointLoad(this, Vector(0,-10))
+        },
+        Node("C", Vector(2,0)).apply {
+            Support(this, Support.Gender.FIRST, Vector.Consts.VERTICAL)
+        }
+    )).also {
+        Beam(it.nodes.first(), it.nodes.last())
+    }
+
+    private val basicStructureSampleB = Structure("Basic Sample B", mutableListOf(
+        Node("A", Vector(0,0)).apply {
+            Support(this, Support.Gender.SECOND, Vector.Consts.VERTICAL)
+        },
+        Node("B", Vector(2,0)).apply {
+            Support(this, Support.Gender.FIRST, Vector.Consts.VERTICAL)
+        }
+    )).also {
+        Beam(it.nodes.first(), it.nodes.last())
+        DistributedLoad(it.nodes.first(), it.nodes.last(), Vector(0, -5))
+    }
+
+    @Test
+    fun writeCsvFromShearBasicSampleA() {
+        Stabilization.stabilize(basicStructureSampleA)
+        val output = Diagrams.getDiagram(
+            basicStructureSampleA,
+            basicStructureSampleA.getBeams().first(),
+            Diagrams::generateShearFunction,
+            0.01F
+        )
+
+        writeCsv("basic_sample_a_shear_stress", output.first)
+
+        assertAll("basic sample a - shear stress polynomials test",
+            { assertEquals(Polynomial(0F, 0F, 5F), output.second[0]) },
+            { assertEquals(Polynomial(0F, 0F, -5F), output.second[1]) }
+        )
+    }
+
+    @Test
+    fun writeCsvFromMomentBasicSampleA() {
+        Stabilization.stabilize(basicStructureSampleA)
+        val output = Diagrams.getDiagram(
+            basicStructureSampleA,
+            basicStructureSampleA.getBeams().first(),
+            Diagrams::generateMomentFunction,
+            0.01F
+        )
+
+        writeCsv("basic_sample_a_bending_moment", output.first)
+
+        assertAll("basic sample a - bending moment polynomials test ",
+            { assertEquals(Polynomial(0F, 5F, 0F), output.second[0]) },
+            { assertEquals(Polynomial(0F, -5F, 10F), output.second[1]) }
+        )
+    }
+
+    @Test
+    fun writeCsvFromShearBasicSampleB() {
+        Stabilization.stabilize(basicStructureSampleB)
+        val output = Diagrams.getDiagram(
+            basicStructureSampleB,
+            basicStructureSampleB.getBeams().first(),
+            Diagrams::generateShearFunction,
+            0.01F
+        )
+
+        writeCsv("basic_sample_b_shear_stress", output.first)
+
+        assertEquals(Polynomial(0F, -5F, 5F), output.second[0])
+    }
+
+    @Test
+    fun writeCsvFromMomentBasicSampleB() {
+        Stabilization.stabilize(basicStructureSampleB)
+        val output = Diagrams.getDiagram(
+            basicStructureSampleB,
+            basicStructureSampleB.getBeams().first(),
+            Diagrams::generateMomentFunction,
+            0.01F
+        )
+
+        writeCsv("basic_sample_b_bending_moment", output.first)
+
+        assertEquals(Polynomial(-2.5F, 5F, 0F), output.second[0])
     }
 
     /*
@@ -78,7 +172,7 @@ class IntegrationTest {
             structureSampleA,
             structureSampleA.getBeams().first(),
             Diagrams::generateShearFunction,
-            0.1F
+            0.01F
         ).first)
     }
 
@@ -89,7 +183,7 @@ class IntegrationTest {
             structureSampleA,
             structureSampleA.getBeams().first(),
             Diagrams::generateMomentFunction,
-            0.1F
+            0.01F
         ).first)
     }
 
@@ -100,7 +194,7 @@ class IntegrationTest {
             structureSampleB,
             structureSampleB.getBeams().first(),
             Diagrams::generateShearFunction,
-            0.1F
+            0.01F
         ).first)
     }
 
@@ -111,7 +205,7 @@ class IntegrationTest {
             structureSampleB,
             structureSampleB.getBeams().first(),
             Diagrams::generateMomentFunction,
-            0.1F
+            0.01F
         ).first)
     }
 }

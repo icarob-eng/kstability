@@ -155,6 +155,16 @@ class StabilizationTest {
     }
 
     @Test
+    fun keepStabilityTest() {
+        Stabilization.stabilize(structureSample)
+        Stabilization.stabilize(structureSample)
+        Stabilization.stabilize(structureSample)
+        Stabilization.stabilize(structureSample)
+        Stabilization.stabilize(structureSample)
+        assertTrue(Stabilization.isStable(structureSample))
+    }
+
+    @Test
     fun isNotIsostaticTest() {
         val nodeSampleA1 = Node("A", Vector(0F, 2F))
         val nodeSampleB1 = Node("B", Vector(4F, 2F))
