@@ -42,6 +42,10 @@ data class Polynomial(val a: Float, val b: Float, val c: Float){
         return expression.toString()
     }
     object PointLoad {
+        /**
+         * For all Macaulay's functions in this module, `a` stands for "application point",
+         * `f` for applied force, `end` for end of distributed load and `m` for bending moment load
+         */
         fun normalStress(f: Vector): Polynomial = Polynomial(a=0F, b=0F, c=f.x)
 
         fun shearStress(f: Vector): Polynomial = Polynomial(a=0F, b=0F, c=f.y)
@@ -52,11 +56,11 @@ data class Polynomial(val a: Float, val b: Float, val c: Float){
     object DistributedLoad {
         fun normalStress(a: Vector, f: Vector): Polynomial = Polynomial(a=0F, b=f.x, c=-f.x*a.x)
 
-        fun normalStressEnd(a: Vector, f: Vector, end: Vector) = shearStress(a, f) + bendingMoment(end, -f)
+        fun normalStressEnd(a: Vector, f: Vector, end: Vector) = normalStress(a, f) + normalStress(end, -f)
 
         fun shearStress(a: Vector, f: Vector): Polynomial = Polynomial(a=0F, b=f.y, c=-f.y*a.x)
 
-        fun shearStressEnd(a: Vector, f: Vector, end: Vector) = shearStress(a, f) + bendingMoment(end, -f)
+        fun shearStressEnd(a: Vector, f: Vector, end: Vector) = shearStress(a, f) + shearStress(end, -f)
 
         fun bendingMoment(a: Vector, f: Vector): Polynomial = Polynomial(a=f.y/2, b=-f.y*a.x, c=(f.y*a.x*a.x)/2)
 

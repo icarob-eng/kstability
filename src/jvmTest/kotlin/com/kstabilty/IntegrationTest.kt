@@ -137,7 +137,7 @@ class IntegrationTest {
             PointLoad(this, Vector(0, -90.0))
         },
         Node("C", Vector(2.4 + 1.8, 0)).apply {
-            PointLoad(this, Vector(0, 54.0))
+            PointLoad(this, Vector(0, -54.0))
         },
         Node("D", Vector(3 + 2.4 + 1.8, 0)).apply {
             Support(this, Support.Gender.FIRST, Vector.Consts.VERTICAL)
@@ -145,7 +145,7 @@ class IntegrationTest {
         Node("E", Vector(2.4 + 3 + 2.4 + 1.8, 0))
     )).also {
         Beam(it.nodes.first(), it.nodes.last())
-        DistributedLoad(it.nodes[3], it.nodes[4], Vector(0, 22.50))
+        DistributedLoad(it.nodes[3], it.nodes[4], Vector(0, -22.50))
     }
 
     /*
@@ -162,7 +162,7 @@ class IntegrationTest {
         }
     )).also {
         Beam(it.nodes.first(), it.nodes.last())
-        DistributedLoad(it.nodes[0], it.nodes[1], Vector(0, 20))
+        DistributedLoad(it.nodes[0], it.nodes[1], Vector(0, -20))
     }
 
     @Test

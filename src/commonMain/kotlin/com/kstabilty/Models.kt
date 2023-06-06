@@ -40,6 +40,8 @@ data class Node(var name: String, val pos: Vector, val structure: Structure? = n
         result = 31 * result + (structure?.name.hashCode())
         return result
     }
+
+    override fun toString() = "$name($pos)"
 }
 
 /**
@@ -233,4 +235,6 @@ data class Structure(val name: String, val nodes: MutableList<Node> = mutableLis
 
         return newStructure
     }
+
+    override fun toString() = "\"$name\"(${nodes.size} nodes, ${getBeams().size} beams)"
 }

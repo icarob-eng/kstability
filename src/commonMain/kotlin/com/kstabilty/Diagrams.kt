@@ -9,7 +9,9 @@ object Diagrams {
      *
      * @see Diagrams.getSections
      */
-    data class Section (val beam: Beam, val node: Node)
+    data class Section (val beam: Beam, val node: Node) {
+        override fun toString() = "Start=${node.pos.x}"
+    }
 
     /**
      * Derives a list of sections from a structure. Each section is defined by a node, where it begins.
@@ -46,7 +48,7 @@ object Diagrams {
     fun generateMomentFunction(allSections: List<Section>, sectionId: Int): Polynomial {
         val relevantSections = allSections.subList(0, sectionId + 1)
         val pointLoads = relevantSections.flatMap { it.node.pointLoads }
-        val distributedLoads = relevantSections.flatMap { it.node.distributedLoads }
+        val distributedLoads = relevantSections.flatMap { it.node.distributedLoads }.toSet().toList()
         val momentum = relevantSections.map { it.node.momentum }.sum()
 
         var resultPolynomial = Polynomial.MomentumLoad.bendingMoment(momentum)
@@ -56,7 +58,7 @@ object Diagrams {
         distributedLoads.forEach { dL ->
             val limits = listOf(dL.node1.pos, dL.node2.pos).sortedBy { it.x }
 
-            resultPolynomial += if (limits.last().x >= relevantSections.last().node.pos.x)
+            resultPolynomial += if (limits.last().x <= relevantSections.last().node.pos.x)
                 Polynomial.DistributedLoad.bendingMomentEnd(limits.first(), dL.vector, limits.last())
             else Polynomial.DistributedLoad.bendingMoment(limits.first(), dL.vector)
         }
@@ -79,7 +81,7 @@ object Diagrams {
     fun generateShearFunction(allSections: List<Section>, sectionId: Int): Polynomial {
         val relevantSections = allSections.subList(0, sectionId + 1)
         val pointLoads = relevantSections.flatMap { it.node.pointLoads }
-        val distributedLoads = relevantSections.flatMap { it.node.distributedLoads }
+        val distributedLoads = relevantSections.flatMap { it.node.distributedLoads }.toSet().toList()
 //        val momentum = relevantSections.map { it.node.momentum }.sum()
 
         var resultPolynomial = Polynomial.MomentumLoad.shearStress()
@@ -89,7 +91,7 @@ object Diagrams {
         distributedLoads.forEach { dL ->
             val limits = listOf(dL.node1.pos, dL.node2.pos).sortedBy { it.x }
 
-            resultPolynomial += if (limits.last().x >= relevantSections.last().node.pos.x)
+            resultPolynomial += if (limits.last().x <= relevantSections.last().node.pos.x)
                 Polynomial.DistributedLoad.shearStressEnd(limits.first(), dL.vector, limits.last())
             else Polynomial.DistributedLoad.shearStress(limits.first(), dL.vector)
         }
@@ -112,7 +114,7 @@ object Diagrams {
     fun generateNormalFunction(allSections: List<Section>, sectionId: Int): Polynomial {
         val relevantSections = allSections.subList(0, sectionId + 1)
         val pointLoads = relevantSections.flatMap { it.node.pointLoads }
-        val distributedLoads = relevantSections.flatMap { it.node.distributedLoads }
+        val distributedLoads = relevantSections.flatMap { it.node.distributedLoads }.toSet().toList()
 //        val momentum = relevantSections.map { it.node.momentum }.sum()
 
         var resultPolynomial = Polynomial.MomentumLoad.normalStress()
@@ -122,7 +124,7 @@ object Diagrams {
         distributedLoads.forEach { dL ->
             val limits = listOf(dL.node1.pos, dL.node2.pos).sortedBy { it.x }
 
-            resultPolynomial += if (limits.last().x >= relevantSections.last().node.pos.x)
+            resultPolynomial += if (limits.last().x <= relevantSections.last().node.pos.x)
                 Polynomial.DistributedLoad.normalStressEnd(limits.first(), dL.vector, limits.last())
             else Polynomial.DistributedLoad.normalStress(limits.first(), dL.vector)
         }
