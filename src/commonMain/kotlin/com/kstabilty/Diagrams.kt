@@ -26,9 +26,7 @@ object Diagrams {
      * @return List of sections.
      */
     fun getSections(structure: Structure, beam: Beam): List<Section> {
-        val sections = structure.nodes.sortedBy { it.pos.x }.map { Section(beam,
-//            beam.makeTangentNode(it)) // fixme: generating only nodes at (0,0)
-            it)
+        val sections = structure.nodes.sortedBy { it.pos.x }.map { Section(beam, it)
         }
         return mutableListOf(sections).removeLast()
     }

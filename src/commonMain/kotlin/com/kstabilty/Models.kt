@@ -95,11 +95,11 @@ data class Beam(val node1: Node, val node2: Node) {
         node2.beams.add(this)
     }
 
-    // proj_a b =  (a * b) * a / |a|² = (a * b) * â / |a|
-    fun makeTangentNode(node: Node) = Node(
-        node.name + "'",
-        (beamVector.normalize() / beamVector.length()) * ((node.pos - node1.pos) * beamVector)
-    )
+//    // proj_a b =  (b * a) * a / |a|² = (b * b) * â / |a|
+//    fun makeTangentNode(node: Node) = if (isAligned(node.pos)) node else Node(
+//        node.name + "'",
+//        (beamVector.normalize() / beamVector.length()) * ((node.pos - node1.pos) * beamVector)
+//    )
 
     // C is aligned with AB if |AC| + |CB| == |AB|
     fun isAligned(vector: Vector) =
