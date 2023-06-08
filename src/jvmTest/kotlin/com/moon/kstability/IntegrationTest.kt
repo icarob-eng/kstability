@@ -1,4 +1,4 @@
-package com.kstabilty
+package com.moon.kstability
 
 import org.junit.jupiter.api.Test
 
@@ -10,7 +10,7 @@ import kotlin.test.assertEquals
 
 class IntegrationTest {
     companion object {
-        private const val outputPath = "src/jvmTest/kotlin/com/kstabilty/IntegrationTestOutput"
+        private const val outputPath = "src/jvmTest/kotlin/com/moon/kstability/IntegrationTestOutput"
 
         @JvmStatic
         @BeforeAll

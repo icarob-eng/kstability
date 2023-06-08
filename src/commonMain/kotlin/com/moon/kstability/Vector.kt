@@ -1,4 +1,4 @@
-package com.kstabilty
+package com.moon.kstability
 
 import kotlin.jvm.JvmField
 import kotlin.math.sqrt

@@ -1,6 +1,6 @@
-package com.kstabilty
+package com.moon.kstability
 
-import com.kstabilty.Vector.Consts
+import com.moon.kstability.Vector.Consts
 import org.junit.jupiter.api.Assertions.assertAll
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test

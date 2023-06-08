@@ -1,6 +1,6 @@
-package com.kstabilty
+package com.moon.kstability
 
-import com.kstabilty.Vector.Consts
+import com.moon.kstability.Vector.Consts
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
@@ -176,7 +176,7 @@ class StabilizationTest {
             mutableListOf(nodeSampleA1, nodeSampleB1)
         )
 
-        assertThrows(IllegalArgumentException::class.java) {Stabilization.stabilize(structureB)}
+        assertThrows(IllegalArgumentException::class.java) { Stabilization.stabilize(structureB) }
     }
 
     @Test

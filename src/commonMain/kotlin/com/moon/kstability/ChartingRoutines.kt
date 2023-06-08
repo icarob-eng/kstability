@@ -1,4 +1,4 @@
-package com.kstabilty
+package com.moon.kstability
 
 import kotlin.math.abs
 import kotlin.math.max

@@ -1,6 +1,6 @@
-package com.kstability
+package com.moon.kstability
 
-import com.kstabilty.*
+import com.moon.kstability.*
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 

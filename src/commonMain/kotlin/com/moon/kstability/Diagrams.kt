@@ -1,4 +1,4 @@
-package com.kstabilty
+package com.moon.kstability
 
 
 typealias Axis = List<Float>
@@ -50,7 +50,12 @@ object Diagrams {
         val momentum = relevantSections.map { it.node.momentum }.sum()
 
         var resultPolynomial = Polynomial.MomentumLoad.bendingMoment(momentum)
-        resultPolynomial = pointLoads.map { Polynomial.PointLoad.bendingMoment(it.node.pos, it.vector)}.fold(resultPolynomial) { i, j -> i+j}
+        resultPolynomial = pointLoads.map {
+            Polynomial.PointLoad.bendingMoment(
+                it.node.pos,
+                it.vector
+            )
+        }.fold(resultPolynomial) { i, j -> i+j}
         // equivalent of: result += map.sum()
 
         distributedLoads.forEach { dL ->
@@ -83,7 +88,7 @@ object Diagrams {
 //        val momentum = relevantSections.map { it.node.momentum }.sum()
 
         var resultPolynomial = Polynomial.MomentumLoad.shearStress()
-        resultPolynomial = pointLoads.map { Polynomial.PointLoad.shearStress(it.vector)}.fold(resultPolynomial) { i, j -> i+j}
+        resultPolynomial = pointLoads.map { Polynomial.PointLoad.shearStress(it.vector) }.fold(resultPolynomial) { i, j -> i+j}
         // equivalent of: result += map.sum()
 
         distributedLoads.forEach { dL ->
@@ -116,7 +121,7 @@ object Diagrams {
 //        val momentum = relevantSections.map { it.node.momentum }.sum()
 
         var resultPolynomial = Polynomial.MomentumLoad.normalStress()
-        resultPolynomial = pointLoads.map { Polynomial.PointLoad.normalStress(it.vector)}.fold(resultPolynomial) { i, j -> i+j}
+        resultPolynomial = pointLoads.map { Polynomial.PointLoad.normalStress(it.vector) }.fold(resultPolynomial) { i, j -> i+j}
         // equivalent of: result += map.sum()
 
         distributedLoads.forEach { dL ->
@@ -144,7 +149,7 @@ object Diagrams {
      * @see getSections
      * @see Section
      */
-    fun getXAxis(sections: List<Section>, resolution: Float): Axis{
+    fun getXAxis(sections: List<Section>, resolution: Float): Axis {
         val referenceBeam = sections.first().beam
         val axis = mutableListOf<Float>()
         var x = referenceBeam.node1.pos.x
@@ -232,9 +237,9 @@ object Diagrams {
     /**
      * Rotates a pair of axes, by the given inclination (rise/run).
      */
-    fun rotatePlot(axes: Axes, i: Float): Axes{
+    fun rotatePlot(axes: Axes, i: Float): Axes {
         val vectorList: List<Vector> = axes.first
-            .mapIndexed { index, it -> Vector(it, axes.second[index])}  // transforms axis to vector list
+            .mapIndexed { index, it -> Vector(it, axes.second[index]) }  // transforms axis to vector list
             .map { it.getRotated(i) }  // rotate each vector and return the list of results
 
         return Pair(vectorList.map { it.x }, vectorList.map { it.y })
