@@ -215,8 +215,6 @@ object Diagrams {
      * @see generateNormalFunction
      * @see generateShearFunction
      * @see generateMomentFunction
-     *
-     * @see IStructureDrawer
      */
     fun getDiagram(inputStructure: Structure, beam: Beam,
                    method: (List<Section>, Int) -> Polynomial,
