@@ -1,6 +1,5 @@
-package com.kstability
+package com.moon.kstability
 
-import com.moon.kstability.*
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
