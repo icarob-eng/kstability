@@ -16,12 +16,17 @@ import java.io.File
  * **/
 class NodesManager(private val arg: Map<String,Any>){
 
+    constructor(entry:Map.Entry<String,Any>):this(mapOf(entry.toPair()))
+
     val isANodeSection:Boolean
         get() = _isANodeSection()
 
     @Suppress("UNCHECKED_CAST")
     private fun _isANodeSection():Boolean {
-        if(arg.entries.size!=1){
+        if(arg.entries.size!=1 || arg.entries.first().value !is Map<*, *>){
+            return false
+        }
+        if(!(arg.entries.first().value as Map<*,*>).keys.all { it is String }){
             return false
         }
         for((outerKey,outerValue) in arg as Map<String,Map<String,Any>>){
@@ -42,7 +47,10 @@ class NodesManager(private val arg: Map<String,Any>){
     @Suppress("UNCHECKED_CAST")
     @Throws(ClassCastException::class)
     private fun _isAnyNode():Boolean {
-        if(arg.entries.size!=1){
+        if(arg.entries.size!=1 || arg.entries.first().value !is Map<*, *>){
+            return false
+        }
+        if(!(arg.entries.first().value as Map<*,*>).all { it.key is String }){
             return false
         }
         for((outerKey,outerValue) in arg as Map<String,Map<String,Any>>){
@@ -96,8 +104,14 @@ class SupportsManager(private val arg:Map<String, Any>){
     @Suppress("UNCHECKED_CAST")
     @Throws(ClassCastException::class)
     private fun _isASupportSection():Boolean{
-        if(arg.entries.size!=1) {
+        if(arg.entries.size!=1 || arg.entries.first().value !is Map<*,*>) {
             return false
+        }
+        if(!(arg.entries.first().value as Map<*,*>).keys.all{it is String}){
+            return false
+        }
+        if(!(arg.entries.first().value as Map<*,*>).values.all{it is Map<*,*>}){
+            return false;
         }
         for((_, outerValue) in arg as Map<String,Map<String,Any>>){
             for(support in outerValue){
@@ -115,9 +129,15 @@ class SupportsManager(private val arg:Map<String, Any>){
     @Suppress("UNCHECKED_CAST")
     @Throws(ClassCastException::class)
     private fun _isAllSupports():Boolean{
+        if(arg.entries.size!=1 || arg.entries.first().value !is Map<*,*>) {
+            return false
+        }
+        if(!(arg.entries.first().value as Map<*,*>).keys.all { it is String } || !(arg.entries.first().value as Map<*,*>).values.all { it is Map<*,*> }){
+            return false
+        }
         for((_, outerValue) in arg as Map<String, Map<String,Any>>){
             for(support in outerValue){
-                if(!SupportCreator(outerValue).isSupport){
+                if(!SupportCreator(support).isSupport){
                     return false
                 }
             }
@@ -131,11 +151,19 @@ class SupportsManager(private val arg:Map<String, Any>){
     @Suppress("UNCHECKED_CAST")
     @Throws(ClassCastException::class)
     private fun _isAnySupport():Boolean {
-        for((_, outerValue) in arg as Map<String, Map<String, Any>>){
-            for(support in outerValue){
-                if(!SupportCreator(outerValue).isSupport){
-                    return false
+        if(arg.entries.size!=1 || arg.entries.first().value !is Map<*,*>) {
+            return false
+        }
+        for((_, outerValue) in arg){
+            if(outerValue is Map<*,*> && outerValue.keys.all { it is String } && outerValue.values.all { it is Map<*,*> }){
+                for(support in outerValue as Map<String, Map<String, Any>>){
+                    if(SupportCreator(outerValue).isSupport){
+                        return true
+                    }
                 }
+            }
+            else{
+                continue
             }
         }
         return false
@@ -176,6 +204,9 @@ class BeamsManager(private val arg: Map<String,Any>){
     }
 
     fun isValidListOfBeams(nodes:MutableList<Node>): Boolean {
+        if(!(arg.entries.first().value is ArrayList<*> && (arg.entries.first().value as ArrayList<*>).all { it is String })){
+            return false
+        }
         for (beam in arg.entries.first().value as ArrayList<*>) {
             if (!BeamCreator(beam as ArrayList<*>).isValidBeam(nodes)) {
                 return false
@@ -211,7 +242,7 @@ class PointLoadsManager(private val arg: Map<String,Any>){
     @Suppress("UNCHECKED_CAST")
     @Throws(ClassCastException::class)
     private fun _isALoadSection():Boolean{
-        if(arg.entries.size!=1 && arg["cargas"]==null){
+        if(arg.entries.size!=1 || arg["cargas"]==null){
             return false
         }
         for((_, outerValue) in arg as Map<String,Map<String, Any>>){
@@ -234,9 +265,15 @@ class PointLoadsManager(private val arg: Map<String,Any>){
     @Suppress("UNCHECKED_CAST")
     @Throws(ClassCastException::class)
     private fun _isAllLoads():Boolean{
+        if(arg.entries.size!=1 || arg["cargas"]==null){
+            return false
+        }
+        if(arg.entries.first().value !is Map<*,*> || !(arg.entries.first().value as Map<*,*>).keys.all { it is String }  || !(arg.entries.first().value as Map<*,*>).values.all { it is Map<*,*> }){
+            return false
+        }
         for((_, outerValue) in arg as Map<String,Map<String, Any>>){
             for(load in outerValue){
-                if(PointLoadCreator(load).isLoad){
+                if(!PointLoadCreator(load).isLoad){
                     return false
                 }
             }
@@ -250,10 +287,20 @@ class PointLoadsManager(private val arg: Map<String,Any>){
     @Suppress("UNCHECKED_CAST")
     @Throws(ClassCastException::class)
     private fun _isAnyLoad():Boolean{
-        for((_, outerValue) in arg as Map<String,Map<String, Any>>){
-            for(load in outerValue){
-                if(PointLoadCreator(load).isLoad){
-                    return true
+        if(arg.entries.size!=1){
+            return false
+        }
+        for((_, outerValue) in arg){
+            if(outerValue is Map<*,*> && outerValue.keys.all { it is String } && outerValue.values.all { it is Any }){
+                for(load in outerValue as Map<String, Any>){
+                    try {
+                        if (PointLoadCreator(load).isLoad) {
+                            return true
+                        }
+                    }
+                    catch (_:Exception){
+                        continue
+                    }
                 }
             }
         }

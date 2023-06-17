@@ -1,8 +1,6 @@
 <component name="ArtifactManager">
   <artifact type="jar" name="kstability-jvm-1.0-SNAPSHOT">
     <output-path>$PROJECT_DIR$/build/libs</output-path>
-    <root id="archive" name="kstability-jvm-1.0-SNAPSHOT.jar">
-      <element id="module-output" name="kstability.jvmMain" />
-    </root>
+    <root id="archive" name="kstability-jvm-1.0-SNAPSHOT.jar" />
   </artifact>
 </component>

@@ -96,7 +96,7 @@ class SupportCreator(private val arg:Map<String,Any>){
             return false
         }
         return arg.values.all{ it -> (it as Map<*, *>).values.all { it == 1 || it == 2 || it == 3 || it =="vertical" ||
-                it =="horizontal" || (it is ArrayList<*> && it.all { it is Number })}}
+                it =="horizontal" || (it is ArrayList<*> && it.all { it is Number })|| (it is Array<*> && it.all { it is Number })}}
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -152,7 +152,7 @@ class SupportCreator(private val arg:Map<String,Any>){
  * @see Beam
  * **/
 
-class BeamCreator(private val beams:ArrayList<*>){
+class BeamCreator(private val beams: ArrayList<*>){
 
     val isBeam:Boolean
         get() = _isBeam()
