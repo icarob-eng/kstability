@@ -1,5 +1,6 @@
 plugins {
     kotlin("multiplatform") version "1.8.0"
+    `maven-publish`
 }
 
 group = "me.icaro"
@@ -53,5 +54,19 @@ kotlin {
         val jsTest by getting
         val nativeMain by getting
         val nativeTest by getting
+    }
+}
+
+afterEvaluate {
+    publishing {
+        publications {
+            create<MavenPublication>("maven"){
+                groupId = "com.moon.kstability"
+                artifactId = "kstability"
+                version = "1.0.1"
+
+                from(components["kotlin"])
+            }
+        }
     }
 }
