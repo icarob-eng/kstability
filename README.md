@@ -23,11 +23,7 @@ There are three steps to using this library:
 2. Instantiating objects, decribing the structure;
 3. Putting all together in an [`ChartingRoutines`](https://github.com/icarob-eng/kstability/blob/main/src/commonMain/kotlin/com/kstabilty/ChartingRoutines.kt) instance.
 
-### 1. Implementing an `IStructureDrawer`
-
-`IStructureDrawer` is an basic Kotlin interface that defines all ploting methods that should be implemented in order to make the ploting works. It can be implemented with plataform specific code, which makes this library plataform-independent. See the source code for more specifications.
-
-### 2. Instanciating the models
+### 1. Instanciating the models
 
 There are 6 classes used to describe a structure:
 - Node: a defined point where loads can be applied and beams and supports can be based on;
@@ -44,10 +40,19 @@ By the way that the library is defined, a structure holds a list of node and the
 - Then instanciate the node, passing the strucure (else the structure wouldn't kwon about the node);
 - Finally in each node add the loads;
 
-### 3. Using the `StructureSolver`
+See also the class documentation for the [creators](https://github.com/icarob-eng/kstability/blob/main/src/jvmMain/kotlin/com/moon/kstability/CreatorMenagers.kt). They serve to instantiate a structure from a string formated in yaml and only orks at jvm.
+
+### 2. Using the `StructureSolver`
 
 The `StructureSolver` class is made to facilitate the calculations and ploting routines, simplifing the entire process to those given steps.
 All it's public filds and methods can be used. For more information read the source code's documentation.
+
+### 3. Making the diagrams
+The diagrams are generated completely by the `Diagrams.getDiagram()`. Just need to pass the analized `Structure`, the foccused `Beam`, the the diagram function to be ploted and the step size (releted to the horizontal resolution, the smaller the step, the more points will be ploted). The diagram function should be passed as a reference to one of those functions: `generateNormalFunction`, `generateShearFunction` and `generateMomentFunction`.
+
+Example: generating the Shear Stress Diagram for a giveng `structure`, `beam` with step of 0.01: `Diagrams.getDiagrams(structure, beam, generateShearFunction, 0.01F)`
+
+The method returns a pair of lists, representing the x and y points of the result plot.
 
 ## Contribute
 For all changes, a issue is required, to discuss what you would like to change.
