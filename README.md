@@ -73,3 +73,6 @@ The method returns a pair: the first item is a pair of lists, representing the x
 
 ## Contribute
 For any changes, a issue is first required.
+
+## See also
+- [Estabilidade-IO](https://github.com/icarob-eng/Estabilidade-IO/), a Android client implementation for Kstability.
