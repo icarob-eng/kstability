@@ -193,6 +193,7 @@ data class Structure(val name: String, val nodes: MutableList<Node> = mutableLis
     fun getPointLoads() = nodes.flatMap { it.pointLoads }
     fun getDistributedLoads() = nodes.flatMap { it.distributedLoads }.distinct()
     fun getEqvLoads() = getPointLoads() + getDistributedLoads().map { it.getEqvLoad() }
+    fun deepCopy() = getRotatedCopy(0f)
 
     fun getRotatedCopy(i: Float): Structure {
         // não seria possível rotacionar apenas os nós e direções, pois as direções são valores imutáveis

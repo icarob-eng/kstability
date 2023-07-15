@@ -33,6 +33,20 @@ class StabilizationTest {
     private val expectedReactionA = Vector(0.0f, 17.5f)
     private val expectedReactionD = Vector(0.0f, 12.5f)
 
+    private val sampleB = Structure("Basic Sample B", mutableListOf(
+        Node("A", Vector(0,2)).apply {
+            Support(this, Support.Gender.FIRST, Consts.VERTICAL)
+        },
+        Node("B", Vector(1, 2)).apply {
+            PointLoad(this, Vector(0,-10))
+        },
+        Node("C", Vector(2,2)).apply {
+            Support(this, Support.Gender.SECOND, Consts.VERTICAL)
+        }
+    )).also {
+        Beam(it.nodes.first(), it.nodes.last())
+    }
+
 
     @Test
     fun isostaticTest() {
@@ -133,6 +147,24 @@ class StabilizationTest {
         Stabilization.stabilize(structureSample)
 
         assertEquals(expected, Stabilization.getResultMomentum(structureSample))
+    }
+
+    @Test
+    fun resultForceStabilizedSwitchedStructureTest() {
+        val expected = Vector(0f, 0f)
+
+        Stabilization.stabilize(sampleB)
+
+        assertEquals(expected, Stabilization.getResultForce(sampleB))
+    }
+
+    @Test
+    fun resultMomentumStabilizedSwitchedStructureTest() {
+        val expected = 0F
+
+        Stabilization.stabilize(sampleB)
+
+        assertEquals(expected, Stabilization.getResultMomentum(sampleB))
     }
 
     @Test

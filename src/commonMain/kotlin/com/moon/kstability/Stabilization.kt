@@ -90,21 +90,14 @@ object Stabilization {
         return Pair(Vector(ax, ay), i * k)
     }
 
-    /**
-     * Makes the passed structure stable by adding loads or momenta to the adequate
-     * supports.
-     *
-     * @throws AssertionError thrown if it doesn't have an algorithm to solve de structure.
-     * @param structure Structure to be stabilized. It will be altered
-     * @return Nothing
-     * @see isIsostatic
-     * @see getResultForce
-     * @see getResultMomentum
-     * @see getReactionsAB
-     */
+    @Deprecated("This function will be substituted by v2.x",
+        ReplaceWith("Stabilization.getStabilized(structure)")
+    )
     fun stabilize(structure: Structure) {
+        val exception = IllegalArgumentException("A estrutura não é isostática")
+
         if (! isIsostatic(structure))
-            throw IllegalArgumentException("A estrutura não é isostática")
+            throw exception
         val resultMomentum = getResultMomentum(structure)
         val resultForce = getResultForce(structure)
 
@@ -116,7 +109,7 @@ object Stabilization {
             PointLoad(structure.getSupports()[0].node, -resultForce)
         } else {
             if (supports.size != 2)
-                throw IllegalArgumentException("A estrutura não é isostática")
+                throw exception
 
             when (Support.Gender.SECOND){
                 supports[0].gender -> {  // supports[0] = a
@@ -137,10 +130,28 @@ object Stabilization {
                     PointLoad(structure.getSupports()[1].node, reactionPair.first)
                     PointLoad(structure.getSupports()[0].node, reactionPair.second)
                 }
-                else -> {
-                    throw IllegalArgumentException("A estrutura não é isostática")
-                }
+                else -> throw exception
             }
         }
+    }
+
+    /**
+     * Returns a copy of the passed structure that is stable, by adding loads or momenta to the adequate supports.
+     *
+     * @throws IllegalArgumentException thrown if it doesn't have an algorithm to solve de structure.
+     * @param structure Base structure to be stabilized
+     * @return Stabilized copy of the structure
+     * @see isIsostatic
+     * @see getResultForce
+     * @see getResultMomentum
+     * @see getReactionsAB
+     */
+    @Throws(IllegalArgumentException::class)
+    fun getStabilized(structure: Structure): Structure {
+        val structureCopy = structure.deepCopy()
+
+        stabilize(structureCopy)
+
+        return  structureCopy
     }
 }

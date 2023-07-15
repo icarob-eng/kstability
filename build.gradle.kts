@@ -63,7 +63,7 @@ afterEvaluate {
             create<MavenPublication>("maven"){
                 groupId = "com.moon.kstability"
                 artifactId = "kstability"
-                version = "1.0.1"
+                version = "1.1.1"
 
                 from(components["kotlin"])
             }
