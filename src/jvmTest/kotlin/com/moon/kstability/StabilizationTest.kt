@@ -5,12 +5,12 @@ import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
 
 class StabilizationTest {
-    private val nodeSampleA = Node("A", Vector(0F, 2F))
-    private val nodeSampleB = Node("B", Vector(1F, 2F))
+    private val nodeSampleA = Node("A", Vector(0F, 102F))
+    private val nodeSampleB = Node("B", Vector(1F, 102F))
         .also{ PointLoad(it, Vector(0f, -20f)) } // applies load sample
-    private val nodeSampleC = Node("C", Vector(3F, 2F))
+    private val nodeSampleC = Node("C", Vector(3F, 102F))
         .also { PointLoad(it, Vector(0f, -10f)) }
-    private val nodeSampleD = Node("D", Vector(4F, 2F))
+    private val nodeSampleD = Node("D", Vector(4F, 102F))
         .also { Beam(nodeSampleA, it) }
 
     private val supportSampleA = Support(nodeSampleA, Support.Gender.SECOND, Consts.VERTICAL)
@@ -34,13 +34,13 @@ class StabilizationTest {
     private val expectedReactionD = Vector(0.0f, 12.5f)
 
     private val sampleB = Structure("Basic Sample B", mutableListOf(
-        Node("A", Vector(0,2)).apply {
+        Node("A", Vector(1401,-335)).apply {
             Support(this, Support.Gender.FIRST, Consts.VERTICAL)
         },
-        Node("B", Vector(1, 2)).apply {
+        Node("B", Vector(1402, -335)).apply {
             PointLoad(this, Vector(0,-10))
         },
-        Node("C", Vector(2,2)).apply {
+        Node("C", Vector(1403,-335)).apply {
             Support(this, Support.Gender.SECOND, Consts.VERTICAL)
         }
     )).also {
@@ -150,24 +150,6 @@ class StabilizationTest {
     }
 
     @Test
-    fun resultForceStabilizedSwitchedStructureTest() {
-        val expected = Vector(0f, 0f)
-
-        Stabilization.stabilize(sampleB)
-
-        assertEquals(expected, Stabilization.getResultForce(sampleB))
-    }
-
-    @Test
-    fun resultMomentumStabilizedSwitchedStructureTest() {
-        val expected = 0F
-
-        Stabilization.stabilize(sampleB)
-
-        assertEquals(expected, Stabilization.getResultMomentum(sampleB))
-    }
-
-    @Test
     fun isNotStableTest() {
         assertFalse(Stabilization.isStable(structureSample))
     }
@@ -184,6 +166,12 @@ class StabilizationTest {
     fun isStabilizationStableTest() {
         Stabilization.stabilize(structureSample)
         assertTrue(Stabilization.isStable(structureSample))
+    }
+
+    @Test
+    fun isStableSampleBTest() {
+        Stabilization.stabilize(sampleB)
+        assertTrue(Stabilization.isStable(sampleB))
     }
 
     @Test

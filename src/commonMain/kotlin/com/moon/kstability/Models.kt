@@ -193,6 +193,7 @@ data class Structure(val name: String, val nodes: MutableList<Node> = mutableLis
     fun getPointLoads() = nodes.flatMap { it.pointLoads }
     fun getDistributedLoads() = nodes.flatMap { it.distributedLoads }.distinct()
     fun getEqvLoads() = getPointLoads() + getDistributedLoads().map { it.getEqvLoad() }
+    fun getMiddlePoint() = this.nodes.map{ it.pos }.reduce { acc: Vector, next: Vector ->  acc + next} / this.nodes.size
     fun deepCopy() = getRotatedCopy(0f)
 
     fun getRotatedCopy(i: Float): Structure {

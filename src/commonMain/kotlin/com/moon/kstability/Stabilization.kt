@@ -81,13 +81,12 @@ object Stabilization {
         val phi = rb.crossModule(i)
         val psi = ra.crossModule(i)
 
-        val ax = - (c.x * ra.x * i.y - c.x * phi - c.y * ra.x * i.x + m * i.x)/(-phi + psi)
-        val ay = - (c.x * ra.y * i.y - c.y * ra.y * i.x - c.y * phi + m * i.y)/(-phi + psi)
+        val ax = (c.x * ra.x * i.y - c.x * phi - c.y * ra.x * i.x + m * i.x)/(-phi + psi)
+        val ay = (c.x * ra.y * i.y - c.y * ra.y * i.x - c.y * phi + m * i.y)/(-phi + psi)
 
-        val k = - (ax * ra.y - ay * ra.x + m)/phi
-        // I really don't know why it had to be negative, but is how it works
+        val k = (ax * ra.y - ay * ra.x + m)/phi
 
-        return Pair(Vector(ax, ay), i * k)
+        return Pair(- Vector(ax, ay), - i * k)
     }
 
     @Deprecated("This function will be substituted by v2.x",
@@ -113,22 +112,22 @@ object Stabilization {
 
             when (Support.Gender.SECOND){
                 supports[0].gender -> {  // supports[0] = a
-                    val reactionPair = getReactionsAB(
+                    val (reactionA, reactionB) = getReactionsAB(
                         supports[0], supports[1],
                         resultForce, resultMomentum
                     )
 
-                    PointLoad(structure.getSupports()[0].node, reactionPair.first)
-                    PointLoad(structure.getSupports()[1].node, reactionPair.second)
+                    PointLoad(structure.getSupports()[0].node, reactionA)
+                    PointLoad(structure.getSupports()[1].node, reactionB)
                 }
                 supports[1].gender -> {  // supports[1] = a
-                    val reactionPair = getReactionsAB(
+                    val (reactionA, reactionB) = getReactionsAB(
                         supports[1], supports[0],
                         resultForce, resultMomentum
                     )
 
-                    PointLoad(structure.getSupports()[1].node, reactionPair.first)
-                    PointLoad(structure.getSupports()[0].node, reactionPair.second)
+                    PointLoad(structure.getSupports()[0].node, reactionB)
+                    PointLoad(structure.getSupports()[1].node, reactionA)
                 }
                 else -> throw exception
             }
