@@ -84,9 +84,14 @@ object Stabilization {
         val ax = (c.x * ra.x * i.y - c.x * phi - c.y * ra.x * i.x + m * i.x)/(-phi + psi)
         val ay = (c.x * ra.y * i.y - c.y * ra.y * i.x - c.y * phi + m * i.y)/(-phi + psi)
 
-        val k = (ax * ra.y - ay * ra.x + m)/phi
+//        return if (phi != 0f) {
+//            val k = (ax * ra.y - ay * ra.x + m) / phi
+            
+//            Pair(- Vector(ax, ay), - i * k)
+        val fa = Vector(ax, ay)
+        val fb = resultForce - fa
 
-        return Pair(- Vector(ax, ay), - i * k)
+        return Pair(-fa, -fb)
     }
 
     @Deprecated("This function will be substituted by v2.x",

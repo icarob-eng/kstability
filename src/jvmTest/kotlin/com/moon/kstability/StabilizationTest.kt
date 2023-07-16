@@ -34,13 +34,13 @@ class StabilizationTest {
     private val expectedReactionD = Vector(0.0f, 12.5f)
 
     private val sampleB = Structure("Basic Sample B", mutableListOf(
-        Node("A", Vector(1401,-335)).apply {
+        Node("A", Vector(0,3)).apply {
             Support(this, Support.Gender.FIRST, Consts.VERTICAL)
         },
-        Node("B", Vector(1402, -335)).apply {
+        Node("B", Vector(2, 3)).apply {
             PointLoad(this, Vector(0,-10))
         },
-        Node("C", Vector(1403,-335)).apply {
+        Node("C", Vector(4,3)).apply {
             Support(this, Support.Gender.SECOND, Consts.VERTICAL)
         }
     )).also {
