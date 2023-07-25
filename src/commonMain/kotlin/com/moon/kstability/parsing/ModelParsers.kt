@@ -19,7 +19,7 @@ object ModelParsers {
             return if (arg is List<*> && arg.all { it is Number } && arg.size == 2) {
                 // case [0,1]
                 Vector(arg[0] as Number, arg[1] as Number)
-            } else if (arg is Map<*, *> && arg.keys.toSet().map { (it as? String)?.lowercase() } == setOf(s.x, s.y)) {
+            } else if (arg is Map<*, *> && arg.keys.map { (it as? String)?.lowercase() }.toSet() == setOf(s.x, s.y)) {
                 // case x: 0, y: 1
                 Vector(arg[s.x] as Number, arg[s.y] as Number)
             } else if ((arg as? String)?.lowercase() == s.vertical) {
@@ -77,7 +77,7 @@ object ModelParsers {
         arg.entries.map { (nodeStr, supportMap) ->
             val node = findNode(nodeStr)
 
-            if (supportMap.keys.toSet().map { key -> key.lowercase() } != setOf(s.gender, s.direction))
+            if (supportMap.keys.map { key -> key.lowercase() }.toSet() != setOf(s.gender, s.direction))
                 throw IllegalArgumentException(s.invalidSupportSyntax.format(supportMap))
 
             node.support = Support(
@@ -126,7 +126,7 @@ object ModelParsers {
     @Throws(IllegalArgumentException::class)
     fun Structure.parseLoadSection(arg: Map<String, Map<String, Any>>) {
         arg.map { (_, map) ->
-            val keys = map.keys.toSet().map { key -> key.lowercase() }
+            val keys = map.keys.map { key -> key.lowercase() }.toSet()
 
             val vector = if(s.vector in keys) parseVector(map[s.vector]) else
                 if (s.direction in keys && s.module in keys) parseVector(map[s.direction]).normalize() * map[s.module] as Number
@@ -178,10 +178,10 @@ object ModelParsers {
         try { structure.parseSupportSection(arg[s.supportSection] as Map<String, Map<String, Any>>) }
         catch (e: ClassCastException) { throw IllegalArgumentException(s.invalidSection.format("support")) }
 
-        try { structure.parseBeamSection(arg[s.nodesSection] as List<List<String>>)}
+        try { structure.parseBeamSection(arg[s.beamsSection] as List<List<String>>)}
         catch (e: ClassCastException) { throw IllegalArgumentException(s.invalidSection.format("beam")) }
 
-        try { structure.parseLoadSection(arg[s.nodesSection] as Map<String, Map<String, Any>>) }
+        try { structure.parseLoadSection(arg[s.loadsSection] as Map<String, Map<String, Any>>) }
         catch (e: ClassCastException) { throw IllegalArgumentException(s.invalidSection.format("load")) }
 
         return structure

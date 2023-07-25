@@ -3,7 +3,7 @@ package com.moon.kstability
 import org.junit.jupiter.api.Test
 import kotlin.test.assertEquals
 
-class ParseTest {
+class ParseCreatorsTest {
 
     @Test
     fun isNodeANode() {
