@@ -1,0 +1,21 @@
+--- # sample according to StringsPtBr text
+estrutura: Sample Structure
+nós:
+  A: [0, 0]
+  B: [0, 1]
+  C: [0, 2]
+apoios:
+  A:
+    gênero: 1
+    direção: vertical
+  C:
+    gênero: 2
+    direção: vertical
+barras:
+  - [A, C]
+cargas:
+  F1:
+    nó: B
+    direção: vertical
+    módulo: -10
+...

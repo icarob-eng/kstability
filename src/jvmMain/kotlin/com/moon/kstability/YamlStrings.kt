@@ -5,7 +5,7 @@ object StringsPtBr {
     const val invalidSyntax = "Notação inválida."
     const val undeclaredNode = "Nó não declarado."
     const val invalidBeam = "Barra declarada é inválida."
-    const val invalidLoadSyntax = "Número de nós inválidos."
+    const val invalidLoadSyntax = "Número de nós inválidos"
     const val invalidBeamList = "A lista de barras é inválida."
     const val invalidSupportList = "A lista de suportes é inválida."
 
