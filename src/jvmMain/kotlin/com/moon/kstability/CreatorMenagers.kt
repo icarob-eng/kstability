@@ -18,6 +18,7 @@ import java.io.File
  * @see NodeCreator
  * @see Node
  * **/
+@Deprecated("Use new parsers.", ReplaceWith("Structure.parseNodeSection"))
 class NodesManager(private val arg: Map<String,Any>){
 
     constructor(entry:Map.Entry<String,Any>):this(mapOf(entry.toPair()))
@@ -102,7 +103,7 @@ class NodesManager(private val arg: Map<String,Any>){
  *
  * @see SupportCreator
  * **/
-
+@Deprecated("Use new parsers.", ReplaceWith("Structure.parseSupportSection"))
 class SupportsManager(private val arg:Map<String, Any>){
 
     val isASupportSection:Boolean
@@ -204,6 +205,7 @@ class SupportsManager(private val arg:Map<String, Any>){
  *
  * @see BeamCreator
  * **/
+@Deprecated("Use new parsers.", ReplaceWith("Structure.parseBeamSection"))
 class BeamsManager(private val arg: Map<String,Any>){
 
     val isABeamSection:Boolean
@@ -247,6 +249,7 @@ class BeamsManager(private val arg: Map<String,Any>){
  * @property isALoadSection property responsible for checking whether the argument passed to the class
  * constitutes a section of loads.
  *  **/
+@Deprecated("Use new parsers.", ReplaceWith("Structure.parseLoadSection"))
 class PointLoadsManager(private val arg: Map<String,Any>){
 
     val isALoadSection:Boolean
@@ -324,6 +327,7 @@ class PointLoadsManager(private val arg: Map<String,Any>){
 /**
  * General class responsible for doing the whole process and handling the other classes.
  * **/
+@Deprecated("Use new parsers.", ReplaceWith("Parsers.parseYamlString"))
 class Parser(path:String){
     val data: Map<String,Any> = Yaml().load(File(path).inputStream())
 

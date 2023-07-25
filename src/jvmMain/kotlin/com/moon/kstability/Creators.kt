@@ -17,6 +17,7 @@ import com.moon.kstability.parsing.StringsPtBr
  * @see Node
  * @see Vector
  * **/
+@Deprecated("Use new parsers.", ReplaceWith("Structure.parseNodeSection"))
 class NodeCreator(private val arg:Map<String,Any> = mapOf()){
 
     constructor(entry: Map.Entry<String,Any>) : this(mapOf(entry.toPair()))
@@ -94,6 +95,7 @@ class NodeCreator(private val arg:Map<String,Any> = mapOf()){
  * @see Node
  * @see Vector
  * **/
+@Deprecated("Use new parsers.", ReplaceWith("Structure.parseSupportSection"))
 class SupportCreator(private val arg:Map<String,Any>){
 
     constructor(entry: Map.Entry<String, Any>): this(mapOf(entry.toPair()))
@@ -168,6 +170,7 @@ class SupportCreator(private val arg:Map<String,Any>){
  * 
  * @see Beam
  * **/
+@Deprecated("Use new parsers.", ReplaceWith("Structure.parseBeamSection"))
 class BeamCreator(private val beams: ArrayList<*>){
 
     val isBeam:Boolean
@@ -208,6 +211,7 @@ class BeamCreator(private val beams: ArrayList<*>){
  * @see DistributedLoad
  * @see PointLoad
  * **/
+@Deprecated("Use new parsers.", ReplaceWith("Structure.parseLoadSection"))
 class PointLoadCreator(private val arg: Map<String, Any>){
 
     constructor(arg:Map.Entry<String,Any>):this(mapOf(arg.toPair()))
