@@ -1,11 +1,11 @@
 package com.moon.kstability
 
-object YamlStringsPtBr {
+object StringsPtBr {
     // exceptions
     const val invalidSyntax = "Notação inválida."
     const val undeclaredNode = "Nó não declarado."
     const val invalidBeam = "Barra declarada é inválida."
-    const val invalidLoadSyntax = "Uma carga só pode ser atribuída a um único nó."
+    const val invalidLoadSyntax = "Número de nós inválidos."
     const val invalidBeamList = "A lista de barras é inválida."
     const val invalidSupportList = "A lista de suportes é inválida."
 

@@ -4,10 +4,15 @@ import com.moon.kstability.*
 
 /**
  * Class responsible for converting a node, and its respective properties,
- * from YAML to an object in Kotlin.
+ * from YAML to a Kotlin object.
+ * 
  * @property isNode property responsible for indicating whether the argument
  * passed to the class is, preliminarily, a node.
  *
+ * @suppress UNCHECKED_CAST
+ * @throws IllegalArgumentException
+ * @throws ClassCastException
+ * 
  * @see Node
  * @see Vector
  * **/
@@ -21,11 +26,11 @@ class NodeCreator(private val arg:Map<String,Any> = mapOf()){
         if(arg.keys.size!=1){
             return false
         }
-        if(arg.values.all {it is String && (it.lowercase() =="vertical" || it.lowercase()=="horizontal")}){
+        if(arg.values.all {it is String && (it.lowercase()==StringsPtBr.vertical || it.lowercase()==StringsPtBr.horizontal)}){
             return true
         }
         else if(arg.values.all {it is Map<*,*> } && arg.values.all{ it -> (it as Map<*, *>).values.all { it is Number }
-                    && (it as Map<*,*>).keys.all { it == "x" || it=="y" }}){
+                    && it.keys.all { it==StringsPtBr.x || it==StringsPtBr.y }}){
             return true
         }
         else if(arg.values.all { it -> (it is Array<*>) && it.all { it is Number } }){
@@ -41,7 +46,7 @@ class NodeCreator(private val arg:Map<String,Any> = mapOf()){
     @Throws(ClassCastException::class, IllegalArgumentException::class)
     fun createNode(): Node? {
         if(this.isNode){
-            if(arg.values.all {it is String && (it.lowercase() =="vertical" || it.lowercase()=="horizontal")}){
+            if(arg.values.all {it is String && (it.lowercase()==StringsPtBr.vertical || it.lowercase()==StringsPtBr.horizontal)}){
                 val name:String = arg.entries.first().key
                 val vector = Vector(arg.entries.first().value as String)
                 return Node(name,vector)
@@ -50,7 +55,7 @@ class NodeCreator(private val arg:Map<String,Any> = mapOf()){
                 arg.values.all{ it -> (it as Map<String,Any>).values.all { it is Number }}){
                 val name:String = arg.entries.first().key
                 val coordinatesNotation:Map<String,Any> = arg.entries.first() as Map<String,Any>
-                val vector = Vector(coordinatesNotation["x"] as Float,coordinatesNotation["y"] as Float)
+                val vector = Vector(coordinatesNotation[StringsPtBr.x] as Float, coordinatesNotation[StringsPtBr.y] as Float)
                 return Node(name,vector)
             }
             else if(arg.values.all { it -> it is Array<*> && it.all { it is Number }}){
@@ -67,7 +72,7 @@ class NodeCreator(private val arg:Map<String,Any> = mapOf()){
                 return Node(name, vector)
             }
             else{
-                throw IllegalArgumentException("Tipo de notação inválida.")
+                throw IllegalArgumentException(StringsPtBr.invalidSyntax)
             }
         }
         return null
@@ -76,13 +81,17 @@ class NodeCreator(private val arg:Map<String,Any> = mapOf()){
 
 /**
  * Class responsible for managing a support, regarding the argument passed to it.
+ * 
  * @property isSupport property responsible for indicating, preliminarily, if the
  * argument passed to the class is a support.
  *
+ * @suppress UNCHECKED_CAST
+ * @throws ClassCastException
+ * @throws IllegalArgumentException
+ * 
  * @see Support
  * @see Node
  * @see Vector
- *
  * **/
 class SupportCreator(private val arg:Map<String,Any>){
 
@@ -95,8 +104,8 @@ class SupportCreator(private val arg:Map<String,Any>){
         if(arg.entries.size!=1){
             return false
         }
-        return arg.values.all{ it -> (it as Map<*, *>).values.all { it == 1 || it == 2 || it == 3 || it =="vertical" ||
-                it =="horizontal" || (it is ArrayList<*> && it.all { it is Number })|| (it is Array<*> && it.all { it is Number })}}
+        return arg.values.all{ it -> (it as Map<*, *>).values.all { it == 1 || it == 2 || it == 3 || it==StringsPtBr.vertical ||
+                it==StringsPtBr.horizontal || (it is ArrayList<*> && it.all { n -> n is Number })|| (it is Array<*> && it.all { n -> n is Number })}}
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -104,47 +113,46 @@ class SupportCreator(private val arg:Map<String,Any>){
     fun createSupport(nodes:MutableList<Node>): Support? {
         val holder:Map<String, Any> = (arg.entries.first().value as Map<String,Map<String, Any>>)
         if(this.isSupport){
-            if(holder["direção"] is String){
-                return if(holder["gênero"]==1){
+            if(holder[StringsPtBr.direction] is String){
+                return if(holder[StringsPtBr.gender]==1){
                     nodes.find{it.name==arg.entries.first().key}
                         ?.let { Support(node = it, gender = Support.Gender.FIRST,
-                            dir = Vector(holder["direção"] as String)
+                            dir = Vector(holder[StringsPtBr.direction] as String)
                         ) }
-                } else if(holder["gênero"]==2){
+                } else if(holder[StringsPtBr.gender]==2){
                     nodes.find{it.name==arg.entries.first().key}
                         ?.let { Support(node = it, gender = Support.Gender.SECOND,
-                            dir = Vector(holder["direção"] as String)
+                            dir = Vector(holder[StringsPtBr.direction] as String)
                         ) }
                 } else{
                     nodes.find{it.name==arg.entries.first().key}
                         ?.let { Support(node = it, gender = Support.Gender.THIRD,
-                            dir = Vector(holder["direção"] as String)
+                            dir = Vector(holder[StringsPtBr.direction] as String)
                         ) }
                 }
             }
             else{
-                return if(holder["gênero"]==1){
+                return if(holder[StringsPtBr.gender]==1){
                     nodes.find{it.name==arg.entries.first().key}
                         ?.let { Support(node = it, gender = Support.Gender.FIRST,
-                            dir = Vector(holder["direção"] as ArrayList<Number>)
+                            dir = Vector(holder[StringsPtBr.direction] as ArrayList<Number>)
                         ) }
-                } else if(holder["gênero"]==2){
+                } else if(holder[StringsPtBr.gender]==2){
                     nodes.find{it.name==arg.entries.first().key}
                         ?.let { Support(node = it, gender = Support.Gender.SECOND,
-                            dir = Vector(holder["direção"] as ArrayList<Number>)
+                            dir = Vector(holder[StringsPtBr.direction] as ArrayList<Number>)
                         ) }
                 } else{
                     nodes.find{it.name==arg.entries.first().key}
                         ?.let { Support(node = it, gender = Support.Gender.THIRD,
-                            dir = Vector(holder["direção"] as ArrayList<Number>)
+                            dir = Vector(holder[StringsPtBr.direction] as ArrayList<Number>)
                         ) }
                 }
             }
         }
         else {
-            throw IllegalArgumentException("Nó não declarado.")
+            throw IllegalArgumentException(StringsPtBr.undeclaredNode)
         }
-        return null
     }
 }
 
@@ -155,9 +163,10 @@ class SupportCreator(private val arg:Map<String,Any>){
  * @property isValidBeam Property responsible for checking if the argument passed is a valid slash
  * based on the nodes on the file.
  *
+ * @throws IllegalArgumentException
+ * 
  * @see Beam
  * **/
-
 class BeamCreator(private val beams: ArrayList<*>){
 
     val isBeam:Boolean
@@ -177,21 +186,23 @@ class BeamCreator(private val beams: ArrayList<*>){
     }
 
     @Throws(IllegalArgumentException::class)
-    fun createBeam(nodes:MutableList<Node>): Beam? {
+    fun createBeam(nodes:MutableList<Node>): Beam {
         if(this.isBeam && this.isValidBeam(nodes)){
             return Beam(node1 = nodes.find { it.name == beams[0] }!!,
                 node2 = nodes.find { it.name == beams[1] }!!)
         }
         else{
-            throw IllegalArgumentException("As barras informadas são inválidas.")
+            throw IllegalArgumentException(StringsPtBr.invalidBeam)
         }
-        return null
     }
 }
 
 /**
- * Class responsible for managing the argument passed to it regarding loads.
+ * Class responsible for managing the argument passed to it regarding loads, including point and distributed loads.
  * @property isLoad checks if the argument passed to the class is a payload.
+ * 
+ * @suppress UNCHECKED_CAST
+ * @throws ClassCastException
  *
  * @see DistributedLoad
  * @see PointLoad
@@ -210,7 +221,7 @@ class PointLoadCreator(private val arg: Map<String, Any>){
             return false
         }
         val content:Map<String, Any> = arg.entries.first().value as Map<String,Any>
-        return content.keys.containsAll(setOf("nó","direção","módulo")) || content.keys.containsAll(setOf("nó","vetor"))
+        return content.keys.containsAll(setOf(StringsPtBr.node,StringsPtBr.direction,StringsPtBr.module)) || content.keys.containsAll(setOf(StringsPtBr.node,StringsPtBr.vector))
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -218,31 +229,31 @@ class PointLoadCreator(private val arg: Map<String, Any>){
     fun createLoad(nodes: MutableList<Node>): Any? {
         if(this.isLoad){
             val content = arg.entries.first().value as Map<String, Any>
-            if(content.keys.containsAll(setOf("nó","direção","módulo")) || content["no"] is ArrayList<*>){
-                val nodesNames = (content["no"] as ArrayList<String>)
+            if(content.keys.containsAll(setOf(StringsPtBr.node,StringsPtBr.direction,StringsPtBr.module)) || content[StringsPtBr.node] is ArrayList<*>){
+                val nodesNames = (content[StringsPtBr.node] as ArrayList<String>)
                 if(nodesNames.size!=2){
-                    throw Exception("Número de nós inválidos.")
+                    throw Exception(StringsPtBr.invalidLoadSyntax)
                 }
                 return DistributedLoad(node1 = nodes.find { it.name == nodesNames[0]}!!,
                     node2 = nodes.find { it.name == nodesNames[1]}!!,
-                    vector = Vector(content["direção"] as String) *(content["módulo"] as Float))
+                    vector = Vector(content[StringsPtBr.direction] as String) *(content[StringsPtBr.module] as Float))
             }
-            else if(content.keys.containsAll(setOf("nó","direção","módulo")) || content["no"] is String){
-                return PointLoad(node = nodes.find { it.name == content["nó"]}!!,
-                    vector= Vector(content["direção"] as String) *(content["módulo"] as Float))
+            else if(content.keys.containsAll(setOf(StringsPtBr.node,StringsPtBr.direction,StringsPtBr.module)) || content[StringsPtBr.node] is String){
+                return PointLoad(node = nodes.find { it.name == content[StringsPtBr.node]}!!,
+                    vector= Vector(content[StringsPtBr.direction] as String) *(content[StringsPtBr.module] as Float))
             }
-            else if(content.keys.containsAll(setOf("nó","vetor")) || content["no"] is ArrayList<*>){
-                val nodesNames = (content["no"] as ArrayList<String>)
+            else if(content.keys.containsAll(setOf(StringsPtBr.node,StringsPtBr.vector)) || content[StringsPtBr.node] is ArrayList<*>){
+                val nodesNames = (content[StringsPtBr.node] as ArrayList<String>)
                 if(nodesNames.size!=2){
-                    throw Exception("Número de nós inválidos.")
+                    throw Exception(StringsPtBr.invalidLoadSyntax)
                 }
                 return DistributedLoad(node1 = nodes.find { it.name == nodesNames[0]}!!,
-                    node2 = nodes.find { it.name == nodesNames[1]}!!, Vector(content["vetor"] as ArrayList<Number>)
+                    node2 = nodes.find { it.name == nodesNames[1]}!!, Vector(content[StringsPtBr.vector] as ArrayList<Number>)
                 )
             }
-            else if(content.keys.containsAll(setOf("nó","vetor")) || content["no"] is String){
-                return PointLoad(node = nodes.find { it.name == content["nó"]}!!,
-                    vector= Vector(content["vetor"] as ArrayList<Number>)
+            else if(content.keys.containsAll(setOf(StringsPtBr.node,StringsPtBr.vector)) || content[StringsPtBr.node] is String){
+                return PointLoad(node = nodes.find { it.name == content[StringsPtBr.node]}!!,
+                    vector= Vector(content[StringsPtBr.vector] as ArrayList<Number>)
                 )
             }
         }

@@ -11,6 +11,9 @@ import java.io.File
  * @property isAllNodes property responsible for checking if the content of the section is only composed of nodes.
  * @property isAnyNode property responsible for checking whether there is at least one node in the section.
  *
+ * @suppress UNCHECKED_CAST
+ * @throws ClassCastException
+ *
  * @see NodeCreator
  * @see Node
  * **/
@@ -91,6 +94,10 @@ class NodesManager(private val arg: Map<String,Any>){
  * the class is a support section.
  * @property isAllSupports property responsible for checking whether all arguments in the section are brackets.
  * @property isAnySupport property responsible for checking if any arguments of the section are supports.
+ *
+ * @suppress UNCHECKED_CAST
+ * @throws ClassCastException
+ * @throws IllegalArgumentException
  *
  * @see SupportCreator
  * **/
@@ -181,7 +188,7 @@ class SupportsManager(private val arg:Map<String, Any>){
             }
         }
         else{
-            throw IllegalArgumentException("O argumento da classe não é uma seção de suportes.")
+            throw IllegalArgumentException(StringsPtBr.invalidSupportList)
         }
         return null
     }
@@ -192,6 +199,8 @@ class SupportsManager(private val arg:Map<String, Any>){
  * @property isABeamSection property responsible for checking whether the argument passed to the class
  * constitutes a section of slashes.
  *
+ * @throws ClassCastException
+ *
  * @see BeamCreator
  * **/
 class BeamsManager(private val arg: Map<String,Any>){
@@ -200,7 +209,7 @@ class BeamsManager(private val arg: Map<String,Any>){
         get() = _isABeamSection()
 
     private fun _isABeamSection():Boolean{
-        return !(arg.entries.size !=1 || arg.entries.first().key!="barras")
+        return !(arg.entries.size !=1 || arg.entries.first().key!=StringsPtBr.beamsSection)
     }
 
     fun isValidListOfBeams(nodes:MutableList<Node>): Boolean {
@@ -220,10 +229,10 @@ class BeamsManager(private val arg: Map<String,Any>){
         val out:MutableList<Beam> = mutableListOf()
         if(this.isValidListOfBeams(nodes)){
             for(beam in arg.entries.first().value as ArrayList<*>)
-                BeamCreator(beam as ArrayList<*>).createBeam(nodes)?.let { out.add(it) }
+                BeamCreator(beam as ArrayList<*>).createBeam(nodes).let { out.add(it) }
         }
         else{
-            throw IllegalArgumentException("A lista de barras é inválida.")
+            throw IllegalArgumentException(StringsPtBr.invalidBeamList)
         }
         return out
     }
@@ -231,6 +240,9 @@ class BeamsManager(private val arg: Map<String,Any>){
 /**
  * Class responsible for managing the construction and verification of Loads according to the argument passed to it.
  *
+ * @suppress UNCHECKED_CAST
+ * @throws ClassCastException
+ * 
  * @property isALoadSection property responsible for checking whether the argument passed to the class
  * constitutes a section of loads.
  *  **/
@@ -242,7 +254,7 @@ class PointLoadsManager(private val arg: Map<String,Any>){
     @Suppress("UNCHECKED_CAST")
     @Throws(ClassCastException::class)
     private fun _isALoadSection():Boolean{
-        if(arg.entries.size!=1 || arg["cargas"]==null){
+        if(arg.entries.size!=1 || arg[StringsPtBr.loadsSection]==null){
             return false
         }
         for((_, outerValue) in arg as Map<String,Map<String, Any>>){
@@ -265,7 +277,7 @@ class PointLoadsManager(private val arg: Map<String,Any>){
     @Suppress("UNCHECKED_CAST")
     @Throws(ClassCastException::class)
     private fun _isAllLoads():Boolean{
-        if(arg.entries.size!=1 || arg["cargas"]==null){
+        if(arg.entries.size!=1 || arg[StringsPtBr.loadsSection]==null){
             return false
         }
         if(arg.entries.first().value !is Map<*,*> || !(arg.entries.first().value as Map<*,*>).keys.all { it is String }  || !(arg.entries.first().value as Map<*,*>).values.all { it is Map<*,*> }){
@@ -315,8 +327,8 @@ class Parser(path:String){
     val data: Map<String,Any> = Yaml().load(File(path).inputStream())
 
     fun getProjectName(): String? {
-        if(data["projeto"]!=null && data["projeto"] is String){
-            return data["projeto"] as String
+        if(data[StringsPtBr.structureSection]!=null && data[StringsPtBr.structureSection] is String){
+            return data[StringsPtBr.structureSection] as String
         }
         return null
     }

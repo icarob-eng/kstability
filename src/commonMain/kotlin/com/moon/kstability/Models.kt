@@ -23,7 +23,7 @@ package com.moon.kstability
 data class Node(var name: String, val pos: Vector, val structure: Structure? = null) {
     // todo: garantir que os nomes serão únicos
     var support: Support? = null  // only one support by node
-    var momentum = 0F  // todo: checar a quê corresponde o sinal
+    var momentum = 0F
     val beams: MutableList<Beam> = mutableListOf()
     val pointLoads: MutableList<PointLoad> = mutableListOf()
     val distributedLoads: MutableList<DistributedLoad> = mutableListOf()
@@ -185,6 +185,12 @@ data class DistributedLoad(val node1: Node, val node2: Node, val vector: Vector)
  *
  * @property name It's just a name, use at your will.
  * @property nodes A list of all nodes, that actually holds the data.
+ *
+ * @see Node
+ * @see Support
+ * @see Beam
+ * @see PointLoad
+ * @see DistributedLoad
  */
 data class Structure(val name: String, val nodes: MutableList<Node> = mutableListOf()) {
     fun getSupports() = nodes.mapNotNull { it.support }
