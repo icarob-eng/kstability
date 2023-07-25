@@ -111,7 +111,7 @@ class SupportsManager(private val arg:Map<String, Any>){
             return false
         }
         if(!(arg.entries.first().value as Map<*,*>).values.all{it is Map<*,*>}){
-            return false;
+            return false
         }
         for((_, outerValue) in arg as Map<String,Map<String,Any>>){
             for(support in outerValue){
