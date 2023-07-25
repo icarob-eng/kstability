@@ -15,6 +15,7 @@ object StringsPtBr {
 
     // sections
     const val structureSection = "estrutura"
+    const val supportSection = "apoios"
     const val loadsSection = "cargas"
     const val nodesSection = "nós"
     const val beamsSection = "barras"
@@ -25,6 +26,7 @@ object StringsPtBr {
     const val direction = "direção"
     const val gender = "gênero"
     const val node = "nó"
+    const val nodes = "nós"
     const val module = "módulo"
     const val vector ="vetor"
 }
