@@ -233,7 +233,7 @@ class BeamsManager(private val arg: Map<String,Any>){
                 BeamCreator(beam as ArrayList<*>).createBeam(nodes).let { out.add(it) }
         }
         else{
-            throw IllegalArgumentException(StringsPtBr.invalidBeamList)
+            throw IllegalArgumentException(StringsPtBr.invalidBeamList1)
         }
         return out
     }

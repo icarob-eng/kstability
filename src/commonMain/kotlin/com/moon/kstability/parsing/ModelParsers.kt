@@ -32,7 +32,7 @@ object ModelParsers {
                 throw ClassCastException()
             }
         } catch (e: ClassCastException) {
-            throw IllegalArgumentException("Invalid vector. Value = $arg")
+            throw IllegalArgumentException(s.invalidVector.format(arg))
         }
     }
 
@@ -61,7 +61,7 @@ object ModelParsers {
      */
     @Throws(IllegalArgumentException::class)
     fun Structure.findNode(name: String): Node = nodes.find { it.name == name }
-        ?: throw IllegalArgumentException("Referenced node $name not in the structure.")
+        ?: throw IllegalArgumentException(s.invalidNodeRef.format(name))
 
     /**
      * Parses a specific data structure into `Support`s and adds those in their respective `Node`s.
@@ -78,7 +78,7 @@ object ModelParsers {
             val node = findNode(nodeStr)
 
             if (supportMap.keys.toSet().map { key -> key.lowercase() } != setOf(s.gender, s.direction))
-                throw IllegalArgumentException("Invalid support syntax. Value = $supportMap")
+                throw IllegalArgumentException(s.invalidSupportSyntax.format(supportMap))
 
             node.support = Support(
                 node,
@@ -86,7 +86,7 @@ object ModelParsers {
                     1 -> Support.Gender.FIRST
                     2 -> Support.Gender.SECOND
                     3 -> Support.Gender.THIRD
-                    else -> throw IllegalArgumentException("Invalid support gender. Value = ${supportMap[s.gender]}")
+                    else -> throw IllegalArgumentException(s.invalidSupportGender.format(supportMap[s.gender]))
                 },
                 parseVector(supportMap[s.direction])
                 )
@@ -107,7 +107,7 @@ object ModelParsers {
     fun Structure.parseBeamSection(arg: List<List<String>>) {
         arg.map {
             beamLst ->
-            if (beamLst.size != 2) throw IllegalArgumentException("Invalid node quantity for a beam. Value = $beamLst")
+            if (beamLst.size != 2) throw IllegalArgumentException(s.invalidBeamList.format(beamLst))
             val nodes: List<Node> = beamLst.map { nodeStr -> findNode(nodeStr) }
             Beam(nodes[0], nodes[1])  // this automatically adds itself to the structure
         }
@@ -130,10 +130,10 @@ object ModelParsers {
 
             val vector = if(s.vector in keys) parseVector(map[s.vector]) else
                 if (s.direction in keys && s.module in keys) parseVector(map[s.direction]).normalize() * map[s.module] as Number
-                else throw IllegalArgumentException("Invalid load vector syntax. Value = $map")
+                else throw IllegalArgumentException(s.invalidLoadVectorSyntax.format(map))
 
             val nodeKey = if (s.node in keys) s.node else if (s.nodes in keys) s.node
-            else throw IllegalArgumentException("Invalid load syntax, ${s.node} or ${s.nodes} expected.")
+            else throw IllegalArgumentException(s.invalidLoadNodesSyntax)
 
 
             val nodes = map[nodeKey]
@@ -145,7 +145,7 @@ object ModelParsers {
                 DistributedLoad(findNode(nodes[0] as String), findNode(nodes[1] as String), vector)
 
             else
-                throw IllegalArgumentException("Invalid load syntax. Value = $map")
+                throw IllegalArgumentException(s.invalidLoadSyntax.format(map))
         }
     }
 
@@ -169,21 +169,23 @@ object ModelParsers {
     fun parseSections(arg: Map<String, Any>): Structure {
 
         val structure = Structure(
-            arg[s.structureSection] as? String?: throw IllegalArgumentException("Invalid structure name.")
+            arg[s.structureSection] as? String?: throw IllegalArgumentException(s.invalidSection.format("structure"))
         )
 
         try { structure.parseNodeSection(arg[s.nodesSection] as Map<String, Any>) }
-        catch (e: ClassCastException) { throw IllegalArgumentException("Invalid node section.") }
+        catch (e: ClassCastException) { throw IllegalArgumentException(s.invalidSection.format("node")) }
 
         try { structure.parseSupportSection(arg[s.supportSection] as Map<String, Map<String, Any>>) }
-        catch (e: ClassCastException) { throw IllegalArgumentException("Invalid support section.") }
+        catch (e: ClassCastException) { throw IllegalArgumentException(s.invalidSection.format("support")) }
 
         try { structure.parseBeamSection(arg[s.nodesSection] as List<List<String>>)}
-        catch (e: ClassCastException) { throw IllegalArgumentException("Invalid beam section.") }
+        catch (e: ClassCastException) { throw IllegalArgumentException(s.invalidSection.format("beam")) }
 
         try { structure.parseLoadSection(arg[s.nodesSection] as Map<String, Map<String, Any>>) }
-        catch (e: ClassCastException) { throw IllegalArgumentException("Invalid load section.") }
+        catch (e: ClassCastException) { throw IllegalArgumentException(s.invalidSection.format("load")) }
 
         return structure
     }
+
+    private fun String.format(arg: Any?) = this.replace("{}", arg.toString())
 }

@@ -238,7 +238,7 @@ class PointLoadCreator(private val arg: Map<String, Any>){
                     StringsPtBr.module)) || content[StringsPtBr.node] is ArrayList<*>){
                 val nodesNames = (content[StringsPtBr.node] as ArrayList<String>)
                 if(nodesNames.size!=2){
-                    throw Exception(StringsPtBr.invalidLoadSyntax)
+                    throw Exception(StringsPtBr.invalidLoadSyntax1)
                 }
                 return DistributedLoad(node1 = nodes.find { it.name == nodesNames[0]}!!,
                     node2 = nodes.find { it.name == nodesNames[1]}!!,
@@ -254,7 +254,7 @@ class PointLoadCreator(private val arg: Map<String, Any>){
             else if(content.keys.containsAll(setOf(StringsPtBr.node, StringsPtBr.vector)) || content[StringsPtBr.node] is ArrayList<*>){
                 val nodesNames = (content[StringsPtBr.node] as ArrayList<String>)
                 if(nodesNames.size!=2){
-                    throw Exception(StringsPtBr.invalidLoadSyntax)
+                    throw Exception(StringsPtBr.invalidLoadSyntax1)
                 }
                 return DistributedLoad(node1 = nodes.find { it.name == nodesNames[0]}!!,
                     node2 = nodes.find { it.name == nodesNames[1]}!!, Vector(content[StringsPtBr.vector] as ArrayList<Number>)
