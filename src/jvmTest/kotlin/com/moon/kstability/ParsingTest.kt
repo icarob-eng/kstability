@@ -8,11 +8,11 @@ import java.io.File
 
 
 class ParsingTest {
-    private val structureSample = Structure("Sample Structure", mutableListOf(
+    private val structureSample = Structure("Sample Structure", hashSetOf(
         Node("A", Vector(0, 0)).apply { support = Support(this, Gender.FIRST, Consts.VERTICAL) },
         Node("B", Vector(0, 1)).apply { pointLoads.add(PointLoad(this, Vector(0,-10))) },
         Node("C", Vector(0, 2)).apply { support = Support(this, Gender.SECOND, Consts.VERTICAL) }
-    )).also { Beam(it.nodes.first(), it.nodes.last()) }
+    )).also { Beam(it["A"]!!, it["C"]!!) }
 
     @Test
     fun parseFromYamlStructureTest() {

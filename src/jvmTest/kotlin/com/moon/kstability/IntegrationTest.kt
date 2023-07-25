@@ -1,5 +1,6 @@
 package com.moon.kstability
 
+import com.moon.kstability.Stabilization.stabilize
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.BeforeAll
@@ -33,7 +34,7 @@ class IntegrationTest {
         }
     }
 
-    private val basicStructureSampleA = Structure("Basic Sample A", mutableListOf(
+    private val basicStructureSampleA = Structure("Basic Sample A", hashSetOf(
         Node("A", Vector(0,0)).apply {
             Support(this, Support.Gender.SECOND, Vector.Consts.VERTICAL)
         },
@@ -44,10 +45,10 @@ class IntegrationTest {
             Support(this, Support.Gender.FIRST, Vector.Consts.VERTICAL)
         }
     )).also {
-        Beam(it.nodes.first(), it.nodes.last())
+        Beam(it["A"]!!, it["C"]!!)
     }
 
-    private val basicStructureSampleB = Structure("Basic Sample B", mutableListOf(
+    private val basicStructureSampleB = Structure("Basic Sample B", hashSetOf(
         Node("A", Vector(0,0)).apply {
             Support(this, Support.Gender.SECOND, Vector.Consts.VERTICAL)
         },
@@ -61,7 +62,7 @@ class IntegrationTest {
 
     @Test
     fun writeCsvFromShearBasicSampleA() {
-        Stabilization.stabilize(basicStructureSampleA)
+        basicStructureSampleA.stabilize()
         val output = Diagrams.getDiagram(
             basicStructureSampleA,
             basicStructureSampleA.getBeams().first(),
@@ -79,7 +80,7 @@ class IntegrationTest {
 
     @Test
     fun writeCsvFromMomentBasicSampleA() {
-        Stabilization.stabilize(basicStructureSampleA)
+        basicStructureSampleA.stabilize()
         val output = Diagrams.getDiagram(
             basicStructureSampleA,
             basicStructureSampleA.getBeams().first(),
@@ -97,7 +98,7 @@ class IntegrationTest {
 
     @Test
     fun writeCsvFromShearBasicSampleB() {
-        Stabilization.stabilize(basicStructureSampleB)
+        basicStructureSampleB.stabilize()
         val output = Diagrams.getDiagram(
             basicStructureSampleB,
             basicStructureSampleB.getBeams().first(),
@@ -112,7 +113,7 @@ class IntegrationTest {
 
     @Test
     fun writeCsvFromMomentBasicSampleB() {
-        Stabilization.stabilize(basicStructureSampleB)
+        basicStructureSampleB.stabilize()
         val output = Diagrams.getDiagram(
             basicStructureSampleB,
             basicStructureSampleB.getBeams().first(),
@@ -129,7 +130,7 @@ class IntegrationTest {
     PROBLEMA RESOLVIDO 7.4 (p.378) do livro MECÂNICA VETORIAL PARA ENGENHEIROS: ESTÁTICA.
     Ferdinand P. Beer...(et al.) 9ª edição, 2012.
     */
-    private val structureSampleA = Structure("Sample A", mutableListOf(
+    private val structureSampleA = Structure("Sample A", hashSetOf(
         Node("A", Vector(0, 0)).apply {
             Support(this, Support.Gender.SECOND, Vector.Consts.VERTICAL)
         },
@@ -143,16 +144,17 @@ class IntegrationTest {
             Support(this, Support.Gender.FIRST, Vector.Consts.VERTICAL)
         },
         Node("E", Vector(2.4 + 3 + 2.4 + 1.8, 0))
-    )).also {
-        Beam(it.nodes.first(), it.nodes.last())
-        DistributedLoad(it.nodes[3], it.nodes[4], Vector(0, -22.50))
+    )
+    ).also {
+        Beam(it["A"]!!, it["E"]!!)
+        DistributedLoad(it["D"]!!, it["E"]!!, Vector(0, -22.50))
     }
 
     /*
     PROBLEMA RESOLVIDO 7.6 (p.379) do livro MECÂNICA VETORIAL PARA ENGENHEIROS: ESTÁTICA.
     Ferdinand P. Beer...(et al.) 9ª edição, 2012.
     */
-    private val structureSampleB = Structure("Sample B", mutableListOf(
+    private val structureSampleB = Structure("Sample B", hashSetOf(
         Node("A", Vector(0,0)).apply {
             Support(this, Support.Gender.SECOND, Vector.Consts.VERTICAL)
         },
@@ -161,13 +163,13 @@ class IntegrationTest {
             Support(this, Support.Gender.FIRST, Vector.Consts.VERTICAL)
         }
     )).also {
-        Beam(it.nodes.first(), it.nodes.last())
-        DistributedLoad(it.nodes[0], it.nodes[1], Vector(0, -20))
+        Beam(it["A"]!!, it["C"]!!)
+        DistributedLoad(it["A"]!!, it["B"]!!, Vector(0, -20))
     }
 
     @Test
     fun writeCsvFromShearSampleA() {
-        Stabilization.stabilize(structureSampleA)
+        structureSampleA.stabilize()
         writeCsv("sample_a_shear_stress", Diagrams.getDiagram(
             structureSampleA,
             structureSampleA.getBeams().first(),
@@ -178,7 +180,7 @@ class IntegrationTest {
 
     @Test
     fun writeCsvFromMomentSampleA() {
-        Stabilization.stabilize(structureSampleA)
+        structureSampleA.stabilize()
         writeCsv("sample_a_bending_moment", Diagrams.getDiagram(
             structureSampleA,
             structureSampleA.getBeams().first(),
@@ -189,7 +191,7 @@ class IntegrationTest {
 
     @Test
     fun writeCsvFromShearSampleB() {
-        Stabilization.stabilize(structureSampleB)
+        structureSampleB.stabilize()
         writeCsv("sample_b_shear_stress", Diagrams.getDiagram(
             structureSampleB,
             structureSampleB.getBeams().first(),
@@ -200,7 +202,7 @@ class IntegrationTest {
 
     @Test
     fun writeCsvFromMomentSampleB() {
-        Stabilization.stabilize(structureSampleB)
+        structureSampleB.stabilize()
         writeCsv("sample_b_bending_moment", Diagrams.getDiagram(
             structureSampleB,
             structureSampleB.getBeams().first(),

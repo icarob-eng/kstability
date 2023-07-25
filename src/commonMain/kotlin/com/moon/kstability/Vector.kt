@@ -1,6 +1,5 @@
 package com.moon.kstability
 
-import kotlin.jvm.JvmField
 import kotlin.math.sqrt
 
 
@@ -9,10 +8,8 @@ import kotlin.math.sqrt
  * Ints and Doubles to Floats.
  */
 data class Vector(val x: Float, val y: Float, val name:String="") {
-    object Consts {
-        @JvmField
+    companion object Consts {
         val HORIZONTAL = Vector(1, 0)
-        @JvmField
         val VERTICAL = Vector(0, 1)
     }
 
@@ -86,5 +83,9 @@ data class Vector(val x: Float, val y: Float, val name:String="") {
         var result = x.hashCode()
         result = 31 * result + y.hashCode()
         return result
+    }
+
+    override fun toString(): String {
+        return "V($x, $y)"
     }
 }

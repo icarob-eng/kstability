@@ -24,10 +24,10 @@ object ModelParsers {
                 Vector(arg[s.x] as Number, arg[s.y] as Number)
             } else if ((arg as? String)?.lowercase() == s.vertical) {
                 // case vertical
-                Vector.Consts.VERTICAL
+                Vector.VERTICAL
             } else if ((arg as? String)?.lowercase() == s.horizontal) {
                 // case horizontal
-                Vector.Consts.HORIZONTAL
+                Vector.HORIZONTAL
             } else {
                 throw ClassCastException()
             }
@@ -48,7 +48,7 @@ object ModelParsers {
     @Throws(IllegalArgumentException::class)
     fun Structure.parseNodeSection(arg: Map<String, Any>){
         arg.map { (name, vectorMap) ->
-            Node(name, parseVector(vectorMap), this)
+            nodes.add(Node(name, parseVector(vectorMap)))
         }
     }
 
@@ -60,7 +60,7 @@ object ModelParsers {
      * @throws IllegalArgumentException thrown if the `Node` is not found.
      */
     @Throws(IllegalArgumentException::class)
-    fun Structure.findNode(name: String): Node = nodes.find { it.name == name }
+    fun Structure.findNotNullNode(name: String): Node = nodes.find { it.name == name }
         ?: throw IllegalArgumentException(s.invalidNodeRef.format(name))
 
     /**
@@ -75,7 +75,7 @@ object ModelParsers {
     @Throws(IllegalArgumentException::class)
     fun Structure.parseSupportSection(arg: Map<String, Map<String, Any>>) {
         arg.entries.map { (nodeStr, supportMap) ->
-            val node = findNode(nodeStr)
+            val node = findNotNullNode(nodeStr)
 
             if (supportMap.keys.map { key -> key.lowercase() }.toSet() != setOf(s.gender, s.direction))
                 throw IllegalArgumentException(s.invalidSupportSyntax.format(supportMap))
@@ -108,7 +108,7 @@ object ModelParsers {
         arg.map {
             beamLst ->
             if (beamLst.size != 2) throw IllegalArgumentException(s.invalidBeamList.format(beamLst))
-            val nodes: List<Node> = beamLst.map { nodeStr -> findNode(nodeStr) }
+            val nodes: List<Node> = beamLst.map { nodeStr -> findNotNullNode(nodeStr) }
             Beam(nodes[0], nodes[1])  // this automatically adds itself to the structure
         }
     }
@@ -139,10 +139,10 @@ object ModelParsers {
             val nodes = map[nodeKey]
 
             if (nodes is String)
-                PointLoad(findNode(nodes), vector)
+                PointLoad(findNotNullNode(nodes), vector)
 
             else if (nodes is List<*> && nodes.all { it is String } && nodes.size == 2)
-                DistributedLoad(findNode(nodes[0] as String), findNode(nodes[1] as String), vector)
+                DistributedLoad(findNotNullNode(nodes[0] as String), findNotNullNode(nodes[1] as String), vector)
 
             else
                 throw IllegalArgumentException(s.invalidLoadSyntax.format(map))
