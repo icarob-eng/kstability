@@ -2,12 +2,21 @@ package com.moon.kstability.parsing
 
 object StringsPtBr {
     // exceptions
+    @Deprecated("Used only on the old parsers")
     const val invalidSyntax = "Notação inválida."
+    @Deprecated("Used only on the old parsers")
     const val undeclaredNode = "Nó não declarado."
+    @Deprecated("Used only on the old parsers")
     const val invalidBeam = "Barra declarada é inválida."
+    @Deprecated("Used only on the old parsers")
     const val invalidLoadSyntax = "Número de nós inválidos"
+    @Deprecated("Used only on the old parsers")
     const val invalidBeamList = "A lista de barras é inválida."
+    @Deprecated("Used only on the old parsers")
     const val invalidSupportList = "A lista de suportes é inválida."
+
+    // exceptions
+
 
     // consts
     const val vertical = "vertical"

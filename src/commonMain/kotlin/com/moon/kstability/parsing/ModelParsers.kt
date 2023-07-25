@@ -5,6 +5,14 @@ import com.moon.kstability.*
 object ModelParsers {
     private val s = StringsPtBr
 
+    /**
+     * Parses the many possible syntax for a `Vector`. See parsing documentation for possible syntax.
+     *
+     * @param arg Some data structure correspondent to a `Vector`.
+     * @return `Vector`.
+     * @throws IllegalArgumentException
+     * @see Vector
+     */
     @Throws(IllegalArgumentException::class)
     fun parseVector(arg: Any?): Vector {
         try {
@@ -28,6 +36,15 @@ object ModelParsers {
         }
     }
 
+    /**
+     * Parses a `Map<String, Any>` into `Node`s and adds those to the `Structure`.
+     *
+     * @param arg `Map<String, Any>` corresponding to a list of `Node`s. See documentation for specifications.
+     * @return Nothing: the nodes are added to the structure.
+     * @throws IllegalArgumentException
+     * @see Node
+     * @see parseSections
+     */
     @Throws(IllegalArgumentException::class)
     fun Structure.parseNodeSection(arg: Map<String, Any>){
         arg.map { (name, vectorMap) ->
@@ -35,9 +52,26 @@ object ModelParsers {
         }
     }
 
+    /**
+     * Finds if a node name is a `Node` in the `Structure`, if null safety and correspondent exception.
+     *
+     * @param name The node name to be found.
+     * @return Node
+     * @throws IllegalArgumentException thrown if the `Node` is not found.
+     */
+    @Throws(IllegalArgumentException::class)
     fun Structure.findNode(name: String): Node = nodes.find { it.name == name }
         ?: throw IllegalArgumentException("Referenced node $name not in the structure.")
 
+    /**
+     * Parses a specific data structure into `Support`s and adds those in their respective `Node`s.
+     *
+     * @param arg The data structure of the `Support`. See documentation for specifications.
+     * @return Nothing: the supports are added to the node.
+     * @throws IllegalArgumentException
+     * @see parseNodeSection
+     * @see parseSections
+     */
     @Throws(IllegalArgumentException::class)
     fun Structure.parseSupportSection(arg: Map<String, Map<String, Any>>) {
         arg.entries.map { (nodeStr, supportMap) ->
@@ -59,6 +93,16 @@ object ModelParsers {
         }
     }
 
+    /**
+     * Parses a `List<List<String>>` into a list of `Beam`s, where the inner list is a pair of node names where the
+     * `Beam`s are connected.
+     *
+     * @param arg The specific data structure to be parsed as beams. See documentation for specifications.
+     * @return Nothing: the beams are added to the nodes.
+     * @throws IllegalArgumentException
+     * @see parseNodeSection
+     * @see parseSections
+     */
     @Throws(IllegalArgumentException::class)
     fun Structure.parseBeamSection(arg: List<List<String>>) {
         arg.map {
@@ -69,13 +113,23 @@ object ModelParsers {
         }
     }
 
+    /**
+     * Parses a specific data structure into `PointLoad`s or `DistributedLoad`s, depending on the number of `Node`s
+     * passed.
+     *
+     * @param arg The specific data structure to be parsed as loads. See documentation for specifications.
+     * @return Nothing: the loads are added to the nodes.
+     * @throws IllegalArgumentException
+     * @see parseNodeSection
+     * @see parseSections
+     */
     @Throws(IllegalArgumentException::class)
     fun Structure.parseLoadSection(arg: Map<String, Map<String, Any>>) {
         arg.map { (_, map) ->
             val keys = map.keys.toSet().map { key -> key.lowercase() }
 
             val vector = if(s.vector in keys) parseVector(map[s.vector]) else
-                if (s.direction in keys && s.module in keys) parseVector(map[s.direction]) * map[s.module] as Number
+                if (s.direction in keys && s.module in keys) parseVector(map[s.direction]).normalize() * map[s.module] as Number
                 else throw IllegalArgumentException("Invalid load vector syntax. Value = $map")
 
             val nodeKey = if (s.node in keys) s.node else if (s.nodes in keys) s.node
@@ -95,6 +149,21 @@ object ModelParsers {
         }
     }
 
+    /**
+     * Parses a data structure into a `Structure` and it's properties, using many casts. To convert yaml strings into
+     * `Structure`, see `parseYamlString()` when using JVM.
+     *
+     * @param arg The data structure that will be converted. See documentation for specifications.
+     * @return Structure The created `Structure`, with all the `Load`s, `Beam`s, `Support`s and `Node`s.
+     * @throws IllegalArgumentException
+     * @suppress UNCHECKED_CAST
+     *
+     * @see parseVector
+     * @see parseNodeSection
+     * @see parseSupportSection
+     * @see parseBeamSection
+     * @see parseLoadSection
+     */
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalArgumentException::class)
     fun parseSections(arg: Map<String, Any>): Structure {
