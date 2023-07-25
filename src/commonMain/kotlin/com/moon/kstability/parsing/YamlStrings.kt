@@ -1,4 +1,4 @@
-package com.moon.kstability
+package com.moon.kstability.parsing
 
 object StringsPtBr {
     // exceptions
@@ -27,5 +27,4 @@ object StringsPtBr {
     const val node = "nó"
     const val module = "módulo"
     const val vector ="vetor"
-
 }

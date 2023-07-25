@@ -1,6 +1,7 @@
 package com.moon.kstability
 
 import com.moon.kstability.*
+import com.moon.kstability.parsing.StringsPtBr
 import org.yaml.snakeyaml.Yaml
 import java.io.File
 
@@ -209,7 +210,7 @@ class BeamsManager(private val arg: Map<String,Any>){
         get() = _isABeamSection()
 
     private fun _isABeamSection():Boolean{
-        return !(arg.entries.size !=1 || arg.entries.first().key!=StringsPtBr.beamsSection)
+        return !(arg.entries.size !=1 || arg.entries.first().key!= StringsPtBr.beamsSection)
     }
 
     fun isValidListOfBeams(nodes:MutableList<Node>): Boolean {

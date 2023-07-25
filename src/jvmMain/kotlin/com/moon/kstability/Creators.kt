@@ -1,6 +1,7 @@
 package com.moon.kstability
 
 import com.moon.kstability.*
+import com.moon.kstability.parsing.StringsPtBr
 
 /**
  * Class responsible for converting a node, and its respective properties,
@@ -26,11 +27,11 @@ class NodeCreator(private val arg:Map<String,Any> = mapOf()){
         if(arg.keys.size!=1){
             return false
         }
-        if(arg.values.all {it is String && (it.lowercase()==StringsPtBr.vertical || it.lowercase()==StringsPtBr.horizontal)}){
+        if(arg.values.all {it is String && (it.lowercase()== StringsPtBr.vertical || it.lowercase()== StringsPtBr.horizontal)}){
             return true
         }
         else if(arg.values.all {it is Map<*,*> } && arg.values.all{ it -> (it as Map<*, *>).values.all { it is Number }
-                    && it.keys.all { it==StringsPtBr.x || it==StringsPtBr.y }}){
+                    && it.keys.all { it== StringsPtBr.x || it== StringsPtBr.y }}){
             return true
         }
         else if(arg.values.all { it -> (it is Array<*>) && it.all { it is Number } }){
@@ -46,7 +47,7 @@ class NodeCreator(private val arg:Map<String,Any> = mapOf()){
     @Throws(ClassCastException::class, IllegalArgumentException::class)
     fun createNode(): Node? {
         if(this.isNode){
-            if(arg.values.all {it is String && (it.lowercase()==StringsPtBr.vertical || it.lowercase()==StringsPtBr.horizontal)}){
+            if(arg.values.all {it is String && (it.lowercase()== StringsPtBr.vertical || it.lowercase()== StringsPtBr.horizontal)}){
                 val name:String = arg.entries.first().key
                 val vector = Vector(arg.entries.first().value as String)
                 return Node(name,vector)
@@ -104,8 +105,8 @@ class SupportCreator(private val arg:Map<String,Any>){
         if(arg.entries.size!=1){
             return false
         }
-        return arg.values.all{ it -> (it as Map<*, *>).values.all { it == 1 || it == 2 || it == 3 || it==StringsPtBr.vertical ||
-                it==StringsPtBr.horizontal || (it is ArrayList<*> && it.all { n -> n is Number })|| (it is Array<*> && it.all { n -> n is Number })}}
+        return arg.values.all{ it -> (it as Map<*, *>).values.all { it == 1 || it == 2 || it == 3 || it== StringsPtBr.vertical ||
+                it== StringsPtBr.horizontal || (it is ArrayList<*> && it.all { n -> n is Number })|| (it is Array<*> && it.all { n -> n is Number })}}
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -221,7 +222,9 @@ class PointLoadCreator(private val arg: Map<String, Any>){
             return false
         }
         val content:Map<String, Any> = arg.entries.first().value as Map<String,Any>
-        return content.keys.containsAll(setOf(StringsPtBr.node,StringsPtBr.direction,StringsPtBr.module)) || content.keys.containsAll(setOf(StringsPtBr.node,StringsPtBr.vector))
+        return content.keys.containsAll(setOf(StringsPtBr.node, StringsPtBr.direction, StringsPtBr.module)) || content.keys.containsAll(setOf(
+            StringsPtBr.node,
+            StringsPtBr.vector))
     }
 
     @Suppress("UNCHECKED_CAST")
@@ -229,7 +232,10 @@ class PointLoadCreator(private val arg: Map<String, Any>){
     fun createLoad(nodes: MutableList<Node>): Any? {
         if(this.isLoad){
             val content = arg.entries.first().value as Map<String, Any>
-            if(content.keys.containsAll(setOf(StringsPtBr.node,StringsPtBr.direction,StringsPtBr.module)) || content[StringsPtBr.node] is ArrayList<*>){
+            if(content.keys.containsAll(setOf(
+                    StringsPtBr.node,
+                    StringsPtBr.direction,
+                    StringsPtBr.module)) || content[StringsPtBr.node] is ArrayList<*>){
                 val nodesNames = (content[StringsPtBr.node] as ArrayList<String>)
                 if(nodesNames.size!=2){
                     throw Exception(StringsPtBr.invalidLoadSyntax)
@@ -238,11 +244,14 @@ class PointLoadCreator(private val arg: Map<String, Any>){
                     node2 = nodes.find { it.name == nodesNames[1]}!!,
                     vector = Vector(content[StringsPtBr.direction] as String) *(content[StringsPtBr.module] as Float))
             }
-            else if(content.keys.containsAll(setOf(StringsPtBr.node,StringsPtBr.direction,StringsPtBr.module)) || content[StringsPtBr.node] is String){
+            else if(content.keys.containsAll(setOf(
+                    StringsPtBr.node,
+                    StringsPtBr.direction,
+                    StringsPtBr.module)) || content[StringsPtBr.node] is String){
                 return PointLoad(node = nodes.find { it.name == content[StringsPtBr.node]}!!,
                     vector= Vector(content[StringsPtBr.direction] as String) *(content[StringsPtBr.module] as Float))
             }
-            else if(content.keys.containsAll(setOf(StringsPtBr.node,StringsPtBr.vector)) || content[StringsPtBr.node] is ArrayList<*>){
+            else if(content.keys.containsAll(setOf(StringsPtBr.node, StringsPtBr.vector)) || content[StringsPtBr.node] is ArrayList<*>){
                 val nodesNames = (content[StringsPtBr.node] as ArrayList<String>)
                 if(nodesNames.size!=2){
                     throw Exception(StringsPtBr.invalidLoadSyntax)
@@ -251,7 +260,7 @@ class PointLoadCreator(private val arg: Map<String, Any>){
                     node2 = nodes.find { it.name == nodesNames[1]}!!, Vector(content[StringsPtBr.vector] as ArrayList<Number>)
                 )
             }
-            else if(content.keys.containsAll(setOf(StringsPtBr.node,StringsPtBr.vector)) || content[StringsPtBr.node] is String){
+            else if(content.keys.containsAll(setOf(StringsPtBr.node, StringsPtBr.vector)) || content[StringsPtBr.node] is String){
                 return PointLoad(node = nodes.find { it.name == content[StringsPtBr.node]}!!,
                     vector= Vector(content[StringsPtBr.vector] as ArrayList<Number>)
                 )

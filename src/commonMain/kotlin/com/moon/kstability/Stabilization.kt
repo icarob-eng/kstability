@@ -67,9 +67,13 @@ object Stabilization {
      * @param supportB First gender support
      * @param resultForce Structure's resultant force, calculated by `getResultForce()`
      * @param resultMomentum Structure's resultant force, calculated by `getResultMomentum()`
+     *
+     * @suppress UnnecessaryVariable For clarity in the equations.
+     *
      * @see getResultForce
      * @see getResultMomentum
      */
+    @Suppress("UnnecessaryVariable")
     fun getReactionsAB(supportA: Support, supportB: Support,
                        resultForce: Vector, resultMomentum: Float): Pair<Vector, Vector> {
         val ra = supportA.node.pos
