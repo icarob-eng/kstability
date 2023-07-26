@@ -6,8 +6,9 @@ package com.moon.kstability
  *
  * @property name An (preferably) unique point name.
  * @property pos The node's position.
- * @property structure A circular reference to the hole structure. Nullable.
  * @property momentum The resultant bending moment applied at the node, as a Float.
+ * @property isMomentReaction Should be overwritten only by the framework and flags if the bending moment is inserted
+ * as a reaction or not.
  * @property beams List of beams that start or end at the node. The beams also have a circular reference to the node.
  * @property pointLoads List of point loads applied at the node. The loads also have a circular reference to the node.
  * @property distributedLoads List of distributed loads that start or end at the node.
@@ -20,26 +21,16 @@ package com.moon.kstability
  * @see Beam
  * @see Structure
  */
-data class Node(var name: String, val pos: Vector, val structure: Structure? = null) {
-    // todo: garantir que os nomes serão únicos
+data class Node(var name: String, val pos: Vector) {
     var support: Support? = null  // only one support by node
-    var momentum = 0F  // todo: checar a quê corresponde o sinal
-    val beams: MutableList<Beam> = mutableListOf()
+    var momentum = 0F
+    var isMomentReaction = false
+    val beams: HashSet<Beam> = hashSetOf()
     val pointLoads: MutableList<PointLoad> = mutableListOf()
     val distributedLoads: MutableList<DistributedLoad> = mutableListOf()
 
-    init {
-        structure?.nodes?.add(this)  // null for temporary nodes
-    }
-
     override operator fun equals(other: Any?) = if (other is Node) this.pos == other.pos else false
-    override fun hashCode(): Int {
-        // support, beams, momentum, point loads and distributed loads removed to prevent infinity recursion
-        var result = name.hashCode()
-        result = 31 * result + pos.hashCode()
-        result = 31 * result + (structure?.name.hashCode())
-        return result
-    }
+    override fun hashCode(): Int = name.hashCode()
 
     override fun toString() = "$name($pos)"
 }
@@ -111,11 +102,12 @@ data class Beam(val node1: Node, val node2: Node) {
  *
  * @property node Where the force is applied. When instantiated, it adds itself to the node.
  * @property vector Represents the actual force vector.
+ * @property isReaction Should be overwritten only by the framework and flags if the Load is inserted as a reaction.
  *
  * @see Node
  * @see Vector
  */
-data class PointLoad(val node: Node, val vector: Vector) {
+data class PointLoad(val node: Node, val vector: Vector, val isReaction: Boolean = false) {
     init { node.pointLoads.add(this) }
 
     override operator fun equals(other: Any?): Boolean = when (other) {
@@ -163,7 +155,6 @@ data class DistributedLoad(val node1: Node, val node2: Node, val vector: Vector)
         Node(
             node1.name + node2.name,
             (node1.pos + node2.pos) / 2,  // midpoint
-            null
         ),
         vector * (node2.pos - node1.pos).length()
     )
@@ -184,25 +175,36 @@ data class DistributedLoad(val node1: Node, val node2: Node, val vector: Vector)
  * And also has [getRotatedCopy], a method for rotate all of it.
  *
  * @property name It's just a name, use at your will.
- * @property nodes A list of all nodes, that actually holds the data.
+ * @property nodes A hashSet of all nodes, that actually holds the data.
+ *
+ * @see Node
+ * @see Support
+ * @see Beam
+ * @see PointLoad
+ * @see DistributedLoad
  */
-data class Structure(val name: String, val nodes: MutableList<Node> = mutableListOf()) {
+data class Structure(val name: String, val nodes: HashSet<Node> = hashSetOf()) {
+    operator fun get(name: String) = nodes.find { it.name == name }
+
     fun getSupports() = nodes.mapNotNull { it.support }
     fun getBeams() = nodes.flatMap { it.beams }.distinct()
     fun getMomentumLoads() = nodes.sumOf { it.momentum.toDouble() }.toFloat()
     fun getPointLoads() = nodes.flatMap { it.pointLoads }
     fun getDistributedLoads() = nodes.flatMap { it.distributedLoads }.distinct()
     fun getEqvLoads() = getPointLoads() + getDistributedLoads().map { it.getEqvLoad() }
-    fun getMiddlePoint() = this.nodes.map{ it.pos }.reduce { acc: Vector, next: Vector ->  acc + next} / this.nodes.size
+    fun getMiddlePoint() = nodes.map{ it.pos }.reduce { acc: Vector, next: Vector ->  acc + next} / nodes.size
     fun deepCopy() = getRotatedCopy(0f)
 
     fun getRotatedCopy(i: Float): Structure {
         // não seria possível rotacionar apenas os nós e direções, pois as direções são valores imutáveis
-        val newStructure = Structure(this.name + "'")
-        this.nodes.forEach {
-            val node = Node(it.name, it.pos.getRotated(i), newStructure)
-            node.momentum = it.momentum
-        }
+        val newStructure = Structure(
+            this.name + "'",
+            this.nodes.map {
+                val node = Node(it.name, it.pos.getRotated(i))
+                node.momentum = it.momentum
+                return@map node
+            }.toHashSet()
+        )
         // passa todos os nós e depois altera procurando um a um
 
         this.getSupports().forEach {

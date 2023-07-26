@@ -1,0 +1,32 @@
+estrutura: Sample Structure
+nós:
+  A:
+    x: 0.0
+    y: 0.0
+  B:
+    x: 0.0
+    y: 1.0
+  C:
+    x: 0.0
+    y: 2.0
+apoios:
+  A:
+    gênero: 1
+    direção: vertical
+  C:
+    gênero: 2
+    direção: vertical
+barras:
+- - A
+  - C
+cargas:
+  F0:
+    nó: B
+    vetor:
+      x: 0.0
+      y: -10.0
+  F1:
+    nó: B
+    vetor:
+      x: 0.0
+      y: -10.0

@@ -18,7 +18,7 @@ class DiagramsTest {
         Polynomial(0F, 0F, 4F)
     )
 
-    private val structureSample = Structure("My structure", mutableListOf(nodeSampleA, nodeSampleB, nodeSampleC, nodeSampleD))
+    private val structureSample = Structure("My structure", hashSetOf(nodeSampleA, nodeSampleB, nodeSampleC, nodeSampleD))
     private val sectionSamples = Diagrams.getSections(structureSample, beamSample)
 
 

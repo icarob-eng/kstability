@@ -67,9 +67,13 @@ object Stabilization {
      * @param supportB First gender support
      * @param resultForce Structure's resultant force, calculated by `getResultForce()`
      * @param resultMomentum Structure's resultant force, calculated by `getResultMomentum()`
+     *
+     * @suppress UnnecessaryVariable For clarity in the equations.
+     *
      * @see getResultForce
      * @see getResultMomentum
      */
+    @Suppress("UnnecessaryVariable")
     fun getReactionsAB(supportA: Support, supportB: Support,
                        resultForce: Vector, resultMomentum: Float): Pair<Vector, Vector> {
         val ra = supportA.node.pos
@@ -94,23 +98,35 @@ object Stabilization {
         return Pair(-fa, -fb)
     }
 
-    @Deprecated("This function will be substituted by v2.x",
-        ReplaceWith("Stabilization.getStabilized(structure)")
-    )
-    fun stabilize(structure: Structure) {
+    @Deprecated("This function will be substituted by v2.x", ReplaceWith("Structure.stabilizeStructure()"))
+    fun stabilizeStructure(structure: Structure) = structure.stabilize()
+
+    /**
+     * Makes the structure stable by adding loads or momenta to the adequate supports.
+     *
+     * @throws IllegalArgumentException thrown if it doesn't have an algorithm to solve de structure.
+     *
+     * @see isIsostatic
+     * @see getResultForce
+     * @see getResultMomentum
+     * @see getReactionsAB
+     */
+    @Throws(IllegalArgumentException::class)
+    fun Structure.stabilize() {
         val exception = IllegalArgumentException("A estrutura não é isostática")
 
-        if (! isIsostatic(structure))
+        if (! isIsostatic(this))
             throw exception
-        val resultMomentum = getResultMomentum(structure)
-        val resultForce = getResultForce(structure)
+        val resultMomentum = getResultMomentum(this)
+        val resultForce = getResultForce(this)
 
-        val supports = structure.getSupports()
+        val supports = getSupports()
 
         if (supports.size == 1 && supports[0].gender == Support.Gender.THIRD) {
-            structure.getSupports()[0].node.momentum -= getResultMomentum(structure,
-                structure.getSupports()[0].node.pos)
-            PointLoad(structure.getSupports()[0].node, -resultForce)
+            getSupports()[0].node.momentum -= getResultMomentum(this,
+                getSupports()[0].node.pos)
+            getSupports()[0].node.isMomentReaction = true
+            PointLoad(getSupports()[0].node, -resultForce, true)
         } else {
             if (supports.size != 2)
                 throw exception
@@ -122,8 +138,8 @@ object Stabilization {
                         resultForce, resultMomentum
                     )
 
-                    PointLoad(structure.getSupports()[0].node, reactionA)
-                    PointLoad(structure.getSupports()[1].node, reactionB)
+                    PointLoad(getSupports()[0].node, reactionA, true)
+                    PointLoad(getSupports()[1].node, reactionB, true)
                 }
                 supports[1].gender -> {  // supports[1] = a
                     val (reactionA, reactionB) = getReactionsAB(
@@ -131,31 +147,11 @@ object Stabilization {
                         resultForce, resultMomentum
                     )
 
-                    PointLoad(structure.getSupports()[0].node, reactionB)
-                    PointLoad(structure.getSupports()[1].node, reactionA)
+                    PointLoad(getSupports()[0].node, reactionB, true)
+                    PointLoad(getSupports()[1].node, reactionA, true)
                 }
                 else -> throw exception
             }
         }
-    }
-
-    /**
-     * Returns a copy of the passed structure that is stable, by adding loads or momenta to the adequate supports.
-     *
-     * @throws IllegalArgumentException thrown if it doesn't have an algorithm to solve de structure.
-     * @param structure Base structure to be stabilized
-     * @return Stabilized copy of the structure
-     * @see isIsostatic
-     * @see getResultForce
-     * @see getResultMomentum
-     * @see getReactionsAB
-     */
-    @Throws(IllegalArgumentException::class)
-    fun getStabilized(structure: Structure): Structure {
-        val structureCopy = structure.deepCopy()
-
-        stabilize(structureCopy)
-
-        return  structureCopy
     }
 }

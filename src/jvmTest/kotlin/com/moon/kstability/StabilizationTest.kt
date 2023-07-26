@@ -1,5 +1,6 @@
 package com.moon.kstability
 
+import com.moon.kstability.Stabilization.stabilize
 import com.moon.kstability.Vector.Consts
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
@@ -16,7 +17,7 @@ class StabilizationTest {
     private val supportSampleA = Support(nodeSampleA, Support.Gender.SECOND, Consts.VERTICAL)
     private val supportSampleB = Support(nodeSampleD, Support.Gender.FIRST, Consts.VERTICAL)
 
-    private val structureSample = Structure("My structure", mutableListOf(nodeSampleA, nodeSampleB, nodeSampleC, nodeSampleD))
+    private val structureSample = Structure("My structure", hashSetOf(nodeSampleA, nodeSampleB, nodeSampleC, nodeSampleD))
 
     /**
      * Structure Sample expectations:
@@ -33,7 +34,7 @@ class StabilizationTest {
     private val expectedReactionA = Vector(0.0f, 17.5f)
     private val expectedReactionD = Vector(0.0f, 12.5f)
 
-    private val sampleB = Structure("Basic Sample B", mutableListOf(
+    private val sampleB = Structure("Basic Sample B", hashSetOf(
         Node("A", Vector(0,3)).apply {
             Support(this, Support.Gender.FIRST, Consts.VERTICAL)
         },
@@ -44,7 +45,7 @@ class StabilizationTest {
             Support(this, Support.Gender.SECOND, Consts.VERTICAL)
         }
     )).also {
-        Beam(it.nodes.first(), it.nodes.last())
+        Beam(it["A"]!!, it["C"]!!)
     }
 
 
@@ -95,7 +96,7 @@ class StabilizationTest {
             expectedReactionD
         )
 
-        Stabilization.stabilize(structureSample)
+        structureSample.stabilize()
         val data = Pair(
             structureSample.getSupports()[0].node.pointLoads[0].vector,
             structureSample.getSupports()[1].node.pointLoads[0].vector
@@ -135,7 +136,7 @@ class StabilizationTest {
     fun resultForceStabilizedTest() {
         val expected = Vector(0f, 0f)
 
-        Stabilization.stabilize(structureSample)
+        structureSample.stabilize()
 
         assertEquals(expected, Stabilization.getResultForce(structureSample))
     }
@@ -144,7 +145,7 @@ class StabilizationTest {
     fun resultMomentumStabilizedTest() {
         val expected = 0F
 
-        Stabilization.stabilize(structureSample)
+        structureSample.stabilize()
 
         assertEquals(expected, Stabilization.getResultMomentum(structureSample))
     }
@@ -164,23 +165,23 @@ class StabilizationTest {
 
     @Test
     fun isStabilizationStableTest() {
-        Stabilization.stabilize(structureSample)
+        structureSample.stabilize()
         assertTrue(Stabilization.isStable(structureSample))
     }
 
     @Test
     fun isStableSampleBTest() {
-        Stabilization.stabilize(sampleB)
+        sampleB.stabilize()
         assertTrue(Stabilization.isStable(sampleB))
     }
 
     @Test
     fun keepStabilityTest() {
-        Stabilization.stabilize(structureSample)
-        Stabilization.stabilize(structureSample)
-        Stabilization.stabilize(structureSample)
-        Stabilization.stabilize(structureSample)
-        Stabilization.stabilize(structureSample)
+        structureSample.stabilize()
+        structureSample.stabilize()
+        structureSample.stabilize()
+        structureSample.stabilize()
+        structureSample.stabilize()
         assertTrue(Stabilization.isStable(structureSample))
     }
 
@@ -193,10 +194,10 @@ class StabilizationTest {
         Support(nodeSampleB1, Support.Gender.SECOND, Consts.HORIZONTAL)
 
         val structureB = Structure("Fixed support structure",
-            mutableListOf(nodeSampleA1, nodeSampleB1)
+            hashSetOf(nodeSampleA1, nodeSampleB1)
         )
 
-        assertThrows(IllegalArgumentException::class.java) { Stabilization.stabilize(structureB) }
+        assertThrows(IllegalArgumentException::class.java) { structureB.stabilize() }
     }
 
     @Test
@@ -208,10 +209,10 @@ class StabilizationTest {
         Support(nodeSampleB1, Support.Gender.THIRD, Consts.HORIZONTAL)
 
         val structureB = Structure("Fixed support structure",
-            mutableListOf(nodeSampleA1, nodeSampleB1)
+            hashSetOf(nodeSampleA1, nodeSampleB1)
         )
 
-        Stabilization.stabilize(structureB)
+        structureB.stabilize()
 
         val expectedResultForce = Vector(0f, 0f)
         val expectedResultMomenta = 0F

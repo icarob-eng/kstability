@@ -193,6 +193,7 @@ object Diagrams {
                 if (i >= 0) polynomials[i](x) else 0F  // avoid i = -1 for duplicate 0.0
             )
         }
+        yAxis[yAxis.size-1] = 0F
         return yAxis
     }
 

@@ -15,7 +15,7 @@ class StructureModelTest {
     private val supportSampleA = Support(nodeSampleA, Support.Gender.SECOND, Vector(0F, 5F))
     private val supportSampleB = Support(nodeSampleD, Support.Gender.FIRST, Consts.VERTICAL)
 
-    private val structureSample = Structure("My structure", mutableListOf(nodeSampleA, nodeSampleB, nodeSampleC, nodeSampleD))
+    private val structureSample = Structure("My structure", hashSetOf(nodeSampleA, nodeSampleB, nodeSampleC, nodeSampleD))
 
     @Test
     fun supportDirection() {
