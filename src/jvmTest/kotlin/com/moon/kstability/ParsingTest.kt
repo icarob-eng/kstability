@@ -14,10 +14,26 @@ class ParsingTest {
         Node("C", Vector(0, 2)).apply { support = Support(this, Gender.SECOND, Consts.VERTICAL) }
     )).also { Beam(it["A"]!!, it["C"]!!) }
 
+    private val pathA = "src/jvmTest/kotlin/com/moon/kstability/sampleA.yaml"
+    private val pathB = "src/jvmTest/kotlin/com/moon/kstability/sampleB.yaml"
+
     @Test
     fun parseFromYamlStructureTest() {
-        assertEquals(structureSample, Parsers.parseYamlString(
-            File("src/jvmTest/kotlin/com/moon/kstability/sample.yaml").readText()
+        assertEquals(structureSample, Parsing.parseYamlString(
+            File(pathA).readText()
         ))
+    }
+
+    @Test
+    fun parseAndSerializeTest() {
+        assertEquals(structureSample, Parsing.parseYamlString(Parsing.serializeStructureToYaml(structureSample)))
+    }
+
+    @Test
+    fun readAndWriteFileTest() {
+        val f = File(pathB)
+        f.writeText(Parsing.serializeStructureToYaml(structureSample))
+        val structureResult = Parsing.parseYamlString(f.readText())
+        assertEquals(structureSample, structureResult)
     }
 }
