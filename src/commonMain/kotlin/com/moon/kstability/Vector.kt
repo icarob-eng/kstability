@@ -7,31 +7,17 @@ import kotlin.math.sqrt
  * All relevant methods are documented in `memoria_de_calculo.md`. The class also have many overloads to convert
  * Ints and Doubles to Floats.
  */
-data class Vector(val x: Float, val y: Float, val name:String="") {
+data class Vector(val x: Float, val y: Float) {
     companion object Consts {
         val HORIZONTAL = Vector(1, 0)
         val VERTICAL = Vector(0, 1)
     }
 
-    constructor(x: Number, y: Number,name: String="") : this(x.toFloat(), y.toFloat(), name)
+    constructor(x: Number, y: Number) : this(x.toFloat(), y.toFloat())
 
-    constructor(array: Array<Number>, name:String="") : this(array[0].toFloat(),array[1].toFloat(), name)
+    constructor(array: Array<Number>) : this(array[0].toFloat(),array[1].toFloat())
 
-    constructor(array: ArrayList<Number>, name:String="") : this(array[0].toFloat(),array[1].toFloat(), name)
-
-    constructor(direction: String, name:String=""):this(
-        when (direction) {
-            "vertical" -> 0f
-            "horizontal" -> 1f
-            else -> throw IllegalArgumentException("Invalid direction")
-        },
-        when (direction) {
-            "vertical" -> 1f
-            "horizontal" -> 0f
-            else -> throw IllegalArgumentException("Invalid direction")
-        },
-        name
-    )
+    constructor(array: ArrayList<Number>) : this(array[0].toFloat(),array[1].toFloat())
 
     operator fun plus(other: Vector) = Vector(this.x + other.x, this.y + other.y)
     operator fun minus(other: Vector) = Vector(this.x - other.x, this.y - other.y)
