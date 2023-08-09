@@ -3,7 +3,7 @@ package com.moon.kstability.parsing
 import com.moon.kstability.*
 
 object ModelSerializers {
-    private val s = StringsPtBr
+    private val s = StringsPtBrObject
 
     fun Vector.serialize(): Map<String, Float> = mapOf(s.x to x, s.y to y)
 

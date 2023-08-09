@@ -3,7 +3,7 @@ package com.moon.kstability.parsing
 import com.moon.kstability.*
 
 object ModelParsers {
-    private val s = StringsPtBr
+    private val s = StringsPtBrObject
 
     /**
      * Parses the many possible syntax for a `Vector`. See parsing documentation for possible syntax.
