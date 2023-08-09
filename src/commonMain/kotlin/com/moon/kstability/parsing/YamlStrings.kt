@@ -91,13 +91,47 @@ class StringsPtBr: YamlStrings {
     override val vector ="vetor"
 
     // exceptions
-    override val invalidVector = "Invalid vector. Value = {}"
+    override val invalidVector = "Vetor inválido. Texto inserido = {}"
+    override val invalidNodeRef = "Nó referenciado \"{}\" não foi inserido na estrutura."
+    override val invalidSupportSyntax = "Sintaxe de Suporte inválida. Texto inserido = {}"
+    override val invalidSupportGender = "Gênero de suporte invalido. Esperado: 1, 2 ou 3. Inserido = {}"
+    override val invalidBeamList = "Quantidade inválida de nós em uma barra. Texto inserido = {}"
+    override val invalidLoadVectorSyntax = "Sintaxe de vetor de carga inválida. Texto inserido = {}"
+    override val invalidLoadNodesSyntax = "Sintaxe para carga inválida, \"$node\" ou \"$nodes\" esperados."
+    override val invalidLoadSyntax = "Sintaxe para carga inválida. Texto inserido = {}"
+    override val invalidSection = "Seção de {} inválida."
+}
+
+class StringEn: YamlStrings {
+    // consts
+    override val vertical = "vertical"
+    override val horizontal = "horizontal"
+
+    // sections
+    override val structureSection = "structure"
+    override val supportSection = "supports"
+    override val loadsSection = "loads"
+    override val nodesSection = "nodes"
+    override val beamsSection = "beams"
+
+    // attributes
+    override val x = "x"
+    override val y = "y"
+    override val direction = "direction"
+    override val gender = "gender"
+    override val node = "node"
+    override val nodes = "nodes"
+    override val module = "module"
+    override val vector ="vector"
+
+    // exceptions
+    override val invalidVector = "Invalid vector. Inserted value = {}"
     override val invalidNodeRef = "Referenced node \"{}\" not in the structure."
-    override val invalidSupportSyntax = "Invalid support syntax. Value = {}"
-    override val invalidSupportGender = "Invalid support gender. Value = {}"
-    override val invalidBeamList = "Invalid node quantity for a beam. Value = {}"
-    override val invalidLoadVectorSyntax = "Invalid load vector syntax. Value = {}"
+    override val invalidSupportSyntax = "Invalid support syntax. Inserted value = {}"
+    override val invalidSupportGender = "Invalid support gender. Expected: 1, 2 or 3. Inserted = {}"
+    override val invalidBeamList = "Invalid node quantity for a beam. Inserted value = {}"
+    override val invalidLoadVectorSyntax = "Invalid load vector syntax. Inserted value = {}"
     override val invalidLoadNodesSyntax = "Invalid load syntax, $node or $nodes expected."
-    override val invalidLoadSyntax = "Invalid load syntax. Value = {}"
+    override val invalidLoadSyntax = "Invalid load syntax. Inserted value = {}"
     override val invalidSection = "Invalid {} section."
 }
