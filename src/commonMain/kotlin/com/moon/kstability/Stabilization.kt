@@ -123,9 +123,11 @@ object Stabilization {
         val supports = getSupports()
 
         if (supports.size == 1 && supports[0].gender == Support.Gender.THIRD) {
-            getSupports()[0].node.momentum -= getResultMomentum(this,
+            val momentumAtSupport = getResultMomentum(this,
                 getSupports()[0].node.pos)
-            getSupports()[0].node.isMomentReaction = true
+
+            getSupports()[0].node.momentum -= momentumAtSupport
+            getSupports()[0].node.reactionMomentum = - momentumAtSupport
             PointLoad(getSupports()[0].node, -resultForce, true)
         } else {
             if (supports.size != 2)
