@@ -19,10 +19,10 @@ object ModelSerializers {
 
     fun Node.serialize(lang: YamlStrings): Pair<String, Map<String, Float>> = Pair(name, pos.serialize(lang))
 
-    fun PointLoad.serialize(lang: YamlStrings): Map<String, Any> = mapOf(
+    fun PointLoad.serialize(lang: YamlStrings): Map<String, Any>? = if(!isReaction) mapOf(
         lang.node to node.name,
         lang.vector to vector.serialize(lang)
-    )
+    ) else null
 
     fun DistributedLoad.serialize(lang: YamlStrings): Map<String, Any> = mapOf(
         lang.nodes to listOf(node1.name, node2.name),
