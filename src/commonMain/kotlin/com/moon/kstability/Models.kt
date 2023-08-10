@@ -7,8 +7,8 @@ package com.moon.kstability
  * @property name An (preferably) unique point name.
  * @property pos The node's position.
  * @property momentum The resultant bending moment applied at the node, as a Float.
- * @property isMomentReaction Should be overwritten only by the framework and flags if the bending moment is inserted
- * as a reaction or not.
+ * @property reactionMomentum Should be overwritten only by the framework and represents the intensity of the reaction
+ * momentum (inserted momentum = momentum - reaction momentum)
  * @property beams List of beams that start or end at the node. The beams also have a circular reference to the node.
  * @property pointLoads List of point loads applied at the node. The loads also have a circular reference to the node.
  * @property distributedLoads List of distributed loads that start or end at the node.
@@ -24,7 +24,7 @@ package com.moon.kstability
 data class Node(var name: String, val pos: Vector) {
     var support: Support? = null  // only one support by node
     var momentum = 0F
-    var isMomentReaction = false
+    var reactionMomentum = 0F
     val beams: HashSet<Beam> = hashSetOf()
     val pointLoads: MutableList<PointLoad> = mutableListOf()
     val distributedLoads: MutableList<DistributedLoad> = mutableListOf()

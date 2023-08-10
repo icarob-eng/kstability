@@ -115,22 +115,23 @@ object Stabilization {
     fun Structure.stabilize() {
         val exception = IllegalArgumentException("A estrutura não é isostática")
 
-        if (! isIsostatic(this))
-            throw exception
+        if (isStable(this)) return
+        if (! isIsostatic(this)) throw exception
+
         val resultMomentum = getResultMomentum(this)
         val resultForce = getResultForce(this)
 
         val supports = getSupports()
 
         if (supports.size == 1 && supports[0].gender == Support.Gender.THIRD) {
-            getSupports()[0].node.momentum -= getResultMomentum(this,
+            val momentumAtSupport = getResultMomentum(this,
                 getSupports()[0].node.pos)
-            getSupports()[0].node.isMomentReaction = true
-            PointLoad(getSupports()[0].node, -resultForce, true)
-        } else {
-            if (supports.size != 2)
-                throw exception
 
+            getSupports()[0].node.momentum -= momentumAtSupport
+            getSupports()[0].node.reactionMomentum = - momentumAtSupport
+            PointLoad(getSupports()[0].node, -resultForce, true)
+
+        } else if (supports.size == 2) {
             when (Support.Gender.SECOND){
                 supports[0].gender -> {  // supports[0] = a
                     val (reactionA, reactionB) = getReactionsAB(
@@ -152,6 +153,6 @@ object Stabilization {
                 }
                 else -> throw exception
             }
-        }
+        } else throw exception
     }
 }
