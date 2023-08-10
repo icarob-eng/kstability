@@ -16,16 +16,17 @@ object ModelParsers {
     fun parseVector(arg: Any?, lang: YamlStrings): Vector {
         try {
             return if (arg is List<*> && arg.all { it is Number } && arg.size == 2) {
-                // case [0,1]
+                // syntax [0,1]
                 Vector(arg[0] as Number, arg[1] as Number)
             } else if (arg is Map<*, *> && arg.keys.map { (it as? String)?.lowercase() }.toSet() == setOf(lang.x, lang.y)) {
-                // case x: 0, y: 1
-                Vector(arg[lang.x] as Number, arg[lang.y] as Number)
+                val map = arg.map { (key, value) -> (key as String).lowercase() to value}.toMap()
+                // syntax x: 0, y: 1
+                Vector(map[lang.x] as Number, map[lang.y] as Number)
             } else if ((arg as? String)?.lowercase() == lang.vertical) {
-                // case vertical
+                // syntax vertical
                 Vector.VERTICAL
             } else if ((arg as? String)?.lowercase() == lang.horizontal) {
-                // case horizontal
+                // syntax horizontal
                 Vector.HORIZONTAL
             } else {
                 throw ClassCastException()
@@ -79,18 +80,20 @@ object ModelParsers {
         arg.entries.map { (nodeStr, supportMap) ->
             val node = findNotNullNode(nodeStr, lang)
 
-            if (supportMap.keys.map { key -> key.lowercase() }.toSet() != setOf(lang.gender, lang.direction))
+            val map = supportMap.map { (key, value) -> key.lowercase() to value }.toMap()
+
+            if (map.keys != setOf(lang.gender, lang.direction))
                 throw IllegalArgumentException(lang.invalidSupportSyntax.format(supportMap))
 
             node.support = Support(
                 node,
-                when(supportMap[lang.gender]) {
+                when(map[lang.gender]) {
                     1 -> Support.Gender.FIRST
                     2 -> Support.Gender.SECOND
                     3 -> Support.Gender.THIRD
                     else -> throw IllegalArgumentException(lang.invalidSupportGender.format(supportMap[lang.gender]))
                 },
-                parseVector(supportMap[lang.direction], lang)
+                parseVector(map[lang.direction], lang)
                 )
         }
     }
@@ -129,25 +132,32 @@ object ModelParsers {
      */
     @Throws(IllegalArgumentException::class)
     fun Structure.parseLoadSection(arg: Map<String, Map<String, Any>>, lang: YamlStrings) {
-        arg.map { (_, map) ->
-            val keys = map.keys.map { key -> key.lowercase() }.toSet()
+        arg.map { (_, loadMap) ->  // load "name" is not used
+            val map = loadMap.map { (key, value) -> key.lowercase() to value }.toMap()
+            val keys = map.keys.toSet()
 
-            val vector = if(lang.vector in keys) parseVector(map[lang.vector], lang) else
-                if (lang.direction in keys && lang.module in keys) parseVector(map[lang.direction], lang).normalize() * map[lang.module] as Number
-                else throw IllegalArgumentException(lang.invalidLoadVectorSyntax.format(map))
+            val vector =
+                if(lang.vector in keys)
+                    parseVector(map[lang.vector], lang)
+                else if (lang.direction in keys && lang.module in keys)
+                    parseVector(map[lang.direction], lang).normalize() * map[lang.module] as Number
+                else if (lang.vector !in keys && lang.module in keys)
+                    null
+                else
+                    throw IllegalArgumentException(lang.invalidLoadVectorSyntax.format(map))
+
 
             val nodeKey = if (lang.node in keys) lang.node else if (lang.nodes in keys) lang.node
             else throw IllegalArgumentException(lang.invalidLoadNodesSyntax)
 
-
             val nodes = map[nodeKey]
 
-            if (nodes is String)
+            if (nodes is String && vector != null)
                 PointLoad(findNotNullNode(nodes, lang), vector)
-
-            else if (nodes is List<*> && nodes.all { it is String } && nodes.size == 2)
+            else if (nodes is String && vector == null)
+                findNotNullNode(nodes, lang).momentum = map[lang.module] as Float
+            else if (nodes is List<*> && nodes.all { it is String } && nodes.size == 2 && vector != null)
                 DistributedLoad(findNotNullNode(nodes[0] as String, lang), findNotNullNode(nodes[1] as String, lang), vector)
-
             else
                 throw IllegalArgumentException(lang.invalidLoadSyntax.format(map))
         }
@@ -172,21 +182,23 @@ object ModelParsers {
     @Suppress("UNCHECKED_CAST")
     @Throws(IllegalArgumentException::class)
     fun parseSections(arg: Map<String, Any>, lang: YamlStrings): Structure {
+        val map = arg.map { (key, value) -> key.lowercase() to value}.toMap()
 
         val structure = Structure(
-            arg[lang.structureSection] as? String?: throw IllegalArgumentException(lang.invalidSection.format("structure"))
+            map[lang.structureSection] as? String?:
+            throw IllegalArgumentException(lang.invalidSection.format("structure"))
         )
 
-        try { structure.parseNodeSection(arg[lang.nodesSection] as Map<String, Any>, lang) }
+        try { structure.parseNodeSection(map[lang.nodesSection] as Map<String, Any>, lang) }
         catch (e: ClassCastException) { throw IllegalArgumentException(lang.invalidSection.format(lang.nodesSection)) }
 
-        try { structure.parseSupportSection(arg[lang.supportSection] as Map<String, Map<String, Any>>, lang) }
+        try { structure.parseSupportSection(map[lang.supportSection] as Map<String, Map<String, Any>>, lang) }
         catch (e: ClassCastException) { throw IllegalArgumentException(lang.invalidSection.format(lang.supportSection)) }
 
-        try { structure.parseBeamSection(arg[lang.beamsSection] as List<List<String>>, lang)}
+        try { structure.parseBeamSection(map[lang.beamsSection] as List<List<String>>, lang)}
         catch (e: ClassCastException) { throw IllegalArgumentException(lang.invalidSection.format(lang.beamsSection)) }
 
-        try { structure.parseLoadSection(arg[lang.loadsSection] as Map<String, Map<String, Any>>, lang) }
+        try { structure.parseLoadSection(map[lang.loadsSection] as Map<String, Map<String, Any>>, lang) }
         catch (e: ClassCastException) { throw IllegalArgumentException(lang.invalidSection.format(lang.loadsSection)) }
 
         return structure
