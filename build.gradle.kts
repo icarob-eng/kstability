@@ -3,8 +3,8 @@ plugins {
     `maven-publish`
 }
 
-group = "me.icaro"
-version = "1.0-SNAPSHOT"
+group = "com.moon.kstability"
+version = "1.3.0"
 
 repositories {
     mavenCentral()
@@ -63,7 +63,7 @@ afterEvaluate {
             create<MavenPublication>("maven"){
                 groupId = "com.moon.kstability"
                 artifactId = "kstability"
-                version = "1.2.0"
+                version = "1.3.0"
 
                 from(components["kotlin"])
             }

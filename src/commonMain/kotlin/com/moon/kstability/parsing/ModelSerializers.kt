@@ -19,6 +19,11 @@ object ModelSerializers {
 
     fun Node.serialize(lang: YamlStrings): Pair<String, Map<String, Float>> = Pair(name, pos.serialize(lang))
 
+    fun Node.serializeMomentum(lang: YamlStrings): Map<String, Any>? = if (momentum != reactionMomentum) mapOf(
+        lang.node to name,
+        lang.module to momentum - reactionMomentum
+    ) else null
+
     fun PointLoad.serialize(lang: YamlStrings): Map<String, Any>? = if(!isReaction) mapOf(
         lang.node to node.name,
         lang.vector to vector.serialize(lang)
@@ -34,7 +39,11 @@ object ModelSerializers {
         lang.nodesSection to nodes.associate { it.serialize(lang) },
         lang.supportSection to getSupports().associate { it.serialize(lang) },
         lang.beamsSection to getBeams().map { it.serialize() },
-        lang.loadsSection to (getPointLoads().map { it.serialize(lang) } + getDistributedLoads().map { it.serialize(lang) })
+        lang.loadsSection to (
+                getPointLoads().mapNotNull { it.serialize(lang) }
+                        + getDistributedLoads().map { it.serialize(lang) }
+                        + nodes.mapNotNull { it.serializeMomentum(lang) }
+                )
             .mapIndexed { i, load -> Pair("F$i", load) }.toMap()
     )
 }
